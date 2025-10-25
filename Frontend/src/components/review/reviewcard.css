@@ -1,0 +1,32 @@
+.review-card {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 20px;
+    box-shadow: 2px 1px 10px rgba(0, 0, 0, 0.5);
+    border: 2px solid black;
+    margin-bottom: 20px;
+  }
+  
+  .user-name-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #C0D6DF;
+    padding: 8px 15px;
+    border-radius: 10px;
+    color: black;
+    font-weight: bold;
+  }
+  
+  .stars {
+    color: gold;
+    font-size: 1.5rem;
+    margin-top: 10px;
+    margin-left: 0.8rem;
+  }
+  
+  .iconU {
+    height: 40px;
+    width: 40px;
+  }
+  

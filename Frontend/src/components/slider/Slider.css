@@ -1,0 +1,293 @@
+.slider {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 80vw; /* Cambia de un tamaño fijo a un porcentaje */
+  max-width: 325px; /* Mantén un límite máximo */
+  height: 100%;
+  background-color: #FFFFFF;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  background-image: url('../../assets/backgrounds/backgroundLightTheme.jpg');
+  background-size: cover; /* Cambia contain por cover para evitar espacios vacíos */
+  background-position: center;
+  transition: background-color 0.3s, transform 0.3s ease-in-out;
+  border: 1px solid black; 
+}
+
+
+/* Para el tema oscuro */
+.slider.dark-theme {
+  background-color: #333;
+  color: white;
+}
+
+/* Sección superior con el fondo azul */
+.slider-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #3D405B;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+/* Flecha para cerrar */
+.slider-flecha {
+  width: 45px;
+  cursor: pointer;
+  position: absolute;
+  left: 16px;
+}
+
+/* Logos centrados */
+.slider-logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slider-logo {
+  height: 68px;
+  cursor: pointer;
+}
+
+/* Contenido en columna */
+.slider-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  overflow-y: auto; /* Permite scroll si el contenido es demasiado alto */
+  padding: 2rem;
+}
+
+
+/* Estilos para los botones */
+.slider-button {
+  width: 100rem;
+  max-width: 200px;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 15px;
+  color: white;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  position: relative;
+  height: 60px;
+  font-size: 1.2rem;
+  margin-right: 0rem;
+  background-color: #3D405B;
+
+}
+
+/* Botón de "Iniciar sesión" */
+.login-button {
+  background-color: #3D405B;
+  order: -1;
+  /* Mueve este botón al inicio */
+}
+
+/* Botón de "Registrarse" */
+.register-button {
+  background-color: #3D405B;
+}
+
+/* Estilos para el switch de tema */
+.theme-switch {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+}
+
+.switch-label {
+  font-size: 1.2rem;
+  font-weight: 630;
+  color: black;
+  margin-right: 0.4rem;
+}
+
+
+/* Estilos del switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider-round {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0rem;
+  right: 0;
+  bottom: 0;
+  background-color: rgb(15, 182, 238);
+  transition: 0.4s;
+  border-radius: 50px;
+}
+
+.switch input:checked + .slider-round {
+  background-color: #414141;
+}
+
+.slider-round:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  border-radius: 50px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+}
+
+.switch input:checked + .slider-round:before {
+  transform: translateX(21px);
+}
+
+/* Estilos para el selector de idioma */
+.language-selector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.select-label {
+  font-size: 1rem;
+  width: 160px;
+  height: 25px;
+  text-align: center;
+  margin: 0rem;
+  background-color: #3D405B;
+}
+
+@media (max-width: 768px){
+  .select-label{
+    width: 145px;
+  }
+}
+
+.language-select {
+  padding: 0.5rem;
+  font-size: 1rem;
+  height: 2.3rem;
+  background-color: white;
+  color: black;
+}
+
+/* Fondo oscuro detrás del slider */
+.slider-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999; /* Debe estar detrás del slider */
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+/* Fondo oscuro visible */
+.slider-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Transición suave del slider */
+.slider {
+  transform: translateX(100%);
+  transition: transform 0.3s ease-in-out, background-color 0.3s;
+}
+
+.slider.open {
+  transform: translateX(0);
+}
+
+
+@media (max-width: 426px) {
+  .slider-content {
+    gap: 0.5rem;
+    padding: 2rem;
+    margin-top: 4rem;
+  }
+  .select-label{
+    width: 112px;
+  }
+}
+
+@media (max-width: 376px) {
+  .select-label{
+    width: 100px;
+  }
+  .slider-link {
+    width: 100%;
+  }
+}
+
+.extra-buttons {
+  display: flex;
+  flex-direction: column; /* Coloca los botones uno debajo del otro */
+  align-items: center;
+  gap: 1rem; /* Espaciado entre botones */
+  margin-top: 1.5rem; /* Espacio desde el selector de idioma */
+  
+}
+
+
+.logout-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-contentout {
+  background-color: #3D405B;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.modal-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-button.confirm {
+  background-color: #4caf50;
+  color: #fff;
+}
+
+.modal-button.cancel {
+  background-color: #f44336;
+  color: #fff;
+}

@@ -1,0 +1,68 @@
+/* Card Styles */
+.message-card {
+    background-color: #C0D6DF;
+    color: white;
+    border-radius: 8px;
+    padding-bottom: 10px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin: 1rem 0;
+    width: 300px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border: 1px solid black; 
+
+}
+
+.message-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.card-header {
+    border-radius: 8px 8px 0px 0px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    justify-content: center;
+    background-color: #588B8B;
+        border-bottom: 1px solid black; 
+
+}
+
+.card-body {
+    font-size: 16px;
+    font-weight: 500;
+    background-color: #C0D6DF;
+    color: black;
+    
+}
+.card-body p {
+    overflow-wrap: break-word; /* Rompe palabras largas para que no se desborden */
+}
+.user-div{
+    display: flex;
+}
+.user-div img {
+    height: 4rem;
+    margin: 1rem;
+}
+.user-div h4 {
+    margin-top: 2rem;
+}
+.titulonegro {
+    color: black;
+}
+
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

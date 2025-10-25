@@ -1,0 +1,429 @@
+{
+  "local": [
+    {
+      "id": "1",
+      "nombre": "Delicias Sosa",
+      "categoria": "desayunos",
+      "fotos": [
+        "/assets/locales/ejemplolocal2.jpg",
+        "/assets/locales/ejemplolocal4.png"
+      ],
+      "coords": [
+        13.6788,
+        -89.237816
+      ],
+      "description": "El lugar perfecto para disfrutar de los mejores platos de la universidad",
+      "correo": "contacto@deliciassosa.com",
+      "telefono": "+503 2222-1111",
+      "horario": "Lun - Vie, 7:00 AM - 4:00 PM",
+      "direccion": "Av. Universitaria #123",
+      "reseñas": [
+        {
+          "usuario": "Ana Pérez",
+          "texto": "Excelente lugar para desayunar, el café es muy bueno.",
+          "estrellas": 5
+        },
+        {
+          "usuario": "Carlos López",
+          "texto": "La atención fue rápida, pero podrían mejorar el menú.",
+          "estrellas": 4
+        },
+        {
+          "usuario": "Luis Sánchez",
+          "texto": "Los almuerzos aquí son caseros y muy sabrosos.",
+          "estrellas": 5
+        },
+        {
+          "usuario": "María Martínez",
+          "texto": "Buena relación calidad-precio, aunque hay días con mucha fila.",
+          "estrellas": 4
+        },
+        {
+          "usuario": "Jorge Morales",
+          "texto": "Sabor increíble y auténtico, recomendado para los amantes de la comida china.",
+          "estrellas": 5
+        },
+        {
+          "usuario": "Elena Díaz",
+          "texto": "Buena comida, pero el ambiente podría mejorar.",
+          "estrellas": 3
+        },
+        {
+          "usuario": "michi",
+          "texto": "lol",
+          "estrellas": 5
+        },
+        {
+          "usuario": "dani ",
+          "texto": "SI FUNCIONA AAAAAA",
+          "estrellas": 3
+        },
+        {
+          "usuario": "michiifrisk",
+          "texto": "muy gay ",
+          "estrellas": 4
+        },
+        {
+          "usuario": "Elias",
+          "texto": "que rico se veia sosa",
+          "estrellas": 5
+        },
+        {
+          "usuario": "Eliasgay",
+          "texto": "p",
+          "estrellas": 2
+        },
+        {
+          "usuario": "Astrid",
+          "texto": "esta bien bunito, van a pasar web bien :D",
+          "estrellas": 5
+        }
+      ],
+      "platos": [
+        {
+          "nombre": "Tostadas Francesas",
+          "precio": 3.5,
+          "imagen": "/assets/platos/plato.jpg"
+        },
+        {
+          "nombre": "Huevos Revueltos",
+          "precio": 2.75,
+          "imagen": "/assets/platos/plato1.jpg"
+        },
+        {
+          "nombre": "Arroz con Pollo",
+          "precio": 4,
+          "imagen": "/assets/platos/plato2.jpg"
+        },
+        {
+          "nombre": "Tacos de Carne Asada",
+          "precio": 3.5,
+          "imagen": "/assets/platos/plato3.jpg"
+        },
+        {
+          "nombre": "Chow Mein",
+          "precio": 4.5,
+          "imagen": "/assets/platos/plato4.jpg"
+        },
+        {
+          "nombre": "Rollos de Primavera",
+          "precio": 3,
+          "imagen": "/assets/platos/plato5.jpg"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "nombre": "Mamita Sosa",
+      "categoria": "almuerzos",
+      "fotos": [
+        "/assets/locales/ejemplolocal1.jpg",
+        "/assets/locales/ejemplolocal7.jpg"
+      ],
+      "coords": [
+        13.678803,
+        -89.238089
+      ],
+      "description": "El sabor auténtico de mamita sosa",
+      "correo": "info@mamitakitchen.com",
+      "telefono": "+503 2222-2222",
+      "horario": "Lun - Vie, 11:00 AM - 6:00 PM",
+      "direccion": "Calle Principal #456",
+      "reseñas": [
+        {
+          "usuario": "Luis Sánchez",
+          "texto": "Los almuerzos aquí son caseros y muy sabrosos.",
+          "estrellas": 5
+        },
+        {
+          "usuario": "María Martínez",
+          "texto": "Buena relación calidad-precio, aunque hay días con mucha fila.",
+          "estrellas": 4
+        },
+        {
+          "usuario": "astrid",
+          "texto": "hellooooo vanvan ",
+          "estrellas": 5
+        }
+      ],
+      "platos": [
+        {
+          "nombre": "Arroz con Pollo",
+          "precio": 4,
+          "imagen": "/assets/platos/plato2.jpg"
+        },
+        {
+          "nombre": "Tacos de Carne Asada",
+          "precio": 3.5,
+          "imagen": "/assets/platos/plato3.jpg"
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "nombre": "El Rincon de Sosa",
+      "categoria": "comida china",
+      "fotos": [
+        "/assets/locales/ejemplolocal.jpg",
+        "/assets/locales/ejemplolocal9.jpg"
+      ],
+      "coords": [
+        13.67874,
+        -89.237686
+      ],
+      "description": "El rincón del sabor donde todo te hará decir AAA",
+      "correo": "contacto@rinconsosa.com",
+      "telefono": "+503 3333-3333",
+      "horario": "Mar - Dom, 10:00 AM - 8:00 PM",
+      "direccion": "Bulevar Gastronómico #789",
+      "reseñas": [
+        {
+          "usuario": "Jorge Morales",
+          "texto": "Sabor increíble y auténtico, recomendado para los amantes de la comida china.",
+          "estrellas": 5
+        },
+        {
+          "usuario": "Elena Díaz",
+          "texto": "Buena comida, pero el ambiente podría mejorar.",
+          "estrellas": 3
+        },
+        {
+          "usuario": "Michi",
+          "texto": "esta bien rico",
+          "estrellas": 4
+        }
+      ],
+      "platos": [
+        {
+          "nombre": "Chow Mein",
+          "precio": 4.5,
+          "imagen": "/assets/platos/plato4.jpg"
+        },
+        {
+          "nombre": "Rollos de Primavera",
+          "precio": 3,
+          "imagen": "/assets/platos/plato5.jpg"
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "nombre": "Sosa's Boutique",
+      "categoria": "desayunos",
+      "fotos": [
+        "/assets/locales/ejemplolocal3.jpg",
+        "/assets/locales/ejemplolocal10.jpg"
+      ],
+      "coords": [
+        13.678693,
+        -89.238131
+      ],
+      "description": "El único lugar donde encontrarás comida de calidad",
+      "correo": "boutique@sosas.com",
+      "telefono": "+503 4444-4444",
+      "horario": "Lun - Sáb, 8:00 AM - 5:00 PM",
+      "direccion": "Paseo Central #101",
+      "reseñas": [
+        {
+          "usuario": "Gabriela Vásquez",
+          "texto": "Excelente para desayunos rápidos y ricos.",
+          "estrellas": 4
+        },
+        {
+          "usuario": "Roberto Mejía",
+          "texto": "Los precios están bien, pero falta variedad.",
+          "estrellas": 3
+        },
+        {
+          "usuario": "Michelle",
+          "texto": "esta fea",
+          "estrellas": 1
+        },
+        {
+          "usuario": "Michelle",
+          "texto": "dfged",
+          "estrellas": 1
+        }
+      ],
+      "platos": [
+        {
+          "nombre": "Pancakes",
+          "precio": 3.25,
+          "imagen": "/assets/platos/plato.jpg"
+        },
+        {
+          "nombre": "Bagel con Queso Crema",
+          "precio": 2.5,
+          "imagen": "/assets/platos/plato1.jpg"
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "nombre": "Tienda Sosa",
+      "categoria": "almuerzos",
+      "fotos": [
+        "/assets/locales/ejemplolocal5.jpg",
+        "/assets/locales/ejemplolocal11.jpg"
+      ],
+      "coords": [
+        13.678683,
+        -89.237943
+      ],
+      "description": "Comida deliciosa a la vista",
+      "correo": "info@tiendasosa.com",
+      "telefono": "+503 5555-5555",
+      "horario": "Lun - Vie, 9:00 AM - 7:00 PM",
+      "direccion": "Centro Comercial UCA, Local #12",
+      "reseñas": [
+        {
+          "usuario": "Daniel Ortega",
+          "texto": "Comida variada y de buena calidad.",
+          "estrellas": 4
+        },
+        {
+          "usuario": "Sofía López",
+          "texto": "Muy rica la comida, pero el lugar es un poco pequeño.",
+          "estrellas": 4
+        }
+      ],
+      "platos": [
+        {
+          "nombre": "Ensalada César",
+          "precio": 3,
+          "imagen": "/assets/platos/plato2.jpg"
+        },
+        {
+          "nombre": "Sopa de Pollo",
+          "precio": 2.75,
+          "imagen": "/assets/platos/plato3.jpg"
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "nombre": "La Pancita de Sosa",
+      "categoria": "almuerzos",
+      "fotos": [
+        "/assets/locales/ejemplolocal8.jpg",
+        "/assets/locales/ejemplolocal12.jpg"
+      ],
+      "coords": [
+        13.678743,
+        -89.23746
+      ],
+      "description": "El lugar donde llenaras tu pancita (excepto si eres Ivan)",
+      "correo": "pancita@sosas.com",
+      "telefono": "+503 6666-6666",
+      "horario": "Lun - Dom, 10:00 AM - 9:00 PM",
+      "direccion": "Zona Gastronómica, Av. UCA #15",
+      "reseñas": [
+        {
+          "usuario": "Iván Campos",
+          "texto": "Todo delicioso, aunque el chiste de mi nombre ya cansa :)",
+          "estrellas": 5
+        },
+        {
+          "usuario": "Luz Rodríguez",
+          "texto": "Me encanta el sabor y la cantidad, ideal para almorzar.",
+          "estrellas": 5
+        },
+        {
+          "usuario": "michiifrisk",
+          "texto": "wiwiwiw",
+          "estrellas": 4
+        },
+        {
+          "usuario": "Ivan",
+          "texto": "que rico se veia sosa",
+          "estrellas": 5
+        }
+      ],
+      "platos": [
+        {
+          "nombre": "Tacos de Pollo",
+          "precio": 3.5,
+          "imagen": "/assets/platos/plato4.jpg"
+        },
+        {
+          "nombre": "Burritos",
+          "precio": 4,
+          "imagen": "/assets/platos/plato5.jpg"
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "id": "7e8a",
+      "name": "Michi",
+      "email": "alimaltez@gmail.com",
+      "password": "spike2003",
+      "role": "Cliente",
+      "favoritos": [
+        "5",
+        "2",
+        "1"
+      ]
+    },
+    {
+      "id": "a9a2",
+      "name": "elias gay",
+      "email": "eliasgay@gmail.com",
+      "password": "pitorico",
+      "role": "Cliente",
+      "favoritos": []
+    },
+    {
+      "id": "c3ad",
+      "name": "Astrid",
+      "email": "astrid@gmail.com",
+      "password": "kirito",
+      "role": "Cliente",
+      "favoritos": []
+    }
+  ],
+  "soporte": {
+    "peticionesLocal": [
+      {
+        "idUsuario": "7e8a",
+        "nombre": "sosita",
+        "tipoComida": "postres",
+        "imagenes": [
+          "blob:http://localhost:5173/f855b6cd-ee8e-4e7b-add8-720846652e51"
+        ],
+        "estado": "Pendiente"
+      },
+      {
+        "idUsuario": "7e8a",
+        "nombre": "pizzas sositas",
+        "tipoComida": "comida-rapida",
+        "imagenes": [
+          "blob:http://localhost:5173/ca6f773a-ee65-4885-8005-2aa5a5dca246"
+        ],
+        "estado": "Pendiente"
+      },
+      {
+        "idUsuario": "7e8a",
+        "nombre": "sosita mi amor",
+        "tipoComida": "postres",
+        "imagenes": [
+          "blob:http://localhost:5173/9bf45e68-821f-47ff-a426-2f75e08893d3"
+        ],
+        "estado": "Pendiente"
+      },
+      {
+        "idUsuario": "34dc",
+        "nombre": "asddghfsbfd",
+        "tipoComida": "comida-rapida",
+        "imagenes": [
+          "blob:http://localhost:5173/ce7e5ff4-7450-45af-ad07-688ca948b792"
+        ],
+        "estado": "Pendiente"
+      }
+    ],
+    "reportesUsuario": [],
+    "reportesLocal": [],
+    "correosClientes": []
+  }
+}

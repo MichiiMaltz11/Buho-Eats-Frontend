@@ -1,0 +1,136 @@
+.menu-card {
+  background: linear-gradient(135deg, #ffffff 48%, #C0D6DF 50%);
+  padding: 20px;
+  border-radius: 8px;
+  margin: 5rem auto;
+  max-width: 55rem;
+  border: 1px solid black;
+}
+
+.menu-card .menu-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.menu-item {
+  background-color: transparent;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+}
+
+.menu-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.plato-name {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.plato-price {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.plato-image {
+  width: 100%;
+  height: 15rem;
+  border: 2px solid black;
+  border-radius: 20px 0px 20px 0px;
+  margin-top: 10px;
+}
+
+@media (max-width: 1024px) {
+.menu-card{
+  max-width: 50rem;
+}
+.plato-image{
+  height: 14rem;
+}
+}
+
+@media (max-width: 768px) {
+  .menu-card {
+    padding: 15px;
+    max-width: 90%;
+  }
+
+  .menu-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .menu-card .menu-title {
+    font-size: 20px;
+  }
+
+  .plato-image {
+    height: 12rem;
+  }
+
+  .plato-name {
+    font-size: 16px;
+  }
+
+  .plato-price {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .menu-card .menu-title {
+    font-size: 18px;  
+  }
+  .menu-card{
+    width: 80%;
+  }
+
+  .plato-image {
+    height: 7rem;
+  }
+
+  .menu-item {
+    padding: 8px;
+  }
+
+  .plato-name,
+  .plato-price {
+    font-size: 13px;
+  }
+  
+}
+
+@media (max-width: 321px) {
+
+  .menu-card .menu-title {
+    font-size: 18px;
+  }
+  .menu-card{
+    max-width: 80%;
+  }
+
+  .plato-image {
+    height: 6rem;
+  }
+
+  .menu-item {
+    padding: 8px;
+  }
+
+  .plato-name,
+  .plato-price {
+    font-size: 13px;
+  }
+  
+}

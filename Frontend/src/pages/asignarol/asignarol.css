@@ -1,0 +1,98 @@
+.asignar-roles-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 92vh;
+    margin-top: 6rem;
+}
+.asignar-roles-content {
+    padding: 20px;
+    text-align: center;
+    background-color: #3d405b;
+    margin: 2rem;
+    min-height: 60vh;
+    position: relative; /* Es necesario para que el pseudo-elemento se posicione correctamente */
+}
+
+.asignar-roles-content::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    left: -1px;
+    width: 128px;
+    height: 128px;
+    background-image: url('../../assets/backgrounds/curva.png'); /* Asegúrate de que la ruta sea correcta */
+    background-size: contain;
+    background-repeat: no-repeat;
+    z-index: 1;
+    transform: rotate(180deg); /* Para que la curva quede invertida */
+}
+.asignar-roles-content::after {
+    content: '';
+    position: absolute;
+    bottom: -40px;
+    right: -1px;
+    width: 128px;
+    height: 128px;
+    background-image: url('../../assets/backgrounds/curva.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    z-index: 1;
+}
+
+.asignar-roles-content h1 {
+    font-size: 28px;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.asignar-roles-form {
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-groupo label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: white;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.message-status {
+    text-align: center;
+    color: #ff4747;
+    margin-top: 10px;
+}
+
+.submit-button {
+    display: block;
+    width: 10rem;
+    background-color: rgb(2, 182, 2);
+    color: white;
+    font-size: 16px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    position: relative;
+    height: 3rem;
+    margin-top: 3rem;
+}
+
+.submit-button:hover {
+    background-color: green;
+}
