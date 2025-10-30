@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Registro - Buho Eats</title>
+    
+    <!-- Tailwind CSS (Offline) -->
+    <script src="../libs/tailwind.js"></script>
+    
+    <!-- Configuración de Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3D405B',      // Azul principal
+                        secondary: '#588B8B',    // Verde azulado - botones y acentos
+                        dark: '#2C2C2C',         // Negro/gris oscuro
+                        light: '#FFFFFF',        // Blanco
+                        success: '#06BB0C',      // Verde - confirmación
+                        danger: '#C11D0C',       // Rojo - cancelación
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" href="../assets/css/reset.css">
+    
+    <style>
+        /* Imagen de fondo */
+        body {
+            background-image: url('../assets/img/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+        
+        
+        .owl-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%233D405B' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .strength-weak { color: #C11D0C; }
+        .strength-medium { color: #F39C12; }
+        .strength-strong { color: #06BB0C; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full">
+            <!-- Logo/Header -->
+            <div class="text-center mb-8">
+                <!-- Logo de Buho Eats -->
+                <div class="mx-auto mb-4">
+                    <!-- Opción 1: Si tienes el logo en assets/img/logo.png -->
+                    <img src="../assets/img/logo.png" alt="Buho Eats Logo" class="mx-auto h-24 w-auto" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
+                    
+                    <!-- Fallback: Logo temporal (emoji) - se oculta cuando la imagen carga -->
+                    <div id="logoFallback" class="mx-auto h-20 w-20 bg-secondary rounded-full flex items-center justify-center" style="display: none;">
+                        <span class="text-4xl">🦉</span>
+                    </div>
+                </div>
+                
+                <!-- Título con tipografía de Buho Eats -->
+                <!-- Opción 1: Si tienes imagen con la tipografía -->
+                <img src="../assets/img/logo-text.png" alt="Buho Eats" class="mx-auto h-12 mb-2" onerror="this.style.display='none'; document.getElementById('textFallback').style.display='block';">
+                
+                <!-- Fallback: Texto simple -->
+                <h1 id="textFallback" class="text-4xl font-bold text-dark mb-2" style="display: none;">Buho Eats</h1>
+                
+            </div>
+
+            <!-- Formulario de Registro -->
+            <div class="bg-primary rounded-lg shadow-xl p-8">
+                <form id="signupForm" class="space-y-5">
+                    <!-- Nombre completo -->
+                    <div>
+                        <label for="fullName" class="block text-sm font-medium text-white mb-2">
+                            Nombre completo
+                        </label>
+                        <input 
+                            type="text" 
+                            id="fullName" 
+                            name="fullName" 
+                            required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200"
+                            placeholder="Juan Pérez"
+                        >
+                        <p id="fullNameError" class="mt-1 text-sm text-red-600 hidden"></p>
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-white mb-2">
+                            Email
+                        </label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200"
+                            placeholder="tu@email.com"
+                        >
+                        <p id="emailError" class="mt-1 text-sm text-red-600 hidden"></p>
+                    </div>
+
+
+                    <!-- Tipo de cuenta -->
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2">
+                            Tipo de cuenta
+                        </label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="relative flex items-center p-3 border-2 border-gray-400 rounded-lg cursor-pointer hover:border-white transition bg-white bg-opacity-10">
+                                <input 
+                                    type="radio" 
+                                    name="accountType" 
+                                    value="user" 
+                                    checked
+                                    class="h-4 w-4 text-secondary focus:ring-secondary"
+                                >
+                                <div class="ml-3">
+                                    <span class="block text-sm font-medium text-white">
+                                        🍽️ Cliente
+                                    </span>
+                                    <span class="block text-xs text-gray-200">
+                                        Ver locales y dejar reseñas
+                                    </span>
+                                </div>
+                            </label>
+                            
+                            <label class="relative flex items-center p-3 border-2 border-gray-400 rounded-lg cursor-pointer hover:border-white transition bg-white bg-opacity-10">
+                                <input 
+                                    type="radio" 
+                                    name="accountType" 
+                                    value="owner"
+                                    class="h-4 w-4 text-secondary focus:ring-secondary"
+                                >
+                                <div class="ml-3">
+                                    <span class="block text-sm font-medium text-white">
+                                        🏪 Propietario
+                                    </span>
+                                    <span class="block text-xs text-gray-200">
+                                        Gestionar mi local
+                                    </span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Información adicional para propietarios -->
+                    <div id="ownerFields" class="hidden space-y-4 p-4 bg-white bg-opacity-10 rounded-lg border border-gray-400">
+                        <div>
+                            <label for="businessName" class="block text-sm font-medium text-white mb-2">
+                                Nombre del local
+                            </label>
+                            <input 
+                                type="text" 
+                                id="businessName" 
+                                name="businessName"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200"
+                                placeholder="Mi Restaurante"
+                            >
+                        </div>
+                        <div>
+                            <label for="businessAddress" class="block text-sm font-medium text-white mb-2">
+                                Dirección del local
+                            </label>
+                            <input 
+                                type="text" 
+                                id="businessAddress" 
+                                name="businessAddress"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200"
+                                placeholder="Calle 123, Ciudad"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-white mb-2">
+                            Contraseña
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200"
+                                placeholder="••••••••"
+                            >
+                            <button 
+                                type="button" 
+                                id="togglePassword"
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <!-- Indicador de fortaleza -->
+                        <div class="mt-2">
+                            <div class="flex items-center space-x-2">
+                                <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                    <div id="strengthBar" class="h-full bg-gray-300 transition-all duration-300" style="width: 0%"></div>
+                                </div>
+                                <span id="strengthText" class="text-xs font-medium text-gray-500"></span>
+                            </div>
+                        </div>
+                        <p id="passwordError" class="mt-1 text-sm text-red-600 hidden"></p>
+                    </div>
+
+                    <!-- Confirmar Password -->
+                    <div>
+                        <label for="confirmPassword" class="block text-sm font-medium text-white mb-2">
+                            Confirmar contraseña
+                        </label>
+                        <input 
+                            type="password" 
+                            id="confirmPassword" 
+                            name="confirmPassword" 
+                            required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200"
+                            placeholder="••••••••"
+                        >
+                        <p id="confirmPasswordError" class="mt-1 text-sm text-red-600 hidden"></p>
+                    </div>
+
+                    <!-- Términos y condiciones -->
+                    <div class="flex items-start">
+                        <input 
+                            type="checkbox" 
+                            id="terms" 
+                            name="terms"
+                            required
+                            class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded mt-1"
+                        >
+                        <label for="terms" class="ml-2 block text-sm text-white">
+                            Acepto los <a href="#" class="text-white hover:underline font-semibold">términos y condiciones</a> 
+                            y la <a href="#" class="text-white hover:underline font-semibold">política de privacidad</a>
+                        </label>
+                    </div>
+
+                    <!-- Mensaje de error general -->
+                    <div id="errorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                        <p class="text-sm"></p>
+                    </div>
+
+                    <!-- Botón de Registro -->
+                    <button 
+                        type="submit"
+                        class="w-full bg-secondary hover:bg-opacity-90 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2"
+                    >
+                        <span id="btnText">Crear cuenta</span>
+                        <span id="btnLoading" class="hidden">
+                            <svg class="animate-spin inline h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Creando cuenta...
+                        </span>
+                    </button>
+                </form>
+
+                <!-- Divider -->
+                <div class="mt-6">
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-primary text-white">¿Ya tienes cuenta?</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Link a Login -->
+                <div class="mt-6">
+                    <a 
+                        href="login.html"
+                        class="w-full flex justify-center py-3 px-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-primary transition duration-200"
+                    >
+                        Iniciar sesión
+                    </a>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <p class="mt-8 text-center text-sm text-gray-600">
+                © 2025 Buho Eats. Todos los derechos reservados.
+            </p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script>
+        // Mostrar/ocultar campos de propietario
+        const accountTypeRadios = document.querySelectorAll('input[name="accountType"]');
+        const ownerFields = document.getElementById('ownerFields');
+        
+        accountTypeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.value === 'owner') {
+                    ownerFields.classList.remove('hidden');
+                } else {
+                    ownerFields.classList.add('hidden');
+                }
+            });
+        });
+
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+        });
+
+        // Password strength checker
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthBar = document.getElementById('strengthBar');
+            const strengthText = document.getElementById('strengthText');
+            
+            let strength = 0;
+            let label = '';
+            let color = '';
+            
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]+/)) strength++;
+            if (password.match(/[A-Z]+/)) strength++;
+            if (password.match(/[0-9]+/)) strength++;
+            if (password.match(/[$@#&!]+/)) strength++;
+            
+            switch(strength) {
+                case 0:
+                case 1:
+                    label = 'Muy débil';
+                    color = '#C11D0C';
+                    strengthBar.style.width = '20%';
+                    break;
+                case 2:
+                    label = 'Débil';
+                    color = '#E67E22';
+                    strengthBar.style.width = '40%';
+                    break;
+                case 3:
+                    label = 'Media';
+                    color = '#F39C12';
+                    strengthBar.style.width = '60%';
+                    break;
+                case 4:
+                    label = 'Fuerte';
+                    color = '#06BB0C';
+                    strengthBar.style.width = '80%';
+                    break;
+                case 5:
+                    label = 'Muy fuerte';
+                    color = '#06BB0C';
+                    strengthBar.style.width = '100%';
+                    break;
+            }
+            
+            strengthBar.style.backgroundColor = color;
+            strengthText.textContent = label;
+            strengthText.style.color = color;
+        });
+
+        // Validación de email
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        // Handle form submission
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Limpiar errores
+            document.querySelectorAll('.text-red-600').forEach(el => el.classList.add('hidden'));
+            document.getElementById('errorMessage').classList.add('hidden');
+            
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const accountType = document.querySelector('input[name="accountType"]:checked').value;
+            const terms = document.getElementById('terms').checked;
+            
+            let isValid = true;
+            
+            // Validaciones
+            if (fullName.length < 3) {
+                document.getElementById('fullNameError').textContent = 'El nombre debe tener al menos 3 caracteres';
+                document.getElementById('fullNameError').classList.remove('hidden');
+                isValid = false;
+            }
+            
+            if (!isValidEmail(email)) {
+                document.getElementById('emailError').textContent = 'Email no válido';
+                document.getElementById('emailError').classList.remove('hidden');
+                isValid = false;
+            }
+            
+           
+            if (password.length < 8) {
+                document.getElementById('passwordError').textContent = 'La contraseña debe tener al menos 8 caracteres';
+                document.getElementById('passwordError').classList.remove('hidden');
+                isValid = false;
+            }
+            
+            if (password !== confirmPassword) {
+                document.getElementById('confirmPasswordError').textContent = 'Las contraseñas no coinciden';
+                document.getElementById('confirmPasswordError').classList.remove('hidden');
+                isValid = false;
+            }
+            
+            if (!terms) {
+                alert('Debes aceptar los términos y condiciones');
+                return;
+            }
+            
+            if (!isValid) return;
+            
+            // Mostrar loading
+            const btnText = document.getElementById('btnText');
+            const btnLoading = document.getElementById('btnLoading');
+            btnText.classList.add('hidden');
+            btnLoading.classList.remove('hidden');
+            
+            try {
+                // Preparar datos
+                const userData = {
+                    fullName,
+                    email,
+                    password,
+                    role: accountType
+                };
+                
+                // Agregar datos de negocio si es propietario
+                if (accountType === 'owner') {
+                    userData.businessName = document.getElementById('businessName').value.trim();
+                    userData.businessAddress = document.getElementById('businessAddress').value.trim();
+                }
+                
+                // Llamar al API de registro
+                const response = await API.post(CONFIG.ENDPOINTS.REGISTER, userData);
+                
+                // Mostrar mensaje de éxito y redirigir
+                alert('¡Cuenta creada exitosamente! Serás redirigido al login.');
+                window.location.href = 'login.html';
+                
+            } catch (error) {
+                // Mostrar error
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.querySelector('p').textContent = error.message || 'Error al crear la cuenta';
+                errorMessage.classList.remove('hidden');
+                
+                // Ocultar loading
+                btnText.classList.remove('hidden');
+                btnLoading.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

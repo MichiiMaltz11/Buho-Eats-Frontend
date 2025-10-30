@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Login - Buho Eats</title>
+    
+    <!-- Tailwind CSS (Offline) -->
+    <script src="../libs/tailwind.js"></script>
+    
+    <!-- Configuración de Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3D405B',      // Azul principal
+                        secondary: '#588B8B',    // Verde azulado - botones y acentos
+                        dark: '#2C2C2C',         // Negro/gris oscuro
+                        light: '#FFFFFF',        // Blanco
+                        success: '#06BB0C',      // Verde - confirmación
+                        danger: '#C11D0C',       // Rojo - cancelación
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" href="../assets/css/reset.css">
+    
+    <style>
+        /* Imagen de fondo */
+        body {
+            background-image: url('../assets/img/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+        
+        .owl-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%233D405B' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full">
+            <!-- Logo/Header -->
+            <div class="text-center mb-8">
+                <!-- Logo de Buho Eats -->
+                <div class="mx-auto mb-4">
+                    <!-- Opción 1: Si tienes el logo en assets/img/logo.png -->
+                    <img src="../assets/img/logo.png" alt="Buho Eats Logo" class="mx-auto h-24 w-auto" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
+                    
+                    <!-- Fallback: Logo temporal (emoji) - se oculta cuando la imagen carga -->
+                    <div id="logoFallback" class="mx-auto h-20 w-20 bg-secondary rounded-full flex items-center justify-center" style="display: none;">
+                        <span class="text-4xl">🦉</span>
+                    </div>
+                </div>
+                
+                <!-- Título con tipografía de Buho Eats -->
+                <!-- Opción 1: Si tienes imagen con la tipografía -->
+                <img src="../assets/img/logo-text.png" alt="Buho Eats" class="mx-auto h-12 mb-2" onerror="this.style.display='none'; document.getElementById('textFallback').style.display='block';">
+                
+                <!-- Fallback: Texto simple -->
+                <h1 id="textFallback" class="text-4xl font-bold text-dark mb-2" style="display: none;">Buho Eats</h1>
+            </div>
+
+            <!-- Formulario de Login -->
+            <div class="bg-primary rounded-lg shadow-xl p-8">
+                <form id="loginForm" class="space-y-6">
+                    <!-- Email/Username -->
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-white mb-2">
+                            Usuario o Email
+                        </label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200"
+                            placeholder="tu@email.com"
+                        >
+                        <p id="usernameError" class="mt-1 text-sm text-red-600 hidden">Este campo es requerido</p>
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-white mb-2">
+                            Contraseña
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200"
+                                placeholder="••••••••"
+                            >
+                            <button 
+                                type="button" 
+                                id="togglePassword"
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                            >
+                                <svg id="eyeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <p id="passwordError" class="mt-1 text-sm text-red-600 hidden">Este campo es requerido</p>
+                    </div>
+
+                    <!-- Recordar y Olvidé contraseña -->
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input 
+                                type="checkbox" 
+                                id="remember" 
+                                name="remember"
+                                class="h-4 w-4 text-secondary focus:ring-secondary border-gray-300 rounded"
+                            >
+                            <label for="remember" class="ml-2 block text-sm text-white">
+                                Recordarme
+                            </label>
+                        </div>
+                        <a href="#" class="text-sm text-white hover:text-secondary transition underline">
+                            ¿Olvidaste tu contraseña?
+                        </a>
+                    </div>
+
+                    <!-- Mensaje de error general -->
+                    <div id="errorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                        <p class="text-sm"></p>
+                    </div>
+
+                    <!-- Botón de Login -->
+                    <button 
+                        type="submit"
+                        class="w-full bg-secondary hover:bg-opacity-90 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2"
+                    >
+                        <span id="btnText">Iniciar Sesión</span>
+                        <span id="btnLoading" class="hidden">
+                            <svg class="animate-spin inline h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Iniciando...
+                        </span>
+                    </button>
+                </form>
+
+                <!-- Divider -->
+                <div class="mt-6">
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-primary text-white">¿No tienes cuenta?</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Link a Registro -->
+                <div class="mt-6">
+                    <a 
+                        href="signup.html"
+                        class="w-full flex justify-center py-3 px-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-primary transition duration-200"
+                    >
+                        Crear una cuenta
+                    </a>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <p class="mt-8 text-center text-sm text-gray-600">
+                © 2025 Buho Eats. Todos los derechos reservados.
+            </p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script>
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+        });
+
+        // Handle form submission
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Limpiar errores previos
+            document.getElementById('usernameError').classList.add('hidden');
+            document.getElementById('passwordError').classList.add('hidden');
+            document.getElementById('errorMessage').classList.add('hidden');
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+            
+            // Validación básica
+            let isValid = true;
+            
+            if (!username) {
+                document.getElementById('usernameError').classList.remove('hidden');
+                isValid = false;
+            }
+            
+            if (!password) {
+                document.getElementById('passwordError').classList.remove('hidden');
+                isValid = false;
+            }
+            
+            if (!isValid) return;
+            
+            // Mostrar loading
+            const btnText = document.getElementById('btnText');
+            const btnLoading = document.getElementById('btnLoading');
+            btnText.classList.add('hidden');
+            btnLoading.classList.remove('hidden');
+            
+            try {
+                // Llamar al API de login
+                const response = await Auth.login(username, password);
+                
+                // Guardar preferencia de recordar
+                if (remember) {
+                    localStorage.setItem('rememberMe', 'true');
+                }
+                
+                // Redirigir según el rol del usuario
+                const user = Auth.getUser();
+                switch(user.role) {
+                    case 'admin':
+                        window.location.href = 'dashboard-admin.html';
+                        break;
+                    case 'owner':
+                        window.location.href = 'dashboard-owner.html';
+                        break;
+                    case 'user':
+                    default:
+                        window.location.href = 'dashboard-user.html';
+                        break;
+                }
+                
+            } catch (error) {
+                // Mostrar error
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.querySelector('p').textContent = error.message || 'Usuario o contraseña incorrectos';
+                errorMessage.classList.remove('hidden');
+                
+                // Ocultar loading
+                btnText.classList.remove('hidden');
+                btnLoading.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
