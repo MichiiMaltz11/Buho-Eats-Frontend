@@ -1,0 +1,32 @@
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Archivos de respaldo
+*.bak
+*.backup
+
+# Archivos de configuración local (si existen)
+config.local.js
+
+# Node modules (si usas alguna herramienta de desarrollo)
+node_modules/
+
+# Archivos de sistema
+*.DS_Store
+desktop.ini
