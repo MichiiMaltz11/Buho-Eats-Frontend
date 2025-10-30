@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Dashboard - Buho Eats</title>
+    
+    <!-- Tailwind CSS (Offline) -->
+    <script src="../libs/tailwind.js"></script>
+    
+    <!-- Configuración de Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3D405B',      // Azul principal
+                        secondary: '#588B8B',    // Verde azulado - botones y acentos
+                        dark: '#2C2C2C',         // Negro/gris oscuro
+                        light: '#FFFFFF',        // Blanco
+                        success: '#06BB0C',      // Verde - confirmación
+                        danger: '#C11D0C',       // Rojo - cancelación
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" href="../assets/css/reset.css">
+    
+    <style>
+        /* Imagen de fondo */
+        body {
+            background-image: url('../assets/img/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+        
+    
+        /* Espacio para el header fijo */
+        main {
+            padding-top: 120px !important;
+            min-height: calc(100vh - 120px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- HEADER -->
+    <header class="bg-primary shadow-lg fixed top-0 left-0 right-0 z-50">
+        <nav class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo y Texto a la izquierda -->
+                <div class="flex items-center space-x-3">
+                    <!-- Logo principal (versión blanca/light) -->
+                    <img src="../assets/img/logo-light.png" alt="Buho Eats Logo" class="h-12 w-auto" onerror="this.style.display='none'; document.getElementById('headerLogoFallback').style.display='flex';">
+                    
+                    <!-- Fallback del logo -->
+                    <div id="headerLogoFallback" class="h-12 w-12 bg-secondary rounded-full flex items-center justify-center" style="display: none;">
+                        <span class="text-2xl">🦉</span>
+                    </div>
+                    
+                    <!-- Logo con tipografía (versión blanca/light) -->
+                    <img src="../assets/img/logo-text-light.png" alt="Buho Eats" class="h-8 w-auto" onerror="this.style.display='none'; document.getElementById('headerTextFallback').style.display='block';">
+                    
+                    <!-- Fallback del texto -->
+                    <h1 id="headerTextFallback" class="text-2xl font-bold text-white" style="display: none;">Buho Eats</h1>
+                </div>
+
+                <!-- Menú de usuario a la derecha -->
+                <div class="flex items-center space-x-4">
+                    <!-- Botón de usuario -->
+                    <div class="relative">
+                        <button 
+                            id="userMenuButton" 
+                            class="flex items-center space-x-2 bg-secondary hover:bg-opacity-90 text-white px-4 py-2 rounded-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-white"
+                            onclick="toggleUserMenu()"
+                        >
+                            <!-- Icono de usuario -->
+                            <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            
+                            <!-- Nombre del usuario (opcional) -->
+                            <span class="hidden md:block font-medium">Usuario</span>
+                            
+                            <!-- Icono de flecha -->
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+
+                        <!-- Dropdown del menú de usuario -->
+                        <div 
+                            id="userMenuDropdown" 
+                            class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-50"
+                        >
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                    <span>Mi Perfil</span>
+                                </div>
+                            </a>
+                            
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                    </svg>
+                                    <span>Favoritos</span>
+                                </div>
+                            </a>
+                            
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                    <span>Mis Reseñas</span>
+                                </div>
+                            </a>
+                            
+                            <hr class="my-2">
+                            
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <span>Configuración</span>
+                                </div>
+                            </a>
+                            
+                            <hr class="my-2">
+                            
+                            <a href="#" onclick="logout()" class="block px-4 py-2 text-danger hover:bg-red-50 transition">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                    </svg>
+                                    <span>Cerrar Sesión</span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Título de bienvenida -->
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-primary mb-2">¡Bienvenido de nuevo! 👋</h2>
+            <p class="text-gray-600">Explora nuevos restaurantes y comparte tus experiencias</p>
+        </div>
+
+        <!-- Contenido temporal para demostrar el scroll -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Tarjeta de ejemplo 1 -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-bold text-primary mb-2">Contenido de ejemplo</h3>
+                <p class="text-gray-600">Este es el dashboard del usuario. Aquí irá el contenido real.</p>
+            </div>
+
+            <!-- Tarjeta de ejemplo 2 -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-bold text-primary mb-2">Header fijo</h3>
+                <p class="text-gray-600">Nota cómo el header se queda arriba cuando haces scroll.</p>
+            </div>
+
+            <!-- Tarjeta de ejemplo 3 -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-xl font-bold text-primary mb-2">Menú de usuario</h3>
+                <p class="text-gray-600">Haz click en el icono de usuario arriba a la derecha.</p>
+            </div>
+        </div>
+
+        <!-- Más contenido para demostrar el scroll -->
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+            <h3 class="text-2xl font-bold text-primary mb-4">Contenido adicional</h3>
+            <p class="text-gray-600 mb-4">
+                Este contenido es temporal para que puedas probar el scroll y ver cómo el header se mantiene fijo en la parte superior.
+            </p>
+            <p class="text-gray-600 mb-4">
+                En la siguiente fase agregaremos el contenido real del dashboard: listado de restaurantes, 
+                reseñas recientes, favoritos, etc.
+            </p>
+            <p class="text-gray-600">
+                Por ahora, desplázate hacia abajo para ver el footer y cómo funciona toda la estructura.
+            </p>
+        </div>
+
+        <!-- Espaciador para demostrar el scroll -->
+        <div class="h-96 bg-gradient-to-b from-white to-gray-100 rounded-lg shadow-lg p-8 flex items-center justify-center">
+            <div class="text-center">
+                <p class="text-2xl text-gray-400 mb-4">⬇️</p>
+                <p class="text-gray-600">Sigue scrolleando para ver el footer</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-primary text-white mt-12">
+        <div class="container mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Columna 1: Logo y descripción -->
+                <div class="col-span-1">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <!-- Logo pequeño (versión blanca/light) -->
+                        <img src="../assets/img/logo-light.png" alt="Buho Eats" class="h-10 w-auto" onerror="this.style.display='none'; document.getElementById('footerLogoFallback').style.display='flex';">
+                        
+                        <!-- Fallback -->
+                        <div id="footerLogoFallback" class="h-10 w-10 bg-secondary rounded-full flex items-center justify-center" style="display: none;">
+                            <span class="text-xl">🦉</span>
+                        </div>
+                        
+                        <span class="text-xl font-bold">Buho Eats</span>
+                    </div>
+                    <p class="text-gray-300 text-sm">
+                        Descubre los mejores restaurantes locales y comparte tus experiencias.
+                    </p>
+                </div>
+
+                <!-- Columna 2: Enlaces rápidos -->
+                <div class="col-span-1">
+                    <h3 class="text-lg font-semibold mb-4">Enlaces Rápidos</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Inicio</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Explorar Restaurantes</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Mis Reseñas</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Favoritos</a></li>
+                    </ul>
+                </div>
+
+                <!-- Columna 3: Información -->
+                <div class="col-span-1">
+                    <h3 class="text-lg font-semibold mb-4">Información</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Acerca de Nosotros</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Términos y Condiciones</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Política de Privacidad</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Contacto</a></li>
+                    </ul>
+                </div>
+
+                <!-- Columna 4: Redes sociales -->
+                <div class="col-span-1">
+                    <h3 class="text-lg font-semibold mb-4">Síguenos</h3>
+                    <div class="flex space-x-4 mb-4">
+                        <!-- Facebook -->
+                        <a href="#" class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center hover:bg-opacity-80 transition">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </a>
+                        
+                        <!-- Instagram -->
+                        <a href="#" class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center hover:bg-opacity-80 transition">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                        </a>
+                        
+                        <!-- Twitter/X -->
+                        <a href="#" class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center hover:bg-opacity-80 transition">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                            </svg>
+                        </a>
+                    </div>
+                    
+                    <!-- Email de contacto -->
+                    <div class="text-sm text-gray-300">
+                        <p class="mb-1">Contacto:</p>
+                        <a href="mailto:contacto@buhoeats.com" class="hover:text-white transition">
+                            contacto@buhoeats.com
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Línea divisoria -->
+            <hr class="my-6 border-gray-600">
+
+            <!-- Copyright -->
+            <div class="flex flex-col md:flex-row justify-between items-center text-sm text-gray-300">
+                <p>© 2025 Buho Eats. Todos los derechos reservados.</p>
+                <p class="mt-2 md:mt-0">Hecho con 💙 para descubrir la mejor comida local</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    
+    <script>
+        // Toggle del menú de usuario
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userMenuDropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Cerrar el menú si se hace click fuera
+        document.addEventListener('click', function(event) {
+            const userMenuButton = document.getElementById('userMenuButton');
+            const dropdown = document.getElementById('userMenuDropdown');
+            
+            if (userMenuButton && dropdown) {
+                if (!userMenuButton.contains(event.target) && !dropdown.contains(event.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            }
+        });
+
+        // Función de logout
+        function logout() {
+            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_data');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Verificar autenticación al cargar
+        // Auth.requireAuth();
+    </script>
+</body>
+</html>
