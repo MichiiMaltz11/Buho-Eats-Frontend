@@ -94,7 +94,7 @@ Tu proyecto soporta **3 tipos de usuarios**:
 - Gestionar su local
 - Gestionar menú
 - Ver reseñas recibidas
-- Estadísticas del local
+- Estadísticas del localx
 
 ### 3. 👨‍💼 Administrador
 **Funcionalidades:**
