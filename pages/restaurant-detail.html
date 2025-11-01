@@ -70,20 +70,18 @@
     </style>
 </head>
 <body class="bg-gray-50">
-    <!-- MODAL DE CONFIRMACIÓN PERSONALIZADO -->
+    <!-- MODAL DE CONFIRMACIÓN -->
     <div id="customDialog" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden items-center justify-center">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
             <!-- Header del modal -->
             <div class="p-6">
                 <h3 id="dialogTitle" class="text-2xl font-bold text-primary">
-                    <!-- Título se agregará dinámicamente -->
                 </h3>
             </div>
             
             <!-- Contenido del modal -->
             <div class="p-6">
                 <p id="dialogMessage" class="text-gray-600">
-                    <!-- Mensaje se agregará dinámicamente -->
                 </p>
             </div>
             
@@ -111,24 +109,17 @@
     <header class="bg-primary shadow-lg fixed top-0 left-0 right-0 z-50">
         <nav class="container mx-auto px-4 py-4">
             <div class="flex items-center justify-between">
-                <!-- Logo y Texto a la izquierda -->
+                <!-- Logo y Texto-->
                 <div class="flex items-center space-x-3">
-                    <!-- Logo principal (versión blanca/light) -->
+                    <!-- Logo principal -->
                     <img src="../assets/img/logo-light.png" alt="Buho Eats Logo" class="h-12 w-auto" onerror="this.style.display='none'; document.getElementById('headerLogoFallback').style.display='flex';">
-                    
-                    <!-- Fallback del logo -->
-                    <div id="headerLogoFallback" class="h-12 w-12 bg-secondary rounded-full flex items-center justify-center" style="display: none;">
-                        <span class="text-2xl">🦉</span>
-                    </div>
-                    
-                    <!-- Logo con tipografía (versión blanca/light) -->
+                   
+                    <!-- Logo con tipografía -->
                     <img src="../assets/img/logo-text-light.png" alt="Buho Eats" class="h-8 w-auto" onerror="this.style.display='none'; document.getElementById('headerTextFallback').style.display='block';">
                     
-                    <!-- Fallback del texto -->
-                    <h1 id="headerTextFallback" class="text-2xl font-bold text-white" style="display: none;">Buho Eats</h1>
                 </div>
 
-                <!-- Menú de usuario a la derecha -->
+                <!-- Menú de usuario-->
                 <div class="flex items-center space-x-4">
                     <!-- Botón de usuario -->
                     <div class="relative">
@@ -144,7 +135,7 @@
                                 </svg>
                             </div>
                             
-                            <!-- Nombre del usuario (opcional) -->
+                            <!-- Nombre del usuario-->
                             <span class="hidden md:block font-medium">Usuario</span>
                             
                             <!-- Icono de flecha -->
@@ -249,7 +240,7 @@
             </div>
         </div>
 
-        <!-- Información de Contacto (Fondo Turquesa) -->
+        <!-- Información de Contacto  -->
         <div class="bg-secondary text-white rounded-xl shadow-lg p-8 mb-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Correo -->
@@ -299,21 +290,19 @@
             </div>
         </div>
 
-        <!-- Layout de 2 columnas: Menú (izquierda) y Reseñas (derecha) -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- COLUMNA IZQUIERDA: MENÚ (2/3 del ancho) -->
+            <!-- MENÚ-->
             <div class="lg:col-span-2">
                 <div class="bg-white rounded-xl shadow-lg p-8">
                     <h2 class="text-3xl font-bold text-primary mb-6">Menú</h2>
                     
                     <!-- Grid de platos -->
                     <div id="menuGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Los platos se generarán dinámicamente -->
                     </div>
                 </div>
             </div>
 
-            <!-- COLUMNA DERECHA: CALIFICACIÓN Y RESEÑAS (1/3 del ancho) -->
+            <!-- CALIFICACIÓN Y RESEÑAS-->
             <div class="lg:col-span-1">
                 <!-- Sección de Calificación -->
                 <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
@@ -356,7 +345,6 @@
                     
                     <!-- Lista de reseñas -->
                     <div id="reviewsList" class="space-y-6">
-                        <!-- Las reseñas se generarán dinámicamente -->
                     </div>
 
             
@@ -369,16 +357,12 @@
     <footer class="bg-primary text-white mt-12">
         <div class="container mx-auto px-4 py-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <!-- Columna 1: Logo y descripción -->
+                <!-- Logo y descripción -->
                 <div class="col-span-1">
                     <div class="flex items-center space-x-2 mb-4">
-                        <!-- Logo pequeño (versión blanca/light) -->
+                        <!-- Logo pequeño-->
                         <img src="../assets/img/logo-light.png" alt="Buho Eats" class="h-10 w-auto" onerror="this.style.display='none'; document.getElementById('footerLogoFallback').style.display='flex';">
                         
-                        <!-- Fallback -->
-                        <div id="footerLogoFallback" class="h-10 w-10 bg-secondary rounded-full flex items-center justify-center" style="display: none;">
-                            <span class="text-xl">🦉</span>
-                        </div>
                         
                         <span class="text-xl font-bold">Buho Eats</span>
                     </div>
@@ -387,7 +371,7 @@
                     </p>
                 </div>
 
-                <!-- Columna 2: Enlaces rápidos -->
+                <!--Enlaces rápidos -->
                 <div class="col-span-1">
                     <h3 class="text-lg font-semibold mb-4">Enlaces Rápidos</h3>
                     <ul class="space-y-2">
@@ -398,7 +382,7 @@
                     </ul>
                 </div>
 
-                <!-- Columna 3: Información -->
+                <!-- Información -->
                 <div class="col-span-1">
                     <h3 class="text-lg font-semibold mb-4">Información</h3>
                     <ul class="space-y-2">
@@ -409,7 +393,7 @@
                     </ul>
                 </div>
 
-                <!-- Columna 4: Redes sociales -->
+                <!--Redes sociales -->
                 <div class="col-span-1">
                     <h3 class="text-lg font-semibold mb-4">Síguenos</h3>
                     <div class="flex space-x-4 mb-4">
@@ -470,9 +454,6 @@
             }
         });
 
-        // ============================================
-        // COMPONENTE DE DIÁLOGO PERSONALIZADO
-        // ============================================
         let dialogCallback = null;
 
         function showDialog(options) {
@@ -543,9 +524,7 @@
             });
         }
 
-        // ============================================
-        // DATOS SIMULADOS
-        // ============================================
+        
         const restaurantData = {
             id: 1,
             name: 'La Bella Italia',
@@ -575,9 +554,7 @@
             { id: 5, user: 'Sofia Paredes', rating: 5, comment: 'Atención de primera y sabores auténticos. Volveré pronto.', date: '2025-10-24' }
         ];
 
-        // ============================================
-        // FUNCIONES DE FAVORITOS
-        // ============================================
+        
         let isFavorite = false;
 
         function toggleFavorite() {
@@ -596,9 +573,7 @@
             }
         }
 
-        // ============================================
-        // SISTEMA DE CALIFICACIÓN
-        // ============================================
+       
         let userRating = 0;
 
         function setRating(rating) {
@@ -667,9 +642,7 @@
             });
         }
 
-        // ============================================
-        // RENDERIZADO
-        // ============================================
+        
         function renderMenu() {
             const menuGrid = document.getElementById('menuGrid');
             
@@ -708,15 +681,12 @@
             `).join('');
         }
 
-        // ============================================
-        // INICIALIZACIÓN
-        // ============================================
+       
         document.addEventListener('DOMContentLoaded', function() {
             // Obtener ID del restaurante de la URL
             const urlParams = new URLSearchParams(window.location.search);
             const restaurantId = urlParams.get('id');
             
-            // Cargar datos (en producción, hacer fetch a la API)
             renderMenu();
             renderReviews();
         });

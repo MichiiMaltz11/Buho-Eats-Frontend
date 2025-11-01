@@ -49,7 +49,7 @@
     </style>
 </head>
 <body class="bg-gray-50">
-    <!-- MODAL DE CONFIRMACIÓN PERSONALIZADO -->
+    <!-- MODAL DE CONFIRMACIÓN -->
     <div id="customDialog" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden items-center justify-center">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
             <!-- Header del modal -->
@@ -90,9 +90,9 @@
     <header class="bg-primary shadow-lg fixed top-0 left-0 right-0 z-50">
         <nav class="container mx-auto px-4 py-4">
             <div class="flex items-center justify-between">
-                <!-- Logo y Texto a la izquierda -->
+                <!-- Logo y Texto-->
                 <div class="flex items-center space-x-3">
-                    <!-- Logo principal (versión blanca/light) -->
+                    <!-- Logo principal -->
                     <img src="../assets/img/logo-light.png" alt="Buho Eats Logo" class="h-12 w-auto" onerror="this.style.display='none'; document.getElementById('headerLogoFallback').style.display='flex';">
                     
                     <!-- Fallback del logo -->
@@ -100,7 +100,7 @@
                         <span class="text-2xl">🦉</span>
                     </div>
                     
-                    <!-- Logo con tipografía (versión blanca/light) -->
+                    <!-- Logo con tipografía -->
                     <img src="../assets/img/logo-text-light.png" alt="Buho Eats" class="h-8 w-auto" onerror="this.style.display='none'; document.getElementById('headerTextFallback').style.display='block';">
                     
                     <!-- Fallback del texto -->
@@ -123,7 +123,7 @@
                                 </svg>
                             </div>
                             
-                            <!-- Nombre del usuario (opcional) -->
+                            <!-- Nombre del usuario -->
                             <span class="hidden md:block font-medium">Usuario</span>
                             
                             <!-- Icono de flecha -->
@@ -178,7 +178,7 @@
         <div class="mb-8 flex justify-between items-center gap-4">
             <h2 class="text-3xl font-bold text-primary mb-2">¡Bienvenido Usuario!</h2>
             
-            <!-- Buscador de restaurantes (siempre visible) -->
+            <!-- Buscador de restaurantes -->
             <div class="relative flex-1 max-w-md">
                 <div class="relative">
                     <input 
@@ -202,7 +202,6 @@
                     <div class="p-4">
                         <!-- Resultados de búsqueda en tiempo real -->
                         <div id="searchResults" class="max-h-96 overflow-y-auto">
-                            <!-- Los resultados aparecerán aquí -->
                         </div>
                     </div>
                 </div>
@@ -300,7 +299,6 @@
 
             <!-- Grid de cards de restaurantes -->
             <div id="restaurantsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                <!-- Las cards se generarán dinámicamente con JavaScript -->
             </div>
 
             <!-- Controles de paginación -->
@@ -315,7 +313,6 @@
                 </button>
 
                 <div class="flex items-center space-x-2" id="pageNumbers">
-                    <!-- Los números de página se generarán dinámicamente -->
                 </div>
 
                 <button onclick="nextPage()" id="nextBtn" class="px-4 py-2 bg-secondary hover:bg-secondary/90 text-white rounded-lg transition">
@@ -334,10 +331,10 @@
     <footer class="bg-primary text-white mt-12">
         <div class="container mx-auto px-4 py-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <!-- Columna 1: Logo y descripción -->
+                <!-- Logo y descripción -->
                 <div class="col-span-1">
                     <div class="flex items-center space-x-2 mb-4">
-                        <!-- Logo pequeño (versión blanca/light) -->
+                        <!-- Logo pequeño -->
                         <img src="../assets/img/logo-light.png" alt="Buho Eats" class="h-10 w-auto" onerror="this.style.display='none'; document.getElementById('footerLogoFallback').style.display='flex';">
                         
                         <!-- Fallback -->
@@ -352,7 +349,7 @@
                     </p>
                 </div>
 
-                <!-- Columna 2: Enlaces rápidos -->
+                <!-- Enlaces rápidos -->
                 <div class="col-span-1">
                     <h3 class="text-lg font-semibold mb-4">Enlaces Rápidos</h3>
                     <ul class="space-y-2">
@@ -363,7 +360,7 @@
                     </ul>
                 </div>
 
-                <!-- Columna 3: Información -->
+                <!--Información -->
                 <div class="col-span-1">
                     <h3 class="text-lg font-semibold mb-4">Información</h3>
                     <ul class="space-y-2">
@@ -374,7 +371,7 @@
                     </ul>
                 </div>
 
-                <!-- Columna 4: Redes sociales -->
+                <!-- Redes sociales -->
                 <div class="col-span-1">
                     <h3 class="text-lg font-semibold mb-4">Síguenos</h3>
                     <div class="flex space-x-4 mb-4">
@@ -447,22 +444,8 @@
             }
         });
 
-        // ============================================
-        // COMPONENTE DE DIÁLOGO PERSONALIZADO
-        // ============================================
         let dialogCallback = null;
 
-        /**
-         * Muestra un diálogo de confirmación personalizado
-         * @param {Object} options - Configuración del diálogo
-         * @param {string} options.title - Título del diálogo
-         * @param {string} options.message - Mensaje del diálogo
-         * @param {string} options.icon - Icono a mostrar ('warning', 'info', 'success', 'danger')
-         * @param {string} options.confirmText - Texto del botón de confirmación (default: 'Aceptar')
-         * @param {string} options.cancelText - Texto del botón de cancelar (default: 'Cancelar')
-         * @param {Function} options.onConfirm - Callback cuando se confirma
-         * @param {Function} options.onCancel - Callback cuando se cancela
-         */
         function showDialog(options) {
             const dialog = document.getElementById('customDialog');
             const title = document.getElementById('dialogTitle');
@@ -541,12 +524,6 @@
             });
         }
 
-        // Verificar autenticación al cargar
-        // Auth.requireAuth();
-
-        // ============================================
-        // CARRUSEL DE IMÁGENES
-        // ============================================
         let currentSlide = 1;
         const totalSlides = 3;
         let carouselInterval;
@@ -605,9 +582,6 @@
         // Auto-avanzar cada 5 segundos
         carouselInterval = setInterval(nextSlide, 5000);
 
-        // ============================================
-        // DATOS DE RESTAURANTES (simulados)
-        // ============================================
         window.restaurants = [
             { id: 1, name: 'La Bella Italia', category: 'Italiana', rating: 4.8, image: 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=La+Bella+Italia', reviews: 127, isFavorite: false },
             { id: 2, name: 'Sushi Master', category: 'Japonesa', rating: 4.9, image: 'https://via.placeholder.com/400x300/588B8B/FFFFFF?text=Sushi+Master', reviews: 203, isFavorite: false },
@@ -629,16 +603,11 @@
             { id: 18, name: 'BBQ Kings', category: 'BBQ', rating: 4.9, image: 'https://via.placeholder.com/400x300/06BB0C/FFFFFF?text=BBQ+Kings', reviews: 188, isFavorite: false }
         ];
 
-        // ============================================
-        // PAGINACIÓN
-        // ============================================
+        
         let currentPage = 1;
         const itemsPerPage = 6;
         let totalPages = Math.ceil(window.restaurants.length / itemsPerPage);
 
-        // ============================================
-        // BÚSQUEDA DE RESTAURANTES (DROPDOWN)
-        // ============================================
         function showSearchResults() {
             const dropdown = document.getElementById('searchDropdown');
             const searchInput = document.getElementById('searchInput');

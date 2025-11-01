@@ -115,7 +115,7 @@ function toggleRestaurantFavorite(id, event) {
     // Alternar estado de favorito
     restaurant.isFavorite = !restaurant.isFavorite;
     
-    // Guardar en localStorage (simulación)
+    // Guardar en localStorage
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
     
     if (restaurant.isFavorite) {

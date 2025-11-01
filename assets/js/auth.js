@@ -1,11 +1,6 @@
 /**
- * Módulo de autenticación con medidas de seguridad mejoradas
+ * Módulo de autenticación con medidas de seguridad
  */
-
-// ============================================
-// UTILIDADES DE SEGURIDAD
-// ============================================
-
 /**
  * Sanitiza un string para prevenir XSS
  * @param {string} str - String a sanitizar
@@ -80,10 +75,6 @@ function isTokenExpired(token) {
         return true; // Si no se puede decodificar, considerar expirado
     }
 }
-
-// ============================================
-// RATE LIMITING Y BLOQUEO DE INTENTOS
-// ============================================
 
 const RateLimiter = {
     MAX_ATTEMPTS: 5,
@@ -161,10 +152,6 @@ const RateLimiter = {
         return Math.max(0, this.MAX_ATTEMPTS - attempts.count);
     }
 };
-
-// ============================================
-// MÓDULO DE AUTENTICACIÓN PRINCIPAL
-// ============================================
 
 const Auth = {
     // Tiempo de expiración del token (en horas)
@@ -481,11 +468,6 @@ const Auth = {
         }
     }
 };
-
-// ============================================
-// FUNCIONES GLOBALES DE CONVENIENCIA
-// ============================================
-
 /**
  * Función global para verificar autenticación
  */
@@ -506,10 +488,6 @@ function getUser() {
 function logout() {
     Auth.logout();
 }
-
-// ============================================
-// MONITOREO DE ACTIVIDAD
-// ============================================
 
 // Actualizar última actividad con cada interacción del usuario
 if (typeof document !== 'undefined') {

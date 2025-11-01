@@ -2,7 +2,7 @@
  * Configuración de la aplicación
  */
 const CONFIG = {
-    // URL del backend (ajustar según configuración del servidor)
+    // URL del backend
     API_URL: 'http://localhost:3000/api',
     
     // Endpoints

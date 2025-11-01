@@ -52,21 +52,12 @@
             <div class="text-center mb-8">
                 <!-- Logo de Buho Eats -->
                 <div class="mx-auto mb-4">
-                    <!-- Opción 1: Si tienes el logo en assets/img/logo.png -->
                     <img src="../assets/img/logo.png" alt="Buho Eats Logo" class="mx-auto h-24 w-auto" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';">
-                    
-                    <!-- Fallback: Logo temporal (emoji) - se oculta cuando la imagen carga -->
-                    <div id="logoFallback" class="mx-auto h-20 w-20 bg-secondary rounded-full flex items-center justify-center" style="display: none;">
-                        <span class="text-4xl">🦉</span>
-                    </div>
                 </div>
                 
                 <!-- Título con tipografía de Buho Eats -->
-                <!-- Opción 1: Si tienes imagen con la tipografía -->
                 <img src="../assets/img/logo-text.png" alt="Buho Eats" class="mx-auto h-12 mb-2" onerror="this.style.display='none'; document.getElementById('textFallback').style.display='block';">
                 
-                <!-- Fallback: Texto simple -->
-                <h1 id="textFallback" class="text-4xl font-bold text-dark mb-2" style="display: none;">Buho Eats</h1>
             </div>
 
             <!-- Formulario de Login -->
@@ -213,16 +204,12 @@
     <script src="../assets/js/api.js"></script>
     <script src="../assets/js/auth.js"></script>
     <script>
-        // ============================================
-        // VERIFICAR SI YA ESTÁ AUTENTICADO
-        // ============================================
+        
         if (Auth.isAuthenticated()) {
             Auth.redirectToDashboard();
         }
         
-        // ============================================
-        // VERIFICAR BLOQUEO AL CARGAR LA PÁGINA
-        // ============================================
+        
         window.addEventListener('DOMContentLoaded', function() {
             checkLockoutStatus();
         });
@@ -271,9 +258,7 @@
             }
         }
         
-        // ============================================
-        // TOGGLE PASSWORD VISIBILITY
-        // ============================================
+        
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordInput = document.getElementById('password');
             const eyeIcon = document.getElementById('eyeIcon');
@@ -293,9 +278,7 @@
             }
         });
 
-        // ============================================
-        // HANDLE FORM SUBMISSION
-        // ============================================
+        
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -392,9 +375,7 @@
             }
         });
         
-        // ============================================
-        // LIMPIAR CAMPOS AL HACER FOCUS
-        // ============================================
+       
         document.getElementById('username').addEventListener('focus', function() {
             document.getElementById('usernameError').classList.add('hidden');
             document.getElementById('errorMessage').classList.add('hidden');

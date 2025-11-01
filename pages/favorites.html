@@ -53,7 +53,6 @@
 
         <!-- Estado vacío -->
         <div id="emptyState" class="text-center py-20 bg-gray-800/70 backdrop-blur-sm rounded-2xl max-w-2xl mx-auto px-8">
-            <!-- Icono de favoritos vacío -->
             <div class="mb-6">
                 <svg class="w-24 h-24 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -81,9 +80,7 @@
     <script src="../assets/js/restaurant-card.js"></script>
     
     <script>
-        // ============================================
-        // CARGAR COMPONENTES
-        // ============================================
+       
         async function loadComponents() {
             try {
                 // Cargar header
@@ -108,9 +105,7 @@
             }
         }
 
-        // ============================================
-        // DATOS DE RESTAURANTES (simulados)
-        // ============================================
+        
         window.restaurants = [
             { id: 1, name: 'La Bella Italia', category: 'Italiana', rating: 4.8, image: 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=La+Bella+Italia', reviews: 127, isFavorite: false },
             { id: 2, name: 'Sushi Master', category: 'Japonesa', rating: 4.9, image: 'https://via.placeholder.com/400x300/588B8B/FFFFFF?text=Sushi+Master', reviews: 203, isFavorite: false },
@@ -132,9 +127,7 @@
             { id: 18, name: 'BBQ Kings', category: 'BBQ', rating: 4.9, image: 'https://via.placeholder.com/400x300/06BB0C/FFFFFF?text=BBQ+Kings', reviews: 188, isFavorite: false }
         ];
 
-        // ============================================
-        // RENDERIZAR FAVORITOS
-        // ============================================
+     
         function renderFavorites() {
             // Cargar favoritos del localStorage
             const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
@@ -163,16 +156,11 @@
             }
         }
 
-        // ============================================
-        // NAVEGAR A RESTAURANTE
-        // ============================================
         function goToRestaurant(id) {
             window.location.href = `restaurant-detail.html?id=${id}`;
         }
 
-        // ============================================
-        // INICIALIZACIÓN
-        // ============================================
+       
         function initializePage() {
             // Verificar autenticación
             if (!isAuthenticated()) {
@@ -187,9 +175,7 @@
             renderFavorites();
         }
 
-        // ============================================
-        // EVENTO: CAMBIOS EN FAVORITOS
-        // ============================================
+       
         // Escuchar cambios en favoritos desde otras pestañas
         window.addEventListener('storage', (e) => {
             if (e.key === 'favorites') {
@@ -202,9 +188,6 @@
             renderFavorites();
         });
 
-        // ============================================
-        // MENÚ DROPDOWN DE USUARIO
-        // ============================================
         function toggleUserMenu() {
             const dropdown = document.getElementById('userMenuDropdown');
             dropdown.classList.toggle('hidden');
@@ -220,14 +203,12 @@
             }
         });
 
-        // ============================================
-        // CERRAR SESIÓN
-        // ============================================
+       
         function logout() {
             showDialog({
                 title: '¿Cerrar Sesión?',
                 message: '¿Estás seguro de que deseas cerrar sesión?',
-                confirmText: 'Sí, cerrar sesión',
+                confirmText: 'Aceptar',
                 cancelText: 'Cancelar',
                 onConfirm: function() {
                     // Limpiar datos de sesión
@@ -240,9 +221,6 @@
             });
         }
 
-        // ============================================
-        // CARGAR PÁGINA
-        // ============================================
         window.addEventListener('DOMContentLoaded', loadComponents);
     </script>
 </body>

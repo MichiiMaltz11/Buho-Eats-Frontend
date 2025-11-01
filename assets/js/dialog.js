@@ -15,19 +15,6 @@ let dialogCallback = null;
  * @param {Function} options.onConfirm - Callback cuando se confirma
  * @param {Function} options.onCancel - Callback cuando se cancela
  * 
- * @example
- * showDialog({
- *     title: 'Eliminar registro',
- *     message: '¿Estás seguro de eliminar este elemento?',
- *     confirmText: 'Sí, eliminar',
- *     cancelText: 'No, conservar',
- *     onConfirm: () => {
- *         console.log('Confirmado');
- *     },
- *     onCancel: () => {
- *         console.log('Cancelado');
- *     }
- * });
  */
 function showDialog(options) {
     const dialog = document.getElementById('customDialog');
