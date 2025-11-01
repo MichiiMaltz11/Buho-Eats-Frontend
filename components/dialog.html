@@ -1,0 +1,36 @@
+<!-- MODAL DE CONFIRMACIÓN PERSONALIZADO -->
+<div id="customDialog" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden items-center justify-center">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
+        <!-- Header del modal -->
+        <div class="p-6">
+            <h3 id="dialogTitle" class="text-2xl font-bold text-primary">
+                <!-- Título se agregará dinámicamente -->
+            </h3>
+        </div>
+        
+        <!-- Contenido del modal -->
+        <div class="p-6">
+            <p id="dialogMessage" class="text-gray-600">
+                <!-- Mensaje se agregará dinámicamente -->
+            </p>
+        </div>
+        
+        <!-- Botones del modal -->
+        <div class="p-6 border-gray-200 flex gap-3">
+            <button 
+                id="dialogCancelBtn" 
+                class="flex-1 px-6 py-3 bg-danger text-white rounded-lg font-semibold hover:bg-danger/90 transition-all transform hover:scale-105"
+                onclick="closeDialog(false)"
+            >
+                Cancelar
+            </button>
+            <button 
+                id="dialogConfirmBtn" 
+                class="flex-1 px-6 py-3 bg-success text-white rounded-lg font-semibold hover:bg-success/90 transition-all transform hover:scale-105"
+                onclick="closeDialog(true)"
+            >
+                Aceptar
+            </button>
+        </div>
+    </div>
+</div>
