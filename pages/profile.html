@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Mi Perfil - Buho Eats</title>
+    
+    <!-- Tailwind CSS (Offline) -->
+    <script src="../libs/tailwind.js"></script>
+    
+    <!-- Configuración de Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3D405B',      // Azul principal
+                        secondary: '#588B8B',    // Verde azulado - botones y acentos
+                        dark: '#2C2C2C',         // Negro/gris oscuro
+                        light: '#FFFFFF',        // Blanco
+                        success: '#06BB0C',      // Verde - confirmación
+                        danger: '#C11D0C',       // Rojo - cancelación
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" href="../assets/css/reset.css">
+    
+    <style>
+        /* Imagen de fondo */
+        body {
+            background-image: url('../assets/img/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+        
+        /* Espacio para el header fijo */
+        main {
+            padding-top: 120px !important;
+            min-height: calc(100vh - 120px);
+        }
+
+        /* Preview de foto de perfil */
+        .profile-photo-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #588B8B;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- MODAL DE CONFIRMACIÓN PERSONALIZADO -->
+    <div id="customDialog" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
+            <!-- Header del modal -->
+            <div class="p-6">
+                <h3 id="dialogTitle" class="text-2xl font-bold text-primary">
+                    <!-- Título se agregará dinámicamente -->
+                </h3>
+            </div>
+            
+            <!-- Contenido del modal -->
+            <div class="p-6">
+                <p id="dialogMessage" class="text-gray-600">
+                    <!-- Mensaje se agregará dinámicamente -->
+                </p>
+            </div>
+            
+            <!-- Botones del modal -->
+            <div class="p-6 flex gap-3">
+                <button 
+                    id="dialogCancelBtn" 
+                    class="flex-1 px-6 py-3 bg-danger text-white rounded-lg font-semibold hover:bg-danger/90 transition-all transform hover:scale-105"
+                    onclick="closeDialog(false)"
+                >
+                    Cancelar
+                </button>
+                <button 
+                    id="dialogConfirmBtn" 
+                    class="flex-1 px-6 py-3 bg-success text-white rounded-lg font-semibold hover:bg-success/90 transition-all transform hover:scale-105"
+                    onclick="closeDialog(true)"
+                >
+                    Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="bg-primary shadow-lg fixed top-0 left-0 right-0 z-50">
+        <nav class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo y Texto a la izquierda -->
+                <div class="flex items-center space-x-3">
+                    <!-- Logo principal (versión blanca/light) -->
+                    <img src="../assets/img/logo-light.png" alt="Buho Eats Logo" class="h-12 w-auto" onerror="this.style.display='none'; document.getElementById('headerLogoFallback').style.display='flex';">
+                    
+                    <!-- Fallback del logo -->
+                    <div id="headerLogoFallback" class="h-12 w-12 bg-secondary rounded-full flex items-center justify-center" style="display: none;">
+                        <span class="text-2xl">🦉</span>
+                    </div>
+                    
+                    <!-- Logo con tipografía (versión blanca/light) -->
+                    <img src="../assets/img/logo-text-light.png" alt="Buho Eats" class="h-8 w-auto" onerror="this.style.display='none'; document.getElementById('headerTextFallback').style.display='block';">
+                    
+                    <!-- Fallback del texto -->
+                    <h1 id="headerTextFallback" class="text-2xl font-bold text-white" style="display: none;">Buho Eats</h1>
+                </div>
+
+                <!-- Menú de usuario a la derecha -->
+                <div class="flex items-center space-x-4">
+                    <!-- Botón de usuario -->
+                    <div class="relative">
+                        <button 
+                            id="userMenuButton" 
+                            class="flex items-center space-x-2 bg-secondary hover:bg-opacity-90 text-white px-4 py-2 rounded-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-white"
+                            onclick="toggleUserMenu()"
+                        >
+                            <!-- Icono de usuario -->
+                            <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            
+                            <!-- Nombre del usuario (opcional) -->
+                            <span class="hidden md:block font-medium">Usuario</span>
+                            
+                            <!-- Icono de flecha -->
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+
+                        <!-- Dropdown del menú de usuario -->
+                        <div 
+                            id="userMenuDropdown" 
+                            class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-50"
+                        >
+                            <a href="dashboard-user.html" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                    </svg>
+                                    <span>Inicio</span>
+                                </div>
+                            </a>
+                            
+                            <a href="profile.html" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition bg-gray-50">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                    <span>Mi Perfil</span>
+                                </div>
+                            </a>
+                            
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                    </svg>
+                                    <span>Favoritos</span>
+                                </div>
+                            </a>
+                            
+                            
+                            
+                            <hr class="my-2">
+                            
+                            <a href="#" onclick="logout()" class="block px-4 py-2 text-danger hover:bg-red-50 transition">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                    </svg>
+                                    <span>Cerrar Sesión</span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Título de la página -->
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-primary mb-2">Mi Perfil</h2>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- COLUMNA IZQUIERDA: Foto de Perfil -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <h3 class="text-xl font-bold text-primary mb-6 text-center">Foto de Perfil</h3>
+                    
+                    <!-- Preview de la foto -->
+                    <div class="flex justify-center mb-6">
+                        <div class="relative">
+                            <img 
+                                id="profilePhotoPreview" 
+                                src="../assets/img/default-avatar.png" 
+                                alt="Foto de perfil" 
+                                class="profile-photo-preview"
+                                onerror="this.src='https://ui-avatars.com/api/?name=Usuario&size=150&background=588B8B&color=fff&bold=true'"
+                            >
+                            <!-- Badge de editar -->
+                            <div class="absolute bottom-0 right-0 bg-secondary rounded-full p-2 shadow-lg cursor-pointer hover:bg-secondary/90 transition">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input de archivo oculto -->
+                    <input 
+                        type="file" 
+                        id="photoInput" 
+                        accept="image/*" 
+                        class="hidden" 
+                        onchange="previewPhoto(event)"
+                    >
+
+                    <!-- Botones de foto -->
+                    <div class="space-y-3">
+                        <button 
+                            onclick="document.getElementById('photoInput').click()"
+                            class="w-full bg-secondary text-white px-6 py-3 rounded-lg font-semibold hover:bg-secondary/90 transition"
+                        >
+                            Cambiar Foto
+                        </button>
+                        <button 
+                            onclick="removePhoto()"
+                            class="w-full bg-danger text-white px-6 py-3 rounded-lg font-semibold hover:bg-danger/90 transition"
+                        >
+                            Eliminar Foto
+                        </button>
+                    </div>
+
+                    <!-- Información de la foto -->
+                    <div class="mt-6 text-sm text-gray-500 text-center">
+                        <p>Formatos permitidos: JPG, PNG</p>
+                        <p>Tamaño máximo: 2MB</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA: Información Personal -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <h3 class="text-xl font-bold text-primary mb-6">Información Personal</h3>
+                    
+                    <form id="profileForm" onsubmit="saveProfile(event)">
+                        <!-- Nombre -->
+                        <div class="mb-6">
+                            <label for="firstName" class="block text-gray-700 font-semibold mb-2">
+                                Nombre <span class="text-danger">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="firstName" 
+                                name="firstName"
+                                value="Juan"
+                                required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent"
+                                placeholder="Ingresa tu nombre"
+                            >
+                        </div>
+
+                        <!-- Apellido -->
+                        <div class="mb-6">
+                            <label for="lastName" class="block text-gray-700 font-semibold mb-2">
+                                Apellido <span class="text-danger">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="lastName" 
+                                name="lastName"
+                                value="Pérez"
+                                required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent"
+                                placeholder="Ingresa tu apellido"
+                            >
+                        </div>
+
+                        <!-- Correo -->
+                        <div class="mb-6">
+                            <label for="email" class="block text-gray-700 font-semibold mb-2">
+                                Correo Electrónico <span class="text-danger">*</span>
+                            </label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email"
+                                value="juan.perez@example.com"
+                                required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent"
+                                placeholder="correo@ejemplo.com"
+                            >
+                        </div>
+
+                        <!-- Separador -->
+                        <hr class="my-8">
+                        <h4 class="text-lg font-bold text-primary mb-6">Cambiar Contraseña</h4>
+
+                        <!-- Contraseña Actual -->
+                        <div class="mb-6">
+                            <label for="currentPassword" class="block text-gray-700 font-semibold mb-2">
+                                Contraseña Actual
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="password" 
+                                    id="currentPassword" 
+                                    name="currentPassword"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent pr-12"
+                                    placeholder="Ingresa tu contraseña actual"
+                                >
+                                <button 
+                                    type="button"
+                                    onclick="togglePassword('currentPassword')"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                >
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Nueva Contraseña -->
+                        <div class="mb-6">
+                            <label for="newPassword" class="block text-gray-700 font-semibold mb-2">
+                                Nueva Contraseña
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="password" 
+                                    id="newPassword" 
+                                    name="newPassword"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent pr-12"
+                                    placeholder="Ingresa tu nueva contraseña"
+                                >
+                                <button 
+                                    type="button"
+                                    onclick="togglePassword('newPassword')"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                >
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Confirmar Nueva Contraseña -->
+                        <div class="mb-8">
+                            <label for="confirmPassword" class="block text-gray-700 font-semibold mb-2">
+                                Confirmar Nueva Contraseña
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="password" 
+                                    id="confirmPassword" 
+                                    name="confirmPassword"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent pr-12"
+                                    placeholder="Confirma tu nueva contraseña"
+                                >
+                                <button 
+                                    type="button"
+                                    onclick="togglePassword('confirmPassword')"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                >
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="flex gap-4">
+                            <button 
+                                type="submit"
+                                class="flex-1 bg-success text-white px-6 py-3 rounded-lg font-semibold hover:bg-success/90 transition-all transform hover:scale-105"
+                            >
+                                Guardar Cambios
+                            </button>
+                            <button 
+                                type="button"
+                                onclick="cancelEdit()"
+                                class="flex-1 bg-danger text-white px-6 py-3 rounded-lg font-semibold hover:bg-danger/90 transition-all transform hover:scale-105"
+                            >
+                                Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-primary text-white mt-12">
+        <div class="container mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Columna 1: Logo y descripción -->
+                <div class="col-span-1">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <img src="../assets/img/logo-light.png" alt="Buho Eats" class="h-10 w-auto" onerror="this.style.display='none'; document.getElementById('footerLogoFallback').style.display='flex';">
+                        <div id="footerLogoFallback" class="h-10 w-10 bg-secondary rounded-full flex items-center justify-center" style="display: none;">
+                            <span class="text-xl">🦉</span>
+                        </div>
+                        <span class="text-xl font-bold">Buho Eats</span>
+                    </div>
+                    <p class="text-gray-300 text-sm">
+                        Descubre los mejores restaurantes locales y comparte tus experiencias.
+                    </p>
+                </div>
+
+                <!-- Columna 2: Enlaces rápidos -->
+                <div class="col-span-1">
+                    <h3 class="text-lg font-semibold mb-4">Enlaces Rápidos</h3>
+                    <ul class="space-y-2">
+                        <li><a href="dashboard-user.html" class="text-gray-300 hover:text-white transition text-sm">Inicio</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Explorar Restaurantes</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Mis Reseñas</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Favoritos</a></li>
+                    </ul>
+                </div>
+
+                <!-- Columna 3: Información -->
+                <div class="col-span-1">
+                    <h3 class="text-lg font-semibold mb-4">Información</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Acerca de Nosotros</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Términos y Condiciones</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Política de Privacidad</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Contacto</a></li>
+                    </ul>
+                </div>
+
+                <!-- Columna 4: Redes sociales -->
+                <div class="col-span-1">
+                    <h3 class="text-lg font-semibold mb-4">Síguenos</h3>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="#" class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center hover:bg-opacity-80 transition">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center hover:bg-opacity-80 transition">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center hover:bg-opacity-80 transition">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="mt-8 pt-8 border-t border-white/20 flex flex-col md:flex-row justify-between items-center text-sm text-gray-300">
+                <p>© 2025 Buho Eats. Todos los derechos reservados.</p>
+                <p class="mt-2 md:mt-0">Hecho con 💙 para descubrir la mejor comida local</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    
+    <script>
+        // Toggle del menú de usuario
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userMenuDropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Cerrar el menú si se hace click fuera
+        document.addEventListener('click', function(event) {
+            const userMenuButton = document.getElementById('userMenuButton');
+            const dropdown = document.getElementById('userMenuDropdown');
+            
+            if (userMenuButton && dropdown) {
+                if (!userMenuButton.contains(event.target) && !dropdown.contains(event.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            }
+        });
+
+        // ============================================
+        // COMPONENTE DE DIÁLOGO PERSONALIZADO
+        // ============================================
+        let dialogCallback = null;
+
+        function showDialog(options) {
+            const dialog = document.getElementById('customDialog');
+            const title = document.getElementById('dialogTitle');
+            const message = document.getElementById('dialogMessage');
+            const confirmBtn = document.getElementById('dialogConfirmBtn');
+            const cancelBtn = document.getElementById('dialogCancelBtn');
+            
+            title.textContent = options.title || 'Confirmación';
+            message.textContent = options.message || '¿Estás seguro?';
+            confirmBtn.textContent = options.confirmText || 'Aceptar';
+            cancelBtn.textContent = options.cancelText || 'Cancelar';
+            
+            dialogCallback = {
+                onConfirm: options.onConfirm || null,
+                onCancel: options.onCancel || null
+            };
+            
+            dialog.classList.remove('hidden');
+            dialog.classList.add('flex');
+            
+            setTimeout(() => {
+                dialog.querySelector('.bg-white').classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeDialog(confirmed) {
+            const dialog = document.getElementById('customDialog');
+            
+            dialog.querySelector('.bg-white').classList.remove('scale-100');
+            
+            setTimeout(() => {
+                dialog.classList.add('hidden');
+                dialog.classList.remove('flex');
+                
+                if (confirmed && dialogCallback?.onConfirm) {
+                    dialogCallback.onConfirm();
+                } else if (!confirmed && dialogCallback?.onCancel) {
+                    dialogCallback.onCancel();
+                }
+                
+                dialogCallback = null;
+            }, 200);
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const dialog = document.getElementById('customDialog');
+                if (dialog && !dialog.classList.contains('hidden')) {
+                    closeDialog(false);
+                }
+            }
+        });
+
+        // Función de logout
+        function logout() {
+            showDialog({
+                title: 'Cerrar Sesión',
+                message: '¿Estás seguro de que deseas cerrar sesión?',
+                confirmText: 'Sí, cerrar sesión',
+                cancelText: 'Cancelar',
+                onConfirm: function() {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_data');
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+
+        // ============================================
+        // GESTIÓN DE FOTO DE PERFIL
+        // ============================================
+        function previewPhoto(event) {
+            const file = event.target.files[0];
+            
+            if (file) {
+                // Validar tamaño (2MB máximo)
+                if (file.size > 2 * 1024 * 1024) {
+                    showDialog({
+                        title: 'Archivo muy grande',
+                        message: 'La foto no debe superar los 2MB. Por favor selecciona una imagen más pequeña.',
+                        confirmText: 'Entendido',
+                        cancelText: 'Cerrar'
+                    });
+                    return;
+                }
+                
+                // Validar tipo de archivo
+                if (!file.type.match('image/(jpeg|jpg|png)')) {
+                    showDialog({
+                        title: 'Formato no válido',
+                        message: 'Solo se permiten archivos JPG y PNG.',
+                        confirmText: 'Entendido',
+                        cancelText: 'Cerrar'
+                    });
+                    return;
+                }
+                
+                // Mostrar preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profilePhotoPreview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removePhoto() {
+            showDialog({
+                title: 'Eliminar Foto',
+                message: '¿Estás seguro de que deseas eliminar tu foto de perfil?',
+                confirmText: 'Sí, eliminar',
+                cancelText: 'Cancelar',
+                onConfirm: function() {
+                    document.getElementById('profilePhotoPreview').src = 'https://ui-avatars.com/api/?name=Usuario&size=150&background=588B8B&color=fff&bold=true';
+                    document.getElementById('photoInput').value = '';
+                }
+            });
+        }
+
+        // ============================================
+        // TOGGLE PASSWORD VISIBILITY
+        // ============================================
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const type = field.getAttribute('type') === 'password' ? 'text' : 'password';
+            field.setAttribute('type', type);
+        }
+
+        // ============================================
+        // VALIDACIÓN Y GUARDADO DEL PERFIL
+        // ============================================
+        function saveProfile(event) {
+            event.preventDefault();
+            
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validar campos básicos
+            if (!firstName || !lastName || !email) {
+                showDialog({
+                    title: 'Campos requeridos',
+                    message: 'Por favor completa todos los campos obligatorios.',
+                    confirmText: 'Entendido',
+                    cancelText: 'Cerrar'
+                });
+                return;
+            }
+            
+            // Validar email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showDialog({
+                    title: 'Email inválido',
+                    message: 'Por favor ingresa un correo electrónico válido.',
+                    confirmText: 'Entendido',
+                    cancelText: 'Cerrar'
+                });
+                return;
+            }
+            
+            // Si está cambiando la contraseña
+            if (currentPassword || newPassword || confirmPassword) {
+                if (!currentPassword) {
+                    showDialog({
+                        title: 'Contraseña actual requerida',
+                        message: 'Debes ingresar tu contraseña actual para cambiarla.',
+                        confirmText: 'Entendido',
+                        cancelText: 'Cerrar'
+                    });
+                    return;
+                }
+                
+                if (!newPassword) {
+                    showDialog({
+                        title: 'Nueva contraseña requerida',
+                        message: 'Debes ingresar tu nueva contraseña.',
+                        confirmText: 'Entendido',
+                        cancelText: 'Cerrar'
+                    });
+                    return;
+                }
+                
+                if (newPassword.length < 6) {
+                    showDialog({
+                        title: 'Contraseña débil',
+                        message: 'La contraseña debe tener al menos 6 caracteres.',
+                        confirmText: 'Entendido',
+                        cancelText: 'Cerrar'
+                    });
+                    return;
+                }
+                
+                if (newPassword !== confirmPassword) {
+                    showDialog({
+                        title: 'Contraseñas no coinciden',
+                        message: 'La nueva contraseña y su confirmación no coinciden.',
+                        confirmText: 'Entendido',
+                        cancelText: 'Cerrar'
+                    });
+                    return;
+                }
+            }
+            
+            // Todo válido, guardar
+            showDialog({
+                title: '¡Perfil Actualizado!',
+                message: 'Tus cambios han sido guardados exitosamente.',
+                confirmText: 'Genial',
+                cancelText: 'Cerrar',
+                onConfirm: function() {
+                    // Limpiar campos de contraseña
+                    document.getElementById('currentPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                    
+                    // En producción, aquí harías el API call
+                    console.log('Perfil guardado:', { firstName, lastName, email });
+                }
+            });
+        }
+
+        function cancelEdit() {
+            showDialog({
+                title: 'Cancelar Cambios',
+                message: '¿Estás seguro? Se perderán todos los cambios no guardados.',
+                confirmText: 'Sí, cancelar',
+                cancelText: 'No, continuar editando',
+                onConfirm: function() {
+                    // Recargar la página o volver a los valores originales
+                    window.location.reload();
+                }
+            });
+        }
+
+        // Verificar autenticación al cargar
+        // Auth.requireAuth();
+    </script>
+</body>
+</html>
