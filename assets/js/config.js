@@ -3,13 +3,14 @@
  */
 const CONFIG = {
     // URL del backend (ajustar según configuración del servidor)
-    API_URL: 'http://localhost:8000/api',
+    API_URL: 'http://localhost:3000/api',
     
     // Endpoints
     ENDPOINTS: {
         LOGIN: '/auth/login',
         REGISTER: '/auth/register',
         LOGOUT: '/auth/logout',
+        VERIFY: '/auth/verify',
         PROFILE: '/user/profile',
         // Añadir más endpoints según necesidades
     },
