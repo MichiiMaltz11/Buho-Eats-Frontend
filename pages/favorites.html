@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Favoritos - Buho Eats</title>
+    <link rel="icon" type="image/svg+xml" href="../assets/images/logo-dark.svg">
+    
+    <!-- Tailwind CSS -->
+    <script src="../libs/tailwind.js"></script>
+    
+    <!-- Configuración de Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3D405B',
+                        secondary: '#588B8B',
+                        accent: '#F4F1DE',
+                        success: '#06BB0C',
+                        danger: '#C11D0C'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Estilos personalizados -->
+    <style>
+        body {
+            background: url('../assets/img/background.jpg') center center / cover no-repeat fixed;
+            min-height: 100vh;
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div id="header-container"></div>
+
+    <!-- Contenido Principal -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8" style="padding-top: 150px !important; padding-bottom: 80px; min-height: calc(100vh - 300px);">
+        <!-- Título -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">Favoritos</h1>
+        </div>
+
+        <!-- Grid de restaurantes favoritos -->
+        <div id="favoritesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" style="display: none;">
+            <!-- Los restaurantes favoritos se cargarán aquí dinámicamente -->
+        </div>
+
+        <!-- Estado vacío -->
+        <div id="emptyState" class="text-center py-20 bg-gray-800/70 backdrop-blur-sm rounded-2xl max-w-2xl mx-auto px-8">
+            <!-- Icono de favoritos vacío -->
+            <div class="mb-6">
+                <svg class="w-24 h-24 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+            </div>
+            <h2 class="text-3xl font-bold text-white mb-4">No hay favoritos</h2>
+            <p class="text-gray-300 mb-8">Aún no has agregado restaurantes a tus favoritos</p>
+            <a href="dashboard-user.html" class="inline-block bg-secondary hover:bg-secondary/90 text-white font-bold py-3 px-8 rounded-lg transition transform hover:scale-105">
+                Explorar Restaurantes
+            </a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <!-- Dialog personalizado -->
+    <div id="dialog-container"></div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/restaurant-card.js"></script>
+    
+    <script>
+        // ============================================
+        // CARGAR COMPONENTES
+        // ============================================
+        async function loadComponents() {
+            try {
+                // Cargar header
+                const headerResponse = await fetch('../components/header.html');
+                const headerHtml = await headerResponse.text();
+                document.getElementById('header-container').innerHTML = headerHtml;
+                
+                // Cargar footer
+                const footerResponse = await fetch('../components/footer.html');
+                const footerHtml = await footerResponse.text();
+                document.getElementById('footer-container').innerHTML = footerHtml;
+
+                // Cargar dialog
+                const dialogResponse = await fetch('../components/dialog.html');
+                const dialogHtml = await dialogResponse.text();
+                document.getElementById('dialog-container').innerHTML = dialogHtml;
+                
+                // Inicializar después de cargar los componentes
+                initializePage();
+            } catch (error) {
+                console.error('Error al cargar componentes:', error);
+            }
+        }
+
+        // ============================================
+        // DATOS DE RESTAURANTES (simulados)
+        // ============================================
+        window.restaurants = [
+            { id: 1, name: 'La Bella Italia', category: 'Italiana', rating: 4.8, image: 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=La+Bella+Italia', reviews: 127, isFavorite: false },
+            { id: 2, name: 'Sushi Master', category: 'Japonesa', rating: 4.9, image: 'https://via.placeholder.com/400x300/588B8B/FFFFFF?text=Sushi+Master', reviews: 203, isFavorite: false },
+            { id: 3, name: 'Taquería El Patrón', category: 'Mexicana', rating: 4.7, image: 'https://via.placeholder.com/400x300/06BB0C/FFFFFF?text=Taqueria+El+Patron', reviews: 89, isFavorite: false },
+            { id: 4, name: 'Burger House', category: 'Hamburguesas', rating: 4.6, image: 'https://via.placeholder.com/400x300/C11D0C/FFFFFF?text=Burger+House', reviews: 156, isFavorite: false },
+            { id: 5, name: 'Pizza Napoli', category: 'Pizzería', rating: 4.5, image: 'https://via.placeholder.com/400x300/2C2C2C/FFFFFF?text=Pizza+Napoli', reviews: 98, isFavorite: false },
+            { id: 6, name: 'El Buen Sabor', category: 'Comida Criolla', rating: 4.8, image: 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=El+Buen+Sabor', reviews: 134, isFavorite: false },
+            { id: 7, name: 'Wok & Roll', category: 'China', rating: 4.4, image: 'https://via.placeholder.com/400x300/588B8B/FFFFFF?text=Wok+and+Roll', reviews: 76, isFavorite: false },
+            { id: 8, name: 'Café Paris', category: 'Café', rating: 4.7, image: 'https://via.placeholder.com/400x300/06BB0C/FFFFFF?text=Cafe+Paris', reviews: 112, isFavorite: false },
+            { id: 9, name: 'Mariscos La Costa', category: 'Mariscos', rating: 4.9, image: 'https://via.placeholder.com/400x300/C11D0C/FFFFFF?text=Mariscos+La+Costa', reviews: 167, isFavorite: false },
+            { id: 10, name: 'Parrilla Argentina', category: 'Parrilla', rating: 4.8, image: 'https://via.placeholder.com/400x300/2C2C2C/FFFFFF?text=Parrilla+Argentina', reviews: 145, isFavorite: false },
+            { id: 11, name: 'Ramen Ya', category: 'Japonesa', rating: 4.6, image: 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=Ramen+Ya', reviews: 92, isFavorite: false },
+            { id: 12, name: 'La Casona', category: 'Peruana', rating: 4.7, image: 'https://via.placeholder.com/400x300/588B8B/FFFFFF?text=La+Casona', reviews: 118, isFavorite: false },
+            { id: 13, name: 'Vegetalia', category: 'Vegetariana', rating: 4.5, image: 'https://via.placeholder.com/400x300/06BB0C/FFFFFF?text=Vegetalia', reviews: 87, isFavorite: false },
+            { id: 14, name: 'Wings & Beer', category: 'Alitas', rating: 4.4, image: 'https://via.placeholder.com/400x300/C11D0C/FFFFFF?text=Wings+and+Beer', reviews: 101, isFavorite: false },
+            { id: 15, name: 'Trattoria Roma', category: 'Italiana', rating: 4.8, image: 'https://via.placeholder.com/400x300/2C2C2C/FFFFFF?text=Trattoria+Roma', reviews: 139, isFavorite: false },
+            { id: 16, name: 'Thai Spice', category: 'Tailandesa', rating: 4.7, image: 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=Thai+Spice', reviews: 94, isFavorite: false },
+            { id: 17, name: 'La Panadería', category: 'Panadería', rating: 4.6, image: 'https://via.placeholder.com/400x300/588B8B/FFFFFF?text=La+Panaderia', reviews: 78, isFavorite: false },
+            { id: 18, name: 'BBQ Kings', category: 'BBQ', rating: 4.9, image: 'https://via.placeholder.com/400x300/06BB0C/FFFFFF?text=BBQ+Kings', reviews: 188, isFavorite: false }
+        ];
+
+        // ============================================
+        // RENDERIZAR FAVORITOS
+        // ============================================
+        function renderFavorites() {
+            // Cargar favoritos del localStorage
+            const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+            
+            // Marcar restaurantes como favoritos
+            window.restaurants.forEach(restaurant => {
+                restaurant.isFavorite = favorites.includes(restaurant.id);
+            });
+            
+            // Filtrar solo los favoritos
+            const favoriteRestaurants = window.restaurants.filter(r => r.isFavorite);
+            
+            // Mostrar/ocultar estado vacío
+            const grid = document.getElementById('favoritesGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (favoriteRestaurants.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
+            } else {
+                grid.style.display = 'grid';
+                emptyState.style.display = 'none';
+                
+                // Renderizar cards de favoritos
+                renderRestaurantCards(favoriteRestaurants, 'favoritesGrid');
+            }
+        }
+
+        // ============================================
+        // NAVEGAR A RESTAURANTE
+        // ============================================
+        function goToRestaurant(id) {
+            window.location.href = `restaurant-detail.html?id=${id}`;
+        }
+
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+        function initializePage() {
+            // Verificar autenticación
+            if (!isAuthenticated()) {
+                window.location.href = '../index.html';
+                return;
+            }
+            
+            // Actualizar nombre de usuario en el header
+            updateUserName();
+            
+            // Renderizar favoritos
+            renderFavorites();
+        }
+
+        // ============================================
+        // EVENTO: CAMBIOS EN FAVORITOS
+        // ============================================
+        // Escuchar cambios en favoritos desde otras pestañas
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'favorites') {
+                renderFavorites();
+            }
+        });
+
+        // Escuchar evento personalizado de cambio de favoritos
+        window.addEventListener('favoritesChanged', () => {
+            renderFavorites();
+        });
+
+        // ============================================
+        // MENÚ DROPDOWN DE USUARIO
+        // ============================================
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userMenuDropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Cerrar el dropdown si se hace clic fuera de él
+        document.addEventListener('click', function(event) {
+            const userMenu = document.getElementById('userMenuButton');
+            const dropdown = document.getElementById('userMenuDropdown');
+            
+            if (userMenu && dropdown && !userMenu.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        // ============================================
+        // CERRAR SESIÓN
+        // ============================================
+        function logout() {
+            showDialog({
+                title: '¿Cerrar Sesión?',
+                message: '¿Estás seguro de que deseas cerrar sesión?',
+                confirmText: 'Sí, cerrar sesión',
+                cancelText: 'Cancelar',
+                onConfirm: function() {
+                    // Limpiar datos de sesión
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    
+                    // Redirigir al login
+                    window.location.href = '../index.html';
+                }
+            });
+        }
+
+        // ============================================
+        // CARGAR PÁGINA
+        // ============================================
+        window.addEventListener('DOMContentLoaded', loadComponents);
+    </script>
+</body>
+</html>
