@@ -49,6 +49,43 @@
     </style>
 </head>
 <body class="bg-gray-50">
+    <!-- MODAL DE CONFIRMACIÓN PERSONALIZADO -->
+    <div id="customDialog" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
+            <!-- Header del modal -->
+            <div class="p-6">
+                <h3 id="dialogTitle" class="text-2xl font-bold text-primary">
+                    <!-- Título se agregará dinámicamente -->
+                </h3>
+            </div>
+            
+            <!-- Contenido del modal -->
+            <div class="p-6">
+                <p id="dialogMessage" class="text-gray-600">
+                    <!-- Mensaje se agregará dinámicamente -->
+                </p>
+            </div>
+            
+            <!-- Botones del modal -->
+            <div class="p-6 flex gap-3">
+                <button 
+                    id="dialogCancelBtn" 
+                    class="flex-1 px-6 py-3 bg-danger text-white rounded-lg font-semibold hover:bg-danger/90 transition-all transform hover:scale-105"
+                    onclick="closeDialog(false)"
+                >
+                    Cancelar
+                </button>
+                <button 
+                    id="dialogConfirmBtn" 
+                    class="flex-1 px-6 py-3 bg-success text-white rounded-lg font-semibold hover:bg-success/90 transition-all transform hover:scale-105"
+                    onclick="closeDialog(true)"
+                >
+                    Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- HEADER -->
     <header class="bg-primary shadow-lg fixed top-0 left-0 right-0 z-50">
         <nav class="container mx-auto px-4 py-4">
@@ -117,28 +154,7 @@
                                     <span>Favoritos</span>
                                 </div>
                             </a>
-                            
-                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition">
-                                <div class="flex items-center space-x-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                    <span>Mis Reseñas</span>
-                                </div>
-                            </a>
-                            
-                            <hr class="my-2">
-                            
-                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition">
-                                <div class="flex items-center space-x-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                    <span>Configuración</span>
-                                </div>
-                            </a>
-                            
+                           
                             <hr class="my-2">
                             
                             <a href="#" onclick="logout()" class="block px-4 py-2 text-danger hover:bg-red-50 transition">
@@ -158,53 +174,158 @@
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="container mx-auto px-4 py-8">
-        <!-- Título de bienvenida -->
-        <div class="mb-8">
-            <h2 class="text-3xl font-bold text-primary mb-2">¡Bienvenido de nuevo! 👋</h2>
-            <p class="text-gray-600">Explora nuevos restaurantes y comparte tus experiencias</p>
+        <!-- Título de bienvenida con buscador -->
+        <div class="mb-8 flex justify-between items-center gap-4">
+            <h2 class="text-3xl font-bold text-primary mb-2">¡Bienvenido Usuario!</h2>
+            
+            <!-- Buscador de restaurantes (siempre visible) -->
+            <div class="relative flex-1 max-w-md">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        id="searchInput"
+                        placeholder="Buscar restaurante..." 
+                        class="w-full px-4 py-3 pl-12 rounded-lg border-2 border-gray-300 focus:border-secondary focus:outline-none transition shadow-md"
+                        onfocus="showSearchResults()"
+                        oninput="searchRestaurants()"
+                    >
+                    <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                
+                <!-- Dropdown de resultados -->
+                <div 
+                    id="searchDropdown"
+                    class="hidden absolute left-0 right-0 mt-2 bg-white rounded-lg shadow-2xl z-50 overflow-hidden"
+                >
+                    <div class="p-4">
+                        <!-- Resultados de búsqueda en tiempo real -->
+                        <div id="searchResults" class="max-h-96 overflow-y-auto">
+                            <!-- Los resultados aparecerán aquí -->
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Contenido temporal para demostrar el scroll -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <!-- Tarjeta de ejemplo 1 -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h3 class="text-xl font-bold text-primary mb-2">Contenido de ejemplo</h3>
-                <p class="text-gray-600">Este es el dashboard del usuario. Aquí irá el contenido real.</p>
-            </div>
+        <!-- CARRUSEL DE RESTAURANTES DESTACADOS -->
+        <div class="mb-12">
+            <h3 class="text-2xl font-bold text-primary mb-6">Restaurantes Destacados</h3>
+            
+            <div class="relative bg-white rounded-xl shadow-xl overflow-hidden">
+                <!-- Contenedor del carrusel -->
+                <div id="carousel" class="relative h-96 overflow-hidden">
+                    <!-- Slide 1 -->
+                    <div class="carousel-item absolute w-full h-full transition-opacity duration-500" data-slide="1">
+                        <img src="../assets/img/restaurant-1.jpg" alt="Restaurante 1" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/1200x400/3D405B/FFFFFF?text=Restaurante+Destacado+1'">
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-8">
+                            <h4 class="text-3xl font-bold text-white mb-2">La Bella Italia</h4>
+                            <p class="text-white/90 mb-3">Auténtica comida italiana con recetas tradicionales</p>
+                            <div class="flex items-center space-x-4">
+                                <div class="flex items-center">
+                                    <span class="text-yellow-400 mr-1">⭐</span>
+                                    <span class="text-white font-semibold">4.8</span>
+                                </div>
+                                <span class="text-white/80">•</span>
+                                <span class="text-white/80">Italiana</span>
+                            </div>
+                        </div>
+                    </div>
 
-            <!-- Tarjeta de ejemplo 2 -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h3 class="text-xl font-bold text-primary mb-2">Header fijo</h3>
-                <p class="text-gray-600">Nota cómo el header se queda arriba cuando haces scroll.</p>
-            </div>
+                    <!-- Slide 2 -->
+                    <div class="carousel-item absolute w-full h-full transition-opacity duration-500 opacity-0" data-slide="2">
+                        <img src="../assets/img/restaurant-2.jpg" alt="Restaurante 2" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/1200x400/588B8B/FFFFFF?text=Restaurante+Destacado+2'">
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-8">
+                            <h4 class="text-3xl font-bold text-white mb-2">Sushi Master</h4>
+                            <p class="text-white/90 mb-3">Los mejores rollos de sushi de la ciudad</p>
+                            <div class="flex items-center space-x-4">
+                                <div class="flex items-center">
+                                    <span class="text-yellow-400 mr-1">⭐</span>
+                                    <span class="text-white font-semibold">4.9</span>
+                                </div>
+                                <span class="text-white/80">•</span>
+                                <span class="text-white/80">Japonesa</span>
+                            </div>
+                        </div>
+                    </div>
 
-            <!-- Tarjeta de ejemplo 3 -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h3 class="text-xl font-bold text-primary mb-2">Menú de usuario</h3>
-                <p class="text-gray-600">Haz click en el icono de usuario arriba a la derecha.</p>
+                    <!-- Slide 3 -->
+                    <div class="carousel-item absolute w-full h-full transition-opacity duration-500 opacity-0" data-slide="3">
+                        <img src="../assets/img/restaurant-3.jpg" alt="Restaurante 3" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/1200x400/06BB0C/FFFFFF?text=Restaurante+Destacado+3'">
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-8">
+                            <h4 class="text-3xl font-bold text-white mb-2">Taquería El Patrón</h4>
+                            <p class="text-white/90 mb-3">Tacos y comida mexicana auténtica</p>
+                            <div class="flex items-center space-x-4">
+                                <div class="flex items-center">
+                                    <span class="text-yellow-400 mr-1">⭐</span>
+                                    <span class="text-white font-semibold">4.7</span>
+                                </div>
+                                <span class="text-white/80">•</span>
+                                <span class="text-white/80">Mexicana</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de navegación del carrusel -->
+                <button onclick="previousSlide()" class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary rounded-full p-3 shadow-lg transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <button onclick="nextSlide()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary rounded-full p-3 shadow-lg transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+
+                <!-- Indicadores del carrusel -->
+                <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+                    <button onclick="goToSlide(1)" class="carousel-indicator w-3 h-3 rounded-full bg-white transition" data-slide="1"></button>
+                    <button onclick="goToSlide(2)" class="carousel-indicator w-3 h-3 rounded-full bg-white/50 transition" data-slide="2"></button>
+                    <button onclick="goToSlide(3)" class="carousel-indicator w-3 h-3 rounded-full bg-white/50 transition" data-slide="3"></button>
+                </div>
             </div>
         </div>
 
-        <!-- Más contenido para demostrar el scroll -->
-        <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
-            <h3 class="text-2xl font-bold text-primary mb-4">Contenido adicional</h3>
-            <p class="text-gray-600 mb-4">
-                Este contenido es temporal para que puedas probar el scroll y ver cómo el header se mantiene fijo en la parte superior.
-            </p>
-            <p class="text-gray-600 mb-4">
-                En la siguiente fase agregaremos el contenido real del dashboard: listado de restaurantes, 
-                reseñas recientes, favoritos, etc.
-            </p>
-            <p class="text-gray-600">
-                Por ahora, desplázate hacia abajo para ver el footer y cómo funciona toda la estructura.
-            </p>
-        </div>
+        <!-- LISTADO DE RESTAURANTES CON PAGINACIÓN -->
+        <div class="mb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-primary">Todos los Restaurantes</h3>
+                <div class="text-sm text-gray-600">
+                    Mostrando <span id="showingStart">1</span>-<span id="showingEnd">6</span> de <span id="totalRestaurants">18</span>
+                </div>
+            </div>
 
-        <!-- Espaciador para demostrar el scroll -->
-        <div class="h-96 bg-gradient-to-b from-white to-gray-100 rounded-lg shadow-lg p-8 flex items-center justify-center">
-            <div class="text-center">
-                <p class="text-2xl text-gray-400 mb-4">⬇️</p>
-                <p class="text-gray-600">Sigue scrolleando para ver el footer</p>
+            <!-- Grid de cards de restaurantes -->
+            <div id="restaurantsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <!-- Las cards se generarán dinámicamente con JavaScript -->
+            </div>
+
+            <!-- Controles de paginación -->
+            <div class="flex justify-center items-center space-x-4">
+                <button onclick="previousPage()" id="prevBtn" class="px-4 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed" disabled>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        <span>Anterior</span>
+                    </div>
+                </button>
+
+                <div class="flex items-center space-x-2" id="pageNumbers">
+                    <!-- Los números de página se generarán dinámicamente -->
+                </div>
+
+                <button onclick="nextPage()" id="nextBtn" class="px-4 py-2 bg-secondary hover:bg-secondary/90 text-white rounded-lg transition">
+                    <div class="flex items-center space-x-2">
+                        <span>Siguiente</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
+                </button>
             </div>
         </div>
     </main>
@@ -305,6 +426,7 @@
     <script src="../assets/js/api.js"></script>
     <script src="../assets/js/auth.js"></script>
     <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/restaurant-card.js"></script>
     
     <script>
         // Toggle del menú de usuario
@@ -325,17 +447,352 @@
             }
         });
 
-        // Función de logout
-        function logout() {
-            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-                localStorage.removeItem('auth_token');
-                localStorage.removeItem('user_data');
-                window.location.href = 'login.html';
+        // ============================================
+        // COMPONENTE DE DIÁLOGO PERSONALIZADO
+        // ============================================
+        let dialogCallback = null;
+
+        /**
+         * Muestra un diálogo de confirmación personalizado
+         * @param {Object} options - Configuración del diálogo
+         * @param {string} options.title - Título del diálogo
+         * @param {string} options.message - Mensaje del diálogo
+         * @param {string} options.icon - Icono a mostrar ('warning', 'info', 'success', 'danger')
+         * @param {string} options.confirmText - Texto del botón de confirmación (default: 'Aceptar')
+         * @param {string} options.cancelText - Texto del botón de cancelar (default: 'Cancelar')
+         * @param {Function} options.onConfirm - Callback cuando se confirma
+         * @param {Function} options.onCancel - Callback cuando se cancela
+         */
+        function showDialog(options) {
+            const dialog = document.getElementById('customDialog');
+            const title = document.getElementById('dialogTitle');
+            const message = document.getElementById('dialogMessage');
+            const confirmBtn = document.getElementById('dialogConfirmBtn');
+            const cancelBtn = document.getElementById('dialogCancelBtn');
+            
+            // Configurar contenido
+            title.textContent = options.title || 'Confirmación';
+            message.textContent = options.message || '¿Estás seguro?';
+            confirmBtn.textContent = options.confirmText || 'Aceptar';
+            cancelBtn.textContent = options.cancelText || 'Cancelar';
+            
+            // Guardar callbacks
+            dialogCallback = {
+                onConfirm: options.onConfirm || null,
+                onCancel: options.onCancel || null
+            };
+            
+            // Mostrar el diálogo
+            dialog.classList.remove('hidden');
+            dialog.classList.add('flex');
+            
+            // Animación de entrada
+            setTimeout(() => {
+                dialog.querySelector('.bg-white').classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeDialog(confirmed) {
+            const dialog = document.getElementById('customDialog');
+            
+            // Animación de salida
+            dialog.querySelector('.bg-white').classList.remove('scale-100');
+            
+            setTimeout(() => {
+                dialog.classList.add('hidden');
+                dialog.classList.remove('flex');
+                
+                // Ejecutar callback correspondiente
+                if (confirmed && dialogCallback?.onConfirm) {
+                    dialogCallback.onConfirm();
+                } else if (!confirmed && dialogCallback?.onCancel) {
+                    dialogCallback.onCancel();
+                }
+                
+                dialogCallback = null;
+            }, 200);
+        }
+
+        // Cerrar con ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const dialog = document.getElementById('customDialog');
+                if (!dialog.classList.contains('hidden')) {
+                    closeDialog(false);
+                }
             }
+        });
+
+        // Función de logout actualizada con diálogo personalizado
+        function logout() {
+            showDialog({
+                title: 'Cerrar Sesión',
+                message: '¿Estás seguro de que deseas cerrar sesión?',
+                confirmText: 'Aceptar',
+                cancelText: 'Cancelar',
+                onConfirm: function() {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_data');
+                    window.location.href = 'login.html';
+                },
+                onCancel: function() {
+                    console.log('Logout cancelado');
+                }
+            });
         }
 
         // Verificar autenticación al cargar
         // Auth.requireAuth();
+
+        // ============================================
+        // CARRUSEL DE IMÁGENES
+        // ============================================
+        let currentSlide = 1;
+        const totalSlides = 3;
+        let carouselInterval;
+
+        function showSlide(slideNumber) {
+            const slides = document.querySelectorAll('.carousel-item');
+            const indicators = document.querySelectorAll('.carousel-indicator');
+            
+            slides.forEach(slide => {
+                slide.classList.add('opacity-0');
+            });
+            
+            indicators.forEach(indicator => {
+                indicator.classList.remove('bg-white');
+                indicator.classList.add('bg-white/50');
+            });
+            
+            const activeSlide = document.querySelector(`.carousel-item[data-slide="${slideNumber}"]`);
+            const activeIndicator = document.querySelector(`.carousel-indicator[data-slide="${slideNumber}"]`);
+            
+            if (activeSlide) {
+                activeSlide.classList.remove('opacity-0');
+            }
+            if (activeIndicator) {
+                activeIndicator.classList.remove('bg-white/50');
+                activeIndicator.classList.add('bg-white');
+            }
+            
+            currentSlide = slideNumber;
+        }
+
+        function nextSlide() {
+            let next = currentSlide + 1;
+            if (next > totalSlides) next = 1;
+            showSlide(next);
+            resetCarouselInterval();
+        }
+
+        function previousSlide() {
+            let prev = currentSlide - 1;
+            if (prev < 1) prev = totalSlides;
+            showSlide(prev);
+            resetCarouselInterval();
+        }
+
+        function goToSlide(slideNumber) {
+            showSlide(slideNumber);
+            resetCarouselInterval();
+        }
+
+        function resetCarouselInterval() {
+            clearInterval(carouselInterval);
+            carouselInterval = setInterval(nextSlide, 5000);
+        }
+
+        // Auto-avanzar cada 5 segundos
+        carouselInterval = setInterval(nextSlide, 5000);
+
+        // ============================================
+        // DATOS DE RESTAURANTES (simulados)
+        // ============================================
+        window.restaurants = [
+            { id: 1, name: 'La Bella Italia', category: 'Italiana', rating: 4.8, image: 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=La+Bella+Italia', reviews: 127, isFavorite: false },
+            { id: 2, name: 'Sushi Master', category: 'Japonesa', rating: 4.9, image: 'https://via.placeholder.com/400x300/588B8B/FFFFFF?text=Sushi+Master', reviews: 203, isFavorite: false },
+            { id: 3, name: 'Taquería El Patrón', category: 'Mexicana', rating: 4.7, image: 'https://via.placeholder.com/400x300/06BB0C/FFFFFF?text=Taqueria+El+Patron', reviews: 89, isFavorite: false },
+            { id: 4, name: 'Burger House', category: 'Hamburguesas', rating: 4.6, image: 'https://via.placeholder.com/400x300/C11D0C/FFFFFF?text=Burger+House', reviews: 156, isFavorite: false },
+            { id: 5, name: 'Pizza Napoli', category: 'Pizzería', rating: 4.5, image: 'https://via.placeholder.com/400x300/2C2C2C/FFFFFF?text=Pizza+Napoli', reviews: 98, isFavorite: false },
+            { id: 6, name: 'El Buen Sabor', category: 'Comida Criolla', rating: 4.8, image: 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=El+Buen+Sabor', reviews: 134, isFavorite: false },
+            { id: 7, name: 'Wok & Roll', category: 'China', rating: 4.4, image: 'https://via.placeholder.com/400x300/588B8B/FFFFFF?text=Wok+and+Roll', reviews: 76, isFavorite: false },
+            { id: 8, name: 'Café Paris', category: 'Café', rating: 4.7, image: 'https://via.placeholder.com/400x300/06BB0C/FFFFFF?text=Cafe+Paris', reviews: 112, isFavorite: false },
+            { id: 9, name: 'Mariscos La Costa', category: 'Mariscos', rating: 4.9, image: 'https://via.placeholder.com/400x300/C11D0C/FFFFFF?text=Mariscos+La+Costa', reviews: 167, isFavorite: false },
+            { id: 10, name: 'Parrilla Argentina', category: 'Parrilla', rating: 4.8, image: 'https://via.placeholder.com/400x300/2C2C2C/FFFFFF?text=Parrilla+Argentina', reviews: 145, isFavorite: false },
+            { id: 11, name: 'Ramen Ya', category: 'Japonesa', rating: 4.6, image: 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=Ramen+Ya', reviews: 92, isFavorite: false },
+            { id: 12, name: 'La Casona', category: 'Peruana', rating: 4.7, image: 'https://via.placeholder.com/400x300/588B8B/FFFFFF?text=La+Casona', reviews: 118, isFavorite: false },
+            { id: 13, name: 'Vegetalia', category: 'Vegetariana', rating: 4.5, image: 'https://via.placeholder.com/400x300/06BB0C/FFFFFF?text=Vegetalia', reviews: 87, isFavorite: false },
+            { id: 14, name: 'Wings & Beer', category: 'Alitas', rating: 4.4, image: 'https://via.placeholder.com/400x300/C11D0C/FFFFFF?text=Wings+and+Beer', reviews: 101, isFavorite: false },
+            { id: 15, name: 'Trattoria Roma', category: 'Italiana', rating: 4.8, image: 'https://via.placeholder.com/400x300/2C2C2C/FFFFFF?text=Trattoria+Roma', reviews: 139, isFavorite: false },
+            { id: 16, name: 'Thai Spice', category: 'Tailandesa', rating: 4.7, image: 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=Thai+Spice', reviews: 94, isFavorite: false },
+            { id: 17, name: 'La Panadería', category: 'Panadería', rating: 4.6, image: 'https://via.placeholder.com/400x300/588B8B/FFFFFF?text=La+Panaderia', reviews: 78, isFavorite: false },
+            { id: 18, name: 'BBQ Kings', category: 'BBQ', rating: 4.9, image: 'https://via.placeholder.com/400x300/06BB0C/FFFFFF?text=BBQ+Kings', reviews: 188, isFavorite: false }
+        ];
+
+        // ============================================
+        // PAGINACIÓN
+        // ============================================
+        let currentPage = 1;
+        const itemsPerPage = 6;
+        let totalPages = Math.ceil(window.restaurants.length / itemsPerPage);
+
+        // ============================================
+        // BÚSQUEDA DE RESTAURANTES (DROPDOWN)
+        // ============================================
+        function showSearchResults() {
+            const dropdown = document.getElementById('searchDropdown');
+            const searchInput = document.getElementById('searchInput');
+            
+           
+        }
+        
+        // Cerrar dropdown si se hace clic fuera
+        document.addEventListener('click', function(event) {
+            const searchInput = document.getElementById('searchInput');
+            const dropdown = document.getElementById('searchDropdown');
+            
+            if (searchInput && dropdown && !searchInput.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+        
+        function searchRestaurants() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            const searchResults = document.getElementById('searchResults');
+            const dropdown = document.getElementById('searchDropdown');
+            
+            dropdown.classList.remove('hidden');
+            
+            // Filtrar por nombre
+            const results = window.restaurants.filter(restaurant => 
+                restaurant.name.toLowerCase().includes(searchTerm)
+            );
+            
+            // Mostrar resultados en el dropdown
+            if (results.length === 0) {
+                searchResults.innerHTML = '<p class="text-gray-500 text-center py-4">No se encontraron restaurantes</p>';
+            } else {
+                searchResults.innerHTML = results.map(restaurant => `
+                    <div 
+                        onclick="goToRestaurantFromSearch(${restaurant.id})"
+                        class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition"
+                    >
+                        <img src="${restaurant.image}" alt="${restaurant.name}" class="w-16 h-16 object-cover rounded-lg">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-primary">${restaurant.name}</h4>
+                            <p class="text-sm text-gray-600">${restaurant.category}</p>
+                            <div class="flex items-center gap-1 mt-1">
+                                <span class="text-yellow-400">⭐</span>
+                                <span class="text-sm font-semibold">${restaurant.rating}</span>
+                                <span class="text-sm text-gray-500">(${restaurant.reviews})</span>
+                            </div>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        function goToRestaurantFromSearch(id) {
+            window.location.href = `restaurant-detail.html?id=${id}`;
+        }
+
+        function renderRestaurants() {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const restaurantsToShow = window.restaurants.slice(startIndex, endIndex);
+            
+            // Usar el componente de cards
+            renderRestaurantCards(restaurantsToShow, 'restaurantsGrid');
+            
+            updatePaginationInfo();
+            updatePaginationButtons();
+        }
+
+        function updatePaginationInfo() {
+            const startIndex = (currentPage - 1) * itemsPerPage + 1;
+            const endIndex = Math.min(currentPage * itemsPerPage, window.restaurants.length);
+            
+            document.getElementById('showingStart').textContent = window.restaurants.length > 0 ? startIndex : 0;
+            document.getElementById('showingEnd').textContent = endIndex;
+            document.getElementById('totalRestaurants').textContent = window.restaurants.length;
+        }
+
+        function updatePaginationButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const pageNumbers = document.getElementById('pageNumbers');
+            
+            // Botón anterior
+            if (currentPage === 1) {
+                prevBtn.disabled = true;
+                prevBtn.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+                prevBtn.classList.remove('bg-secondary', 'text-white', 'hover:bg-secondary/90');
+            } else {
+                prevBtn.disabled = false;
+                prevBtn.classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+                prevBtn.classList.add('bg-secondary', 'text-white', 'hover:bg-secondary/90');
+            }
+            
+            // Botón siguiente
+            if (currentPage === totalPages) {
+                nextBtn.disabled = true;
+                nextBtn.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+                nextBtn.classList.remove('bg-secondary', 'text-white', 'hover:bg-secondary/90');
+            } else {
+                nextBtn.disabled = false;
+                nextBtn.classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+                nextBtn.classList.add('bg-secondary', 'text-white', 'hover:bg-secondary/90');
+            }
+            
+            // Números de página
+            pageNumbers.innerHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.textContent = i;
+                pageBtn.onclick = () => goToPage(i);
+                pageBtn.className = `w-10 h-10 rounded-lg transition ${
+                    i === currentPage 
+                        ? 'bg-primary text-white' 
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`;
+                pageNumbers.appendChild(pageBtn);
+            }
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderRestaurants();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderRestaurants();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            renderRestaurants();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goToRestaurant(id) {
+            // Por ahora solo muestra una alerta, luego redirigirá a la página de detalles
+            window.location.href = `restaurant-detail.html?id=${id}`;
+        }
+
+        // Inicializar el dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            renderRestaurants();
+        });
     </script>
 </body>
 </html>
