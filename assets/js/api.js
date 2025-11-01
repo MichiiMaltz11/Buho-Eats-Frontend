@@ -34,12 +34,22 @@ const API = {
             const response = await fetch(url, config);
             const data = await response.json();
             
-            if (!response.ok) {
-                throw new Error(data.message || 'Error en la petición');
+            // Si la respuesta no es OK, lanzar error con el mensaje del backend
+            if (!response.ok || !data.success) {
+                const error = new Error(data.error || 'Error en la petición');
+                error.status = response.status;
+                error.data = data;
+                throw error;
             }
             
             return data;
         } catch (error) {
+            // Si es un error de red o JSON parsing
+            if (!error.status) {
+                console.error('Error de red o conexión:', error);
+                throw new Error('No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:3000');
+            }
+            
             console.error('Error en API:', error);
             throw error;
         }
