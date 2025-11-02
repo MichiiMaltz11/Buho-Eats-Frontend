@@ -36,7 +36,7 @@
                         </div>
                         
                         <!-- Nombre del usuario -->
-                        <span class="hidden md:block font-medium">Usuario</span>
+                        <span id="userName" class="hidden md:block font-medium">Usuario</span>
                         
                         <!-- Icono de flecha -->
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,33 +83,3 @@
         </div>
     </nav>
 </header>
-
-<script>
-// Toggle del menú de usuario
-function toggleUserMenu() {
-    const dropdown = document.getElementById('userMenuDropdown');
-    dropdown.classList.toggle('hidden');
-}
-
-// Cerrar el menú si se hace click fuera
-document.addEventListener('click', function(event) {
-    const userMenuButton = document.getElementById('userMenuButton');
-    const dropdown = document.getElementById('userMenuDropdown');
-    
-    if (userMenuButton && dropdown) {
-        if (!userMenuButton.contains(event.target) && !dropdown.contains(event.target)) {
-            dropdown.classList.add('hidden');
-        }
-    }
-});
-
-// Función de logout
-function logout() {
-    if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-        // Aquí iría la lógica de logout
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('user_data');
-        window.location.href = '../pages/login.html';
-    }
-}
-</script>

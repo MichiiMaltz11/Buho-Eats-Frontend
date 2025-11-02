@@ -328,7 +328,7 @@
             btnLoading.classList.remove('hidden');
             
             try {
-                // Llamar al API de login con las nuevas validaciones de seguridad
+                // Llamar al API de login
                 const response = await Auth.login(username, password);
                 
                 // Guardar preferencia de recordar
@@ -342,34 +342,13 @@
             } catch (error) {
                 console.error('Login error:', error);
                 
-                // Verificar si ahora está bloqueado
-                const newLockStatus = RateLimiter.isLocked();
+                // Mostrar error
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.querySelector('p').textContent = error.message || 'Usuario o contraseña incorrectos';
+                errorMessage.classList.remove('hidden');
                 
-                if (newLockStatus.locked) {
-                    // Mostrar mensaje de bloqueo
-                    const lockoutMsg = document.getElementById('lockoutMessage');
-                    const lockoutText = document.getElementById('lockoutText');
-                    lockoutMsg.classList.remove('hidden');
-                    lockoutText.textContent = `Cuenta bloqueada por múltiples intentos fallidos. Intenta de nuevo en ${newLockStatus.remainingTime} minutos.`;
-                    
-                    // Deshabilitar botón
-                    submitBtn.disabled = true;
-                    submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                } else {
-                    // Mostrar error normal
-                    const errorMessage = document.getElementById('errorMessage');
-                    errorMessage.querySelector('p').textContent = error.message || 'Usuario o contraseña incorrectos';
-                    errorMessage.classList.remove('hidden');
-                    
-                    // Mostrar intentos restantes
-                    const remaining = RateLimiter.getRemainingAttempts();
-                    showAttemptsRemaining(remaining);
-                    
-                    // Rehabilitar botón
-                    submitBtn.disabled = false;
-                }
-                
-                // Ocultar loading
+                // Rehabilitar botón
+                submitBtn.disabled = false;
                 btnText.classList.remove('hidden');
                 btnLoading.classList.add('hidden');
             }

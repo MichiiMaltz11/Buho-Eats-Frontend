@@ -1,0 +1,27 @@
+<!-- Carousel Component - Buho Eats -->
+<div class="mb-12">
+    
+    <div class="relative bg-white rounded-xl shadow-xl overflow-hidden">
+        <!-- Contenedor del carrusel -->
+        <div id="carousel" class="relative h-[500px] overflow-hidden">
+            <!-- Los slides se cargarán dinámicamente aquí -->
+        </div>
+
+        <!-- Botones de navegación del carrusel -->
+        <button onclick="Carousel.previous()" class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary rounded-full p-3 shadow-lg transition">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+        <button onclick="Carousel.next()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary rounded-full p-3 shadow-lg transition">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+        </button>
+
+        <!-- Indicadores del carrusel -->
+        <div id="carouselIndicators" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+            <!-- Los indicadores se cargarán dinámicamente aquí -->
+        </div>
+    </div>
+</div>

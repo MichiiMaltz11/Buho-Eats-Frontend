@@ -313,12 +313,6 @@ const Auth = {
      * @returns {Promise}
      */
     async login(email, password) {
-        // Verificar si la cuenta está bloqueada
-        const lockStatus = RateLimiter.isLocked();
-        if (lockStatus.locked) {
-            throw new Error(`Cuenta bloqueada. Intenta de nuevo en ${lockStatus.remainingTime} minutos.`);
-        }
-        
         // Sanitizar inputs
         email = sanitizeInput(email.trim());
         
@@ -333,35 +327,43 @@ const Auth = {
         }
         
         try {
-            const data = await API.post(CONFIG.ENDPOINTS.LOGIN, {
+            const response = await API.post(CONFIG.ENDPOINTS.LOGIN, {
                 email: email,
-                password: password // La contraseña se envía tal cual al backend
+                password: password
             });
             
-            if (data.success && data.user && data.token) {
-                // Login exitoso - resetear intentos
-                RateLimiter.resetAttempts();
+            console.log('Login response:', response);
+            
+            // Manejar estructura de respuesta: { success, data: { user, token } }
+            if (response.success && response.data) {
+                const { user, token } = response.data;
                 
-                // Guardar sesión (el token ya viene como JWT del backend)
-                localStorage.setItem(CONFIG.STORAGE_KEYS.TOKEN, data.token);
-                localStorage.setItem(CONFIG.STORAGE_KEYS.USER, JSON.stringify(data.user));
-                this.updateLastActivity();
-                
-                return data;
-            } else {
-                // Login fallido
-                RateLimiter.recordFailedAttempt();
-                
-                const remaining = RateLimiter.getRemainingAttempts();
-                if (remaining > 0) {
-                    throw new Error(`Credenciales incorrectas. ${remaining} intentos restantes.`);
+                if (user && token) {
+                    // Login exitoso
+                    localStorage.setItem(CONFIG.STORAGE_KEYS.TOKEN, token);
+                    localStorage.setItem(CONFIG.STORAGE_KEYS.USER, JSON.stringify(user));
+                    this.updateLastActivity();
+                    
+                    return response.data;
                 } else {
-                    throw new Error('Cuenta bloqueada por múltiples intentos fallidos.');
+                    throw new Error('Respuesta del servidor incompleta');
+                }
+            } else {
+                // Login fallido - el error viene del backend
+                const errorMsg = response.error || 'Credenciales incorrectas';
+                
+                // Si el backend devuelve remainingAttempts, incluirlo en el mensaje
+                if (response.remainingAttempts !== undefined && response.remainingAttempts >= 0) {
+                    throw new Error(`${errorMsg} (${response.remainingAttempts} intentos restantes)`);
+                } else {
+                    throw new Error(errorMsg);
                 }
             }
         } catch (error) {
-            // Registrar intento fallido
-            RateLimiter.recordFailedAttempt();
+            // Si el error viene del API con estructura específica, extraer el mensaje
+            if (error.remainingAttempts !== undefined) {
+                throw new Error(`${error.error || 'Error de autenticación'} (${error.remainingAttempts} intentos restantes)`);
+            }
             throw error;
         }
     },
@@ -369,9 +371,10 @@ const Auth = {
     /**
      * Registra un nuevo usuario con validaciones
      * @param {object} userData - Datos del usuario
+     * @param {boolean} autoLogin - Si debe iniciar sesión automáticamente (default: false)
      * @returns {Promise}
      */
-    async register(userData) {
+    async register(userData, autoLogin = false) {
         // Validar email
         if (!isValidEmail(userData.email)) {
             throw new Error('Email inválido');
@@ -392,17 +395,30 @@ const Auth = {
         };
         
         try {
-            const data = await API.post(CONFIG.ENDPOINTS.REGISTER, sanitizedData);
+            const response = await API.post(CONFIG.ENDPOINTS.REGISTER, sanitizedData);
             
-            if (data.success && data.user && data.token) {
-                // Registro exitoso - guardar sesión automáticamente
-                localStorage.setItem(CONFIG.STORAGE_KEYS.TOKEN, data.token);
-                localStorage.setItem(CONFIG.STORAGE_KEYS.USER, JSON.stringify(data.user));
-                this.updateLastActivity();
+            console.log('Register response:', response);
+            
+            // Manejar estructura de respuesta: { success, data: { message, user, token } }
+            if (response.success && response.data) {
+                const { user, token, message } = response.data;
                 
-                return data;
+                if (user && token) {
+                    // Registro exitoso
+                    
+                    // Solo guardar sesión si autoLogin es true
+                    if (autoLogin) {
+                        localStorage.setItem(CONFIG.STORAGE_KEYS.TOKEN, token);
+                        localStorage.setItem(CONFIG.STORAGE_KEYS.USER, JSON.stringify(user));
+                        this.updateLastActivity();
+                    }
+                    
+                    return response.data;
+                } else {
+                    throw new Error('Respuesta del servidor incompleta');
+                }
             } else {
-                throw new Error(data.error || 'Error en el registro');
+                throw new Error(response.error || 'Error en el registro');
             }
         } catch (error) {
             throw error;

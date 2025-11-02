@@ -12,6 +12,9 @@ const CONFIG = {
         LOGOUT: '/auth/logout',
         VERIFY: '/auth/verify',
         PROFILE: '/user/profile',
+        // Restaurantes
+        RESTAURANTS: '/restaurants',
+        RESTAURANT_BY_ID: '/restaurants/', // Append ID to this
         // Añadir más endpoints según necesidades
     },
     

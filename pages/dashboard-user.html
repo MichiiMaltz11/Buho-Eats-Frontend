@@ -87,96 +87,13 @@
     </div>
 
     <!-- HEADER -->
-    <header class="bg-primary shadow-lg fixed top-0 left-0 right-0 z-50">
-        <nav class="container mx-auto px-4 py-4">
-            <div class="flex items-center justify-between">
-                <!-- Logo y Texto-->
-                <div class="flex items-center space-x-3">
-                    <!-- Logo principal -->
-                    <img src="../assets/img/logo-light.png" alt="Buho Eats Logo" class="h-12 w-auto" onerror="this.style.display='none'; document.getElementById('headerLogoFallback').style.display='flex';">
-                    
-                    <!-- Fallback del logo -->
-                    <div id="headerLogoFallback" class="h-12 w-12 bg-secondary rounded-full flex items-center justify-center" style="display: none;">
-                        <span class="text-2xl">🦉</span>
-                    </div>
-                    
-                    <!-- Logo con tipografía -->
-                    <img src="../assets/img/logo-text-light.png" alt="Buho Eats" class="h-8 w-auto" onerror="this.style.display='none'; document.getElementById('headerTextFallback').style.display='block';">
-                    
-                    <!-- Fallback del texto -->
-                    <h1 id="headerTextFallback" class="text-2xl font-bold text-white" style="display: none;">Buho Eats</h1>
-                </div>
-
-                <!-- Menú de usuario a la derecha -->
-                <div class="flex items-center space-x-4">
-                    <!-- Botón de usuario -->
-                    <div class="relative">
-                        <button 
-                            id="userMenuButton" 
-                            class="flex items-center space-x-2 bg-secondary hover:bg-opacity-90 text-white px-4 py-2 rounded-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-white"
-                            onclick="toggleUserMenu()"
-                        >
-                            <!-- Icono de usuario -->
-                            <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                                <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                            
-                            <!-- Nombre del usuario -->
-                            <span class="hidden md:block font-medium">Usuario</span>
-                            
-                            <!-- Icono de flecha -->
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-
-                        <!-- Dropdown del menú de usuario -->
-                        <div 
-                            id="userMenuDropdown" 
-                            class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-50"
-                        >
-                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition">
-                                <div class="flex items-center space-x-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                    <span>Mi Perfil</span>
-                                </div>
-                            </a>
-                            
-                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition">
-                                <div class="flex items-center space-x-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                    </svg>
-                                    <span>Favoritos</span>
-                                </div>
-                            </a>
-                           
-                            <hr class="my-2">
-                            
-                            <a href="#" onclick="logout()" class="block px-4 py-2 text-danger hover:bg-red-50 transition">
-                                <div class="flex items-center space-x-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                    </svg>
-                                    <span>Cerrar Sesión</span>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </header>
+    <div id="header-container"></div>
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="container mx-auto px-4 py-8">
         <!-- Título de bienvenida con buscador -->
         <div class="mb-8 flex justify-between items-center gap-4">
-            <h2 class="text-3xl font-bold text-primary mb-2">¡Bienvenido Usuario!</h2>
+            <h2 class="text-3xl font-bold text-primary mb-2">¡Bienvenido!</h2>
             
             <!-- Buscador de restaurantes -->
             <div class="relative flex-1 max-w-md">
@@ -209,84 +126,7 @@
         </div>
 
         <!-- CARRUSEL DE RESTAURANTES DESTACADOS -->
-        <div class="mb-12">
-            <h3 class="text-2xl font-bold text-primary mb-6">Restaurantes Destacados</h3>
-            
-            <div class="relative bg-white rounded-xl shadow-xl overflow-hidden">
-                <!-- Contenedor del carrusel -->
-                <div id="carousel" class="relative h-96 overflow-hidden">
-                    <!-- Slide 1 -->
-                    <div class="carousel-item absolute w-full h-full transition-opacity duration-500" data-slide="1">
-                        <img src="../assets/img/restaurant-1.jpg" alt="Restaurante 1" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/1200x400/3D405B/FFFFFF?text=Restaurante+Destacado+1'">
-                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-8">
-                            <h4 class="text-3xl font-bold text-white mb-2">La Bella Italia</h4>
-                            <p class="text-white/90 mb-3">Auténtica comida italiana con recetas tradicionales</p>
-                            <div class="flex items-center space-x-4">
-                                <div class="flex items-center">
-                                    <span class="text-yellow-400 mr-1">⭐</span>
-                                    <span class="text-white font-semibold">4.8</span>
-                                </div>
-                                <span class="text-white/80">•</span>
-                                <span class="text-white/80">Italiana</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Slide 2 -->
-                    <div class="carousel-item absolute w-full h-full transition-opacity duration-500 opacity-0" data-slide="2">
-                        <img src="../assets/img/restaurant-2.jpg" alt="Restaurante 2" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/1200x400/588B8B/FFFFFF?text=Restaurante+Destacado+2'">
-                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-8">
-                            <h4 class="text-3xl font-bold text-white mb-2">Sushi Master</h4>
-                            <p class="text-white/90 mb-3">Los mejores rollos de sushi de la ciudad</p>
-                            <div class="flex items-center space-x-4">
-                                <div class="flex items-center">
-                                    <span class="text-yellow-400 mr-1">⭐</span>
-                                    <span class="text-white font-semibold">4.9</span>
-                                </div>
-                                <span class="text-white/80">•</span>
-                                <span class="text-white/80">Japonesa</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Slide 3 -->
-                    <div class="carousel-item absolute w-full h-full transition-opacity duration-500 opacity-0" data-slide="3">
-                        <img src="../assets/img/restaurant-3.jpg" alt="Restaurante 3" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/1200x400/06BB0C/FFFFFF?text=Restaurante+Destacado+3'">
-                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-8">
-                            <h4 class="text-3xl font-bold text-white mb-2">Taquería El Patrón</h4>
-                            <p class="text-white/90 mb-3">Tacos y comida mexicana auténtica</p>
-                            <div class="flex items-center space-x-4">
-                                <div class="flex items-center">
-                                    <span class="text-yellow-400 mr-1">⭐</span>
-                                    <span class="text-white font-semibold">4.7</span>
-                                </div>
-                                <span class="text-white/80">•</span>
-                                <span class="text-white/80">Mexicana</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Botones de navegación del carrusel -->
-                <button onclick="previousSlide()" class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary rounded-full p-3 shadow-lg transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </button>
-                <button onclick="nextSlide()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary rounded-full p-3 shadow-lg transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </button>
-
-                <!-- Indicadores del carrusel -->
-                <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
-                    <button onclick="goToSlide(1)" class="carousel-indicator w-3 h-3 rounded-full bg-white transition" data-slide="1"></button>
-                    <button onclick="goToSlide(2)" class="carousel-indicator w-3 h-3 rounded-full bg-white/50 transition" data-slide="2"></button>
-                    <button onclick="goToSlide(3)" class="carousel-indicator w-3 h-3 rounded-full bg-white/50 transition" data-slide="3"></button>
-                </div>
-            </div>
-        </div>
+        <div id="carousel-container"></div>
 
         <!-- LISTADO DE RESTAURANTES CON PAGINACIÓN -->
         <div class="mb-12">
@@ -328,122 +168,20 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-primary text-white mt-12">
-        <div class="container mx-auto px-4 py-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <!-- Logo y descripción -->
-                <div class="col-span-1">
-                    <div class="flex items-center space-x-2 mb-4">
-                        <!-- Logo pequeño -->
-                        <img src="../assets/img/logo-light.png" alt="Buho Eats" class="h-10 w-auto" onerror="this.style.display='none'; document.getElementById('footerLogoFallback').style.display='flex';">
-                        
-                        <!-- Fallback -->
-                        <div id="footerLogoFallback" class="h-10 w-10 bg-secondary rounded-full flex items-center justify-center" style="display: none;">
-                            <span class="text-xl">🦉</span>
-                        </div>
-                        
-                        <span class="text-xl font-bold">Buho Eats</span>
-                    </div>
-                    <p class="text-gray-300 text-sm">
-                        Descubre los mejores restaurantes locales y comparte tus experiencias.
-                    </p>
-                </div>
-
-                <!-- Enlaces rápidos -->
-                <div class="col-span-1">
-                    <h3 class="text-lg font-semibold mb-4">Enlaces Rápidos</h3>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Inicio</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Explorar Restaurantes</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Mis Reseñas</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Favoritos</a></li>
-                    </ul>
-                </div>
-
-                <!--Información -->
-                <div class="col-span-1">
-                    <h3 class="text-lg font-semibold mb-4">Información</h3>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Acerca de Nosotros</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Términos y Condiciones</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Política de Privacidad</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Contacto</a></li>
-                    </ul>
-                </div>
-
-                <!-- Redes sociales -->
-                <div class="col-span-1">
-                    <h3 class="text-lg font-semibold mb-4">Síguenos</h3>
-                    <div class="flex space-x-4 mb-4">
-                        <!-- Facebook -->
-                        <a href="#" class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center hover:bg-opacity-80 transition">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                            </svg>
-                        </a>
-                        
-                        <!-- Instagram -->
-                        <a href="#" class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center hover:bg-opacity-80 transition">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                            </svg>
-                        </a>
-                        
-                        <!-- Twitter/X -->
-                        <a href="#" class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center hover:bg-opacity-80 transition">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                            </svg>
-                        </a>
-                    </div>
-                    
-                    <!-- Email de contacto -->
-                    <div class="text-sm text-gray-300">
-                        <p class="mb-1">Contacto:</p>
-                        <a href="mailto:contacto@buhoeats.com" class="hover:text-white transition">
-                            contacto@buhoeats.com
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Línea divisoria -->
-            <hr class="my-6 border-gray-600">
-
-            <!-- Copyright -->
-            <div class="flex flex-col md:flex-row justify-between items-center text-sm text-gray-300">
-                <p>© 2025 Buho Eats. Todos los derechos reservados.</p>
-                <p class="mt-2 md:mt-0">Hecho con 💙 para descubrir la mejor comida local</p>
-            </div>
-        </div>
-    </footer>
+    <div id="footer-container"></div>
 
     <!-- Scripts -->
     <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/header.js"></script>
     <script src="../assets/js/api.js"></script>
     <script src="../assets/js/auth.js"></script>
     <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/restaurant-api.js"></script>
+    <script src="../assets/js/carousel.js"></script>
     <script src="../assets/js/restaurant-card.js"></script>
     
     <script>
-        // Toggle del menú de usuario
-        function toggleUserMenu() {
-            const dropdown = document.getElementById('userMenuDropdown');
-            dropdown.classList.toggle('hidden');
-        }
-
-        // Cerrar el menú si se hace click fuera
-        document.addEventListener('click', function(event) {
-            const userMenuButton = document.getElementById('userMenuButton');
-            const dropdown = document.getElementById('userMenuDropdown');
-            
-            if (userMenuButton && dropdown) {
-                if (!userMenuButton.contains(event.target) && !dropdown.contains(event.target)) {
-                    dropdown.classList.add('hidden');
-                }
-            }
-        });
-
         let dialogCallback = null;
 
         function showDialog(options) {
@@ -524,84 +262,132 @@
             });
         }
 
-        let currentSlide = 1;
-        const totalSlides = 3;
-        let carouselInterval;
+        // Datos de restaurantes (se cargarán desde la API)
+        window.restaurants = [];
+        window.isLoadingRestaurants = false;
 
-        function showSlide(slideNumber) {
-            const slides = document.querySelectorAll('.carousel-item');
-            const indicators = document.querySelectorAll('.carousel-indicator');
-            
-            slides.forEach(slide => {
-                slide.classList.add('opacity-0');
-            });
-            
-            indicators.forEach(indicator => {
-                indicator.classList.remove('bg-white');
-                indicator.classList.add('bg-white/50');
-            });
-            
-            const activeSlide = document.querySelector(`.carousel-item[data-slide="${slideNumber}"]`);
-            const activeIndicator = document.querySelector(`.carousel-indicator[data-slide="${slideNumber}"]`);
-            
-            if (activeSlide) {
-                activeSlide.classList.remove('opacity-0');
+        /**
+         * Cargar restaurantes desde la API
+         */
+        async function loadRestaurants(filters = {}) {
+            try {
+                window.isLoadingRestaurants = true;
+                showLoadingState();
+
+                console.log('Cargando restaurantes desde API...');
+                const response = await RestaurantAPI.getAll(filters);
+                
+                console.log('Respuesta recibida:', response);
+                
+                if (response.success) {
+                    // Verificar si tiene la estructura correcta
+                    if (response.data && response.data.restaurants) {
+                        console.log('Estructura correcta, mapeando datos...');
+                        
+                        // Mapear los datos de la API al formato que usa el frontend
+                        window.restaurants = response.data.restaurants.map(restaurant => ({
+                            id: restaurant.id,
+                            name: restaurant.name,
+                            category: restaurant.cuisine_type || 'Sin categoría',
+                            rating: restaurant.rating || restaurant.average_rating || 0,
+                            image: restaurant.image_url || 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=' + encodeURIComponent(restaurant.name),
+                            reviews: restaurant.total_reviews || 0,
+                            isFavorite: false,
+                            // Datos adicionales
+                            description: restaurant.description,
+                            address: restaurant.address,
+                            phone: restaurant.phone,
+                            price_range: restaurant.price_range,
+                            opening_hours: restaurant.opening_hours
+                        }));
+
+                        console.log(`${window.restaurants.length} restaurantes cargados`);
+                        console.log('Primer restaurante:', window.restaurants[0]);
+
+                        totalPages = Math.ceil(window.restaurants.length / itemsPerPage);
+                        currentPage = 1;
+                        renderRestaurants();
+                        hideLoadingState();
+                    } else {
+                        // Si la respuesta no tiene data.restaurants, intentar con la estructura alternativa
+                        console.warn('Estructura alternativa detectada');
+                        if (response.restaurants) {
+                            window.restaurants = response.restaurants.map(restaurant => ({
+                                id: restaurant.id,
+                                name: restaurant.name,
+                                category: restaurant.cuisine_type || 'Sin categoría',
+                                rating: restaurant.rating || restaurant.average_rating || 0,
+                                image: restaurant.image_url || 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=' + encodeURIComponent(restaurant.name),
+                                reviews: restaurant.total_reviews || 0,
+                                isFavorite: false
+                            }));
+                            
+                            console.log(`${window.restaurants.length} restaurantes cargados (estructura alternativa)`);
+                            totalPages = Math.ceil(window.restaurants.length / itemsPerPage);
+                            currentPage = 1;
+                            renderRestaurants();
+                            hideLoadingState();
+                        } else {
+                            throw new Error('Estructura de respuesta no reconocida');
+                        }
+                    }
+                } else {
+                    throw new Error(response.message || response.error || 'Error desconocido al cargar restaurantes');
+                }
+            } catch (error) {
+                console.error('Error cargando restaurantes:', error);
+                showError('No se pudieron cargar los restaurantes. ' + error.message);
+                hideLoadingState();
+            } finally {
+                window.isLoadingRestaurants = false;
             }
-            if (activeIndicator) {
-                activeIndicator.classList.remove('bg-white/50');
-                activeIndicator.classList.add('bg-white');
+        }
+
+        /**
+         * Mostrar estado de carga
+         */
+        function showLoadingState() {
+            const grid = document.getElementById('restaurantsGrid');
+            if (grid) {
+                grid.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-12">
+                        <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-secondary mb-4"></div>
+                        <p class="text-gray-600 text-lg">Cargando restaurantes...</p>
+                    </div>
+                `;
             }
-            
-            currentSlide = slideNumber;
         }
 
-        function nextSlide() {
-            let next = currentSlide + 1;
-            if (next > totalSlides) next = 1;
-            showSlide(next);
-            resetCarouselInterval();
+        /**
+         * Ocultar estado de carga
+         */
+        function hideLoadingState() {
+            // El renderRestaurants() se encargará de mostrar el contenido
         }
 
-        function previousSlide() {
-            let prev = currentSlide - 1;
-            if (prev < 1) prev = totalSlides;
-            showSlide(prev);
-            resetCarouselInterval();
+        /**
+         * Mostrar mensaje de error
+         */
+        function showError(message) {
+            const grid = document.getElementById('restaurantsGrid');
+            if (grid) {
+                grid.innerHTML = `
+                    <div class="col-span-full bg-red-50 border-2 border-red-200 rounded-lg p-6 text-center">
+                        <svg class="w-12 h-12 text-red-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h3 class="text-xl font-bold text-red-700 mb-2">Error al cargar restaurantes</h3>
+                        <p class="text-red-600">${message}</p>
+                        <button 
+                            onclick="loadRestaurants()" 
+                            class="mt-4 px-6 py-2 bg-secondary text-white rounded-lg hover:bg-secondary/90 transition"
+                        >
+                            Reintentar
+                        </button>
+                    </div>
+                `;
+            }
         }
-
-        function goToSlide(slideNumber) {
-            showSlide(slideNumber);
-            resetCarouselInterval();
-        }
-
-        function resetCarouselInterval() {
-            clearInterval(carouselInterval);
-            carouselInterval = setInterval(nextSlide, 5000);
-        }
-
-        // Auto-avanzar cada 5 segundos
-        carouselInterval = setInterval(nextSlide, 5000);
-
-        window.restaurants = [
-            { id: 1, name: 'La Bella Italia', category: 'Italiana', rating: 4.8, image: 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=La+Bella+Italia', reviews: 127, isFavorite: false },
-            { id: 2, name: 'Sushi Master', category: 'Japonesa', rating: 4.9, image: 'https://via.placeholder.com/400x300/588B8B/FFFFFF?text=Sushi+Master', reviews: 203, isFavorite: false },
-            { id: 3, name: 'Taquería El Patrón', category: 'Mexicana', rating: 4.7, image: 'https://via.placeholder.com/400x300/06BB0C/FFFFFF?text=Taqueria+El+Patron', reviews: 89, isFavorite: false },
-            { id: 4, name: 'Burger House', category: 'Hamburguesas', rating: 4.6, image: 'https://via.placeholder.com/400x300/C11D0C/FFFFFF?text=Burger+House', reviews: 156, isFavorite: false },
-            { id: 5, name: 'Pizza Napoli', category: 'Pizzería', rating: 4.5, image: 'https://via.placeholder.com/400x300/2C2C2C/FFFFFF?text=Pizza+Napoli', reviews: 98, isFavorite: false },
-            { id: 6, name: 'El Buen Sabor', category: 'Comida Criolla', rating: 4.8, image: 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=El+Buen+Sabor', reviews: 134, isFavorite: false },
-            { id: 7, name: 'Wok & Roll', category: 'China', rating: 4.4, image: 'https://via.placeholder.com/400x300/588B8B/FFFFFF?text=Wok+and+Roll', reviews: 76, isFavorite: false },
-            { id: 8, name: 'Café Paris', category: 'Café', rating: 4.7, image: 'https://via.placeholder.com/400x300/06BB0C/FFFFFF?text=Cafe+Paris', reviews: 112, isFavorite: false },
-            { id: 9, name: 'Mariscos La Costa', category: 'Mariscos', rating: 4.9, image: 'https://via.placeholder.com/400x300/C11D0C/FFFFFF?text=Mariscos+La+Costa', reviews: 167, isFavorite: false },
-            { id: 10, name: 'Parrilla Argentina', category: 'Parrilla', rating: 4.8, image: 'https://via.placeholder.com/400x300/2C2C2C/FFFFFF?text=Parrilla+Argentina', reviews: 145, isFavorite: false },
-            { id: 11, name: 'Ramen Ya', category: 'Japonesa', rating: 4.6, image: 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=Ramen+Ya', reviews: 92, isFavorite: false },
-            { id: 12, name: 'La Casona', category: 'Peruana', rating: 4.7, image: 'https://via.placeholder.com/400x300/588B8B/FFFFFF?text=La+Casona', reviews: 118, isFavorite: false },
-            { id: 13, name: 'Vegetalia', category: 'Vegetariana', rating: 4.5, image: 'https://via.placeholder.com/400x300/06BB0C/FFFFFF?text=Vegetalia', reviews: 87, isFavorite: false },
-            { id: 14, name: 'Wings & Beer', category: 'Alitas', rating: 4.4, image: 'https://via.placeholder.com/400x300/C11D0C/FFFFFF?text=Wings+and+Beer', reviews: 101, isFavorite: false },
-            { id: 15, name: 'Trattoria Roma', category: 'Italiana', rating: 4.8, image: 'https://via.placeholder.com/400x300/2C2C2C/FFFFFF?text=Trattoria+Roma', reviews: 139, isFavorite: false },
-            { id: 16, name: 'Thai Spice', category: 'Tailandesa', rating: 4.7, image: 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=Thai+Spice', reviews: 94, isFavorite: false },
-            { id: 17, name: 'La Panadería', category: 'Panadería', rating: 4.6, image: 'https://via.placeholder.com/400x300/588B8B/FFFFFF?text=La+Panaderia', reviews: 78, isFavorite: false },
-            { id: 18, name: 'BBQ Kings', category: 'BBQ', rating: 4.9, image: 'https://via.placeholder.com/400x300/06BB0C/FFFFFF?text=BBQ+Kings', reviews: 188, isFavorite: false }
-        ];
 
         
         let currentPage = 1;
@@ -632,7 +418,13 @@
             
             dropdown.classList.remove('hidden');
             
-            // Filtrar por nombre
+            // Si no hay término de búsqueda, mostrar mensaje
+            if (!searchTerm) {
+                searchResults.innerHTML = '<p class="text-gray-500 text-center py-4">Escribe para buscar restaurantes</p>';
+                return;
+            }
+            
+            // Filtrar solo por nombre
             const results = window.restaurants.filter(restaurant => 
                 restaurant.name.toLowerCase().includes(searchTerm)
             );
@@ -641,18 +433,18 @@
             if (results.length === 0) {
                 searchResults.innerHTML = '<p class="text-gray-500 text-center py-4">No se encontraron restaurantes</p>';
             } else {
-                searchResults.innerHTML = results.map(restaurant => `
+                searchResults.innerHTML = results.slice(0, 5).map(restaurant => `
                     <div 
                         onclick="goToRestaurantFromSearch(${restaurant.id})"
                         class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition"
                     >
-                        <img src="${restaurant.image}" alt="${restaurant.name}" class="w-16 h-16 object-cover rounded-lg">
+                        <img src="${restaurant.image}" alt="${restaurant.name}" class="w-16 h-16 object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/64/3D405B/FFFFFF?text=🍽️'">
                         <div class="flex-1">
                             <h4 class="font-bold text-primary">${restaurant.name}</h4>
                             <p class="text-sm text-gray-600">${restaurant.category}</p>
                             <div class="flex items-center gap-1 mt-1">
                                 <span class="text-yellow-400">⭐</span>
-                                <span class="text-sm font-semibold">${restaurant.rating}</span>
+                                <span class="text-sm font-semibold">${restaurant.rating.toFixed(1)}</span>
                                 <span class="text-sm text-gray-500">(${restaurant.reviews})</span>
                             </div>
                         </div>
@@ -661,6 +453,46 @@
                         </svg>
                     </div>
                 `).join('');
+                
+                // Si hay más de 5 resultados, mostrar enlace para ver todos
+                if (results.length > 5) {
+                    searchResults.innerHTML += `
+                        <div class="p-3 text-center border-t">
+                            <button 
+                                onclick="searchAllRestaurants('${searchTerm}')"
+                                class="text-secondary font-semibold hover:underline"
+                            >
+                                Ver todos los ${results.length} resultados
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        /**
+         * Buscar todos los restaurantes y filtrar en el grid principal
+         */
+        function searchAllRestaurants(searchTerm) {
+            const dropdown = document.getElementById('searchDropdown');
+            dropdown.classList.add('hidden');
+            
+            // Filtrar solo por nombre
+            const filtered = window.restaurants.filter(restaurant => 
+                restaurant.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            
+            if (filtered.length > 0) {
+                currentPage = 1;
+                renderRestaurantCards(filtered, 'restaurantsGrid');
+                
+                // Actualizar info de paginación
+                document.getElementById('showingStart').textContent = 1;
+                document.getElementById('showingEnd').textContent = filtered.length;
+                document.getElementById('totalRestaurants').textContent = filtered.length;
+                
+                // Scroll al grid
+                document.getElementById('restaurantsGrid').scrollIntoView({ behavior: 'smooth' });
             }
         }
         
@@ -759,8 +591,9 @@
         }
 
         // Inicializar el dashboard
-        document.addEventListener('DOMContentLoaded', function() {
-            renderRestaurants();
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Cargar restaurantes desde la API
+            await loadRestaurants();
         });
     </script>
 </body>

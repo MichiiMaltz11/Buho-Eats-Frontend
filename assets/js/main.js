@@ -27,8 +27,64 @@ function init() {
 /**
  * Carga componentes dinámicos
  */
-function loadComponents() {
-    // Ejemplo: cargar header, footer, etc.
+async function loadComponents() {
+    // Cargar footer si existe el contenedor
+    const footerContainer = document.getElementById('footer-container');
+    if (footerContainer) {
+        try {
+            const response = await fetch('../components/footer.html');
+            if (response.ok) {
+                const html = await response.text();
+                footerContainer.innerHTML = html;
+            }
+        } catch (error) {
+            console.error('Error cargando footer:', error);
+        }
+    }
+
+    // Cargar header si existe el contenedor
+    const headerContainer = document.getElementById('header-container');
+    if (headerContainer) {
+        try {
+            const response = await fetch('../components/header.html');
+            if (response.ok) {
+                const html = await response.text();
+                headerContainer.innerHTML = html;
+                
+                // Cargar información del usuario después de cargar el header
+                setTimeout(() => {
+                    if (typeof window.loadUserInfo === 'function') {
+                        window.loadUserInfo();
+                    }
+                }, 300);
+            }
+        } catch (error) {
+            console.error('Error cargando header:', error);
+        }
+    }
+
+    // Cargar carousel si existe el contenedor
+    const carouselContainer = document.getElementById('carousel-container');
+    if (carouselContainer) {
+        try {
+            const response = await fetch('../components/carousel.html');
+            if (response.ok) {
+                const html = await response.text();
+                carouselContainer.innerHTML = html;
+                
+                // Inicializar el carrusel después de cargar el HTML
+                // Esperar un momento para que el DOM se actualice
+                setTimeout(() => {
+                    if (window.Carousel) {
+                        console.log('Inicializando carrusel...');
+                        window.Carousel.init();
+                    }
+                }, 100);
+            }
+        } catch (error) {
+            console.error('Error cargando carousel:', error);
+        }
+    }
 }
 
 /**
