@@ -750,6 +750,14 @@
             });
         }
 
+        // Verificar autenticación al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!isAuthenticated()) {
+                window.location.href = 'login.html';
+                return;
+            }
+        });
+
        
     </script>
 </body>

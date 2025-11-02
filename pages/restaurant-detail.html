@@ -696,6 +696,12 @@
 
        
         document.addEventListener('DOMContentLoaded', function() {
+            // Verificar autenticación primero
+            if (!isAuthenticated()) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
             // Obtener ID del restaurante de la URL
             const urlParams = new URLSearchParams(window.location.search);
             const restaurantId = urlParams.get('id');

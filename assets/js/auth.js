@@ -158,7 +158,7 @@ const Auth = {
     TOKEN_EXPIRATION_HOURS: 2,
     
     /**
-     * Verifica si hay un token válido
+     * Verifica si hay un token válido y no expirado
      * @returns {boolean}
      */
     isAuthenticated() {
@@ -169,9 +169,25 @@ const Auth = {
             return false;
         }
         
-        // El token viene del backend como JWT real, simplemente verificar que exista
-        // La expiración la maneja el backend
-        return true;
+        // Verificar si el token ha expirado
+        try {
+            // El token es un JWT, decodificar el payload
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const now = Math.floor(Date.now() / 1000); // Tiempo actual en segundos
+            
+            if (payload.exp && now >= payload.exp) {
+                console.warn('Token expirado, cerrando sesión...');
+                this.logout();
+                return false;
+            }
+            
+            return true;
+        } catch (error) {
+            // Si hay error al decodificar, considerar token inválido
+            console.error('Error al verificar token:', error);
+            this.logout();
+            return false;
+        }
     },
     
     /**

@@ -604,6 +604,12 @@
 
         // Inicializar el dashboard
         document.addEventListener('DOMContentLoaded', async function() {
+            // Verificar autenticación primero
+            if (!isAuthenticated()) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
             // Cargar restaurantes desde la API
             await loadRestaurants();
         });
