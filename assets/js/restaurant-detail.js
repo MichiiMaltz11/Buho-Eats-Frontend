@@ -37,6 +37,7 @@ const RestaurantDetail = {
                 this.currentRestaurant = response.data.restaurant;
                 this.renderRestaurant();
                 this.renderReviews();
+                this.loadMenu(id);
             } else {
                 this.showError('Restaurante no encontrado');
                 setTimeout(() => {
@@ -203,9 +204,16 @@ const RestaurantDetail = {
     formatDate(dateString) {
         const date = new Date(dateString);
         const now = new Date();
-        const diffTime = Math.abs(now - date);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        // Calcular diferencia en milisegundos
+        const diffTime = now - date;
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+        const diffMinutes = Math.floor(diffTime / (1000 * 60));
 
+        if (diffMinutes < 1) return 'Justo ahora';
+        if (diffMinutes < 60) return `Hace ${diffMinutes} minuto${diffMinutes > 1 ? 's' : ''}`;
+        if (diffHours < 24) return `Hace ${diffHours} hora${diffHours > 1 ? 's' : ''}`;
         if (diffDays === 0) return 'Hoy';
         if (diffDays === 1) return 'Ayer';
         if (diffDays < 7) return `Hace ${diffDays} días`;
@@ -252,6 +260,10 @@ const RestaurantDetail = {
     async submitReview() {
         const comment = document.getElementById('reviewComment')?.value.trim();
 
+        console.log('📝 Iniciando envío de reseña...');
+        console.log('⭐ Rating actual:', this.currentRating);
+        console.log('💬 Comentario:', comment);
+
         if (this.currentRating === 0) {
             showDialog({
                 title: 'Calificación requerida',
@@ -280,7 +292,11 @@ const RestaurantDetail = {
                 visitDate: new Date().toISOString().split('T')[0]
             };
 
+            console.log('📤 Enviando datos:', reviewData);
+
             const response = await API.post('/reviews', reviewData);
+
+            console.log('📥 Respuesta recibida:', response);
 
             if (response.success) {
                 showDialog({
@@ -315,6 +331,117 @@ const RestaurantDetail = {
                 cancelText: 'Cerrar'
             });
         }
+    },
+
+    /**
+     * Cargar menú del restaurante
+     */
+    async loadMenu(restaurantId) {
+        console.log('🍽️ Cargando menú para restaurante:', restaurantId);
+        try {
+            const response = await API.get(`/menu?restaurantId=${restaurantId}&availableOnly=true`);
+            console.log('📋 Respuesta del menú:', response);
+            
+            if (response.success && response.data && response.data.length > 0) {
+                console.log('✅ Menú tiene items:', response.data.length);
+                this.renderMenu(response.data);
+            } else {
+                console.log('⚠️ Menú vacío o sin datos');
+                this.showEmptyMenu();
+            }
+        } catch (error) {
+            console.error('❌ Error al cargar menú:', error);
+            this.showEmptyMenu();
+        }
+    },
+
+    /**
+     * Renderizar menú
+     */
+    renderMenu(menuItems) {
+        const menuGrid = document.getElementById('menuGrid');
+        if (!menuGrid) return;
+
+        // Agrupar por categoría
+        const categories = {
+            'Entrada': [],
+            'Plato Principal': [],
+            'Postre': [],
+            'Bebida': [],
+            'Otro': []
+        };
+
+        menuItems.forEach(item => {
+            if (categories[item.category]) {
+                categories[item.category].push(item);
+            } else {
+                categories['Otro'].push(item);
+            }
+        });
+
+        // Construir HTML
+        let menuHTML = '';
+
+        Object.entries(categories).forEach(([category, items]) => {
+            if (items.length > 0) {
+                menuHTML += `
+                    <div class="col-span-full">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-amber-500 pb-2">
+                            ${category}
+                        </h3>
+                    </div>
+                `;
+
+                items.forEach(item => {
+                    menuHTML += `
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                            ${item.image_url ? `
+                                <img src="${item.image_url}" 
+                                     alt="${item.name}" 
+                                     class="w-full h-48 object-cover"
+                                     onerror="this.src='https://via.placeholder.com/400x300?text=Sin+Imagen'">
+                            ` : `
+                                <div class="w-full h-48 bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
+                                    <svg class="w-20 h-20 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                </div>
+                            `}
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-bold text-lg text-gray-800">${item.name}</h4>
+                                    <span class="text-amber-600 font-bold text-lg">$${item.price.toFixed(2)}</span>
+                                </div>
+                                ${item.description ? `
+                                    <p class="text-gray-600 text-sm">${item.description}</p>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        });
+
+        menuGrid.innerHTML = menuHTML;
+    },
+
+    /**
+     * Mostrar mensaje de menú vacío
+     */
+    showEmptyMenu() {
+        const menuGrid = document.getElementById('menuGrid');
+        if (!menuGrid) return;
+
+        menuGrid.innerHTML = `
+            <div class="col-span-full text-center py-12">
+                <svg class="w-20 h-20 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                    </path>
+                </svg>
+                <p class="text-gray-500 text-lg">Este restaurante aún no ha publicado su menú</p>
+            </div>
+        `;
     },
 
     /**
