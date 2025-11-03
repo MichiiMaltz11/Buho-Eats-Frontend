@@ -56,6 +56,9 @@ async function loadComponents() {
                     if (typeof window.loadUserInfo === 'function') {
                         window.loadUserInfo();
                     }
+                    if (typeof window.showHomeOptionIfNeeded === 'function') {
+                        window.showHomeOptionIfNeeded();
+                    }
                 }, 300);
             }
         } catch (error) {

@@ -45,41 +45,34 @@ function logout() {
  */
 function loadUserInfo() {
     try {
-        // Usar directamente 'user_data' como clave
         const userDataStr = localStorage.getItem('user_data');
-        console.log('🔍 Intentando cargar info del usuario...');
-        console.log('📦 user_data en localStorage:', userDataStr);
         
         if (userDataStr) {
             const userData = JSON.parse(userDataStr);
-            console.log('✅ Datos del usuario parseados:', userData);
-            
             const userName = document.getElementById('userName');
-            console.log('🎯 Elemento userName encontrado:', userName);
             
             if (userName && userData.firstName) {
-                // Usar firstName directamente
                 userName.textContent = userData.firstName;
-                console.log('✨ Nombre actualizado a:', userData.firstName);
-            } else {
-                console.warn('⚠️ No se encontró userName element o userData.firstName');
-                console.log('userName element:', userName);
-                console.log('userData.firstName:', userData.firstName);
             }
-        } else {
-            console.warn('⚠️ No hay user_data en localStorage');
-            console.log('🔑 Todas las claves en localStorage:', Object.keys(localStorage));
         }
     } catch (error) {
-        console.error('❌ Error cargando información del usuario:', error);
+        console.error('Error cargando información del usuario:', error);
+    }
+}
+
+/**
+ * Mostrar opción "Inicio" en el menú solo si NO estamos en dashboard
+ */
+function showHomeOptionIfNeeded() {
+    const currentPage = document.body.getAttribute('data-page');
+    const homeOption = document.getElementById('menuHomeOption');
+    
+    if (homeOption && currentPage !== 'dashboard') {
+        homeOption.classList.remove('hidden');
+        homeOption.classList.add('block');
     }
 }
 
 // Hacer la función global
 window.loadUserInfo = loadUserInfo;
-
-// Cargar información del usuario cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', () => {
-    // Esperar un poco para asegurar que el header se haya cargado
-    setTimeout(loadUserInfo, 200);
-});
+window.showHomeOptionIfNeeded = showHomeOptionIfNeeded;

@@ -260,10 +260,6 @@ const RestaurantDetail = {
     async submitReview() {
         const comment = document.getElementById('reviewComment')?.value.trim();
 
-        console.log('📝 Iniciando envío de reseña...');
-        console.log('⭐ Rating actual:', this.currentRating);
-        console.log('💬 Comentario:', comment);
-
         if (this.currentRating === 0) {
             showDialog({
                 title: 'Calificación requerida',
@@ -292,11 +288,7 @@ const RestaurantDetail = {
                 visitDate: new Date().toISOString().split('T')[0]
             };
 
-            console.log('📤 Enviando datos:', reviewData);
-
             const response = await API.post('/reviews', reviewData);
-
-            console.log('📥 Respuesta recibida:', response);
 
             if (response.success) {
                 showDialog({
@@ -337,20 +329,16 @@ const RestaurantDetail = {
      * Cargar menú del restaurante
      */
     async loadMenu(restaurantId) {
-        console.log('🍽️ Cargando menú para restaurante:', restaurantId);
         try {
             const response = await API.get(`/menu?restaurantId=${restaurantId}&availableOnly=true`);
-            console.log('📋 Respuesta del menú:', response);
             
             if (response.success && response.data && response.data.length > 0) {
-                console.log('✅ Menú tiene items:', response.data.length);
                 this.renderMenu(response.data);
             } else {
-                console.log('⚠️ Menú vacío o sin datos');
                 this.showEmptyMenu();
             }
         } catch (error) {
-            console.error('❌ Error al cargar menú:', error);
+            console.error('Error al cargar menú:', error);
             this.showEmptyMenu();
         }
     },
@@ -541,6 +529,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Cargar componentes (header, footer)
     if (typeof loadComponents === 'function') {
         await loadComponents();
+        
+        // Asegurar que se cargue la opción de inicio
+        setTimeout(() => {
+            if (typeof window.showHomeOptionIfNeeded === 'function') {
+                window.showHomeOptionIfNeeded();
+            }
+        }, 400);
     }
 
     // Inicializar detalles del restaurante

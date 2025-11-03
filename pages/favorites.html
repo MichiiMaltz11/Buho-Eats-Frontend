@@ -101,6 +101,16 @@
                 const headerHtml = await headerResponse.text();
                 document.getElementById('header-container').innerHTML = headerHtml;
                 
+                // Llamar funciones del header después de cargarlo
+                setTimeout(() => {
+                    if (typeof window.loadUserInfo === 'function') {
+                        window.loadUserInfo();
+                    }
+                    if (typeof window.showHomeOptionIfNeeded === 'function') {
+                        window.showHomeOptionIfNeeded();
+                    }
+                }, 300);
+                
                 // Cargar footer
                 const footerResponse = await fetch('../components/footer.html');
                 const footerHtml = await footerResponse.text();
