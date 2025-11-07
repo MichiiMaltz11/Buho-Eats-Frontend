@@ -203,11 +203,22 @@ function showEmptyState() {
  * Eliminar restaurante de favoritos
  */
 async function removeFavorite(restaurantId, restaurantName) {
-    // Mostrar confirmación
-    if (!confirm(`¿Eliminar "${restaurantName}" de tus favoritos?`)) {
-        return;
-    }
+    // Mostrar confirmación con modal
+    showDialog({
+        title: 'Confirmar eliminación',
+        message: `¿Estás seguro de eliminar "${restaurantName}" de tus favoritos?`,
+        confirmText: 'Eliminar',
+        cancelText: 'Cancelar',
+        onConfirm: async () => {
+            await executeRemoveFavorite(restaurantId);
+        }
+    });
+}
 
+/**
+ * Ejecutar eliminación de favorito
+ */
+async function executeRemoveFavorite(restaurantId) {
     // Verificar autenticación
     if (!Auth.isAuthenticated()) {
         window.location.href = 'login.html';
@@ -239,39 +250,15 @@ async function removeFavorite(restaurantId, restaurantName) {
             loadFavorites();
             
             // Mostrar notificación
-            showNotification('Eliminado de favoritos', 'success');
+            Utils.showToast('Eliminado de favoritos', 'info');
         } else {
             console.error('Error al eliminar favorito:', data.error);
-            showNotification(data.error || 'Error al eliminar de favoritos', 'error');
+            Utils.showToast(data.error || 'Error al eliminar de favoritos', 'error');
         }
     } catch (error) {
         console.error('Error al eliminar favorito:', error);
-        showNotification('Error al eliminar de favoritos', 'error');
+        Utils.showToast('Error al eliminar de favoritos', 'error');
     }
-}
-
-/**
- * Mostrar notificación temporal
- */
-function showNotification(message, type = 'success') {
-    const notification = document.createElement('div');
-    notification.className = `fixed top-24 right-4 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300`;
-    notification.textContent = message;
-    
-    document.body.appendChild(notification);
-    
-    // Animar entrada
-    setTimeout(() => {
-        notification.style.transform = 'translateX(0)';
-    }, 10);
-    
-    // Eliminar después de 3 segundos
-    setTimeout(() => {
-        notification.style.transform = 'translateX(400px)';
-        setTimeout(() => {
-            notification.remove();
-        }, 300);
-    }, 3000);
 }
 
 // Hacer función global para que pueda ser llamada desde el HTML

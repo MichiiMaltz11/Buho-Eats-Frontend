@@ -260,11 +260,7 @@ async function saveProfile(event) {
         }
 
         // Mostrar mensaje de éxito
-        showDialog({
-            title: '¡Éxito!',
-            message: 'Perfil actualizado correctamente',
-            confirmText: 'Genial'
-        });
+        Utils.showToast('¡Perfil actualizado correctamente!', 'success');
 
         // Actualizar el nombre en el header usando la función global
         if (typeof window.loadUserInfo === 'function') {
@@ -386,11 +382,7 @@ async function uploadProfilePhoto(base64Image) {
         }
 
         // Éxito
-        showDialog({
-            title: 'Éxito',
-            message: 'Foto de perfil actualizada correctamente',
-            confirmText: 'Genial'
-        });
+        Utils.showToast('Foto de perfil actualizada correctamente', 'success');
 
         // Actualizar la foto en el header si existe
         const headerPhoto = document.querySelector('.user-avatar, [alt="User avatar"]');
@@ -487,11 +479,7 @@ async function removePhoto() {
             
             temporaryPhoto = null;
 
-            showDialog({
-                title: '¡Éxito!',
-                message: 'Foto de perfil eliminada',
-                confirmText: 'Entendido'
-            });
+            Utils.showToast('Foto de perfil eliminada', 'success');
         } else {
             showDialog({
                 title: 'Error',

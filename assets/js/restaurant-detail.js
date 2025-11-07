@@ -362,27 +362,21 @@ const RestaurantDetail = {
             const response = await API.post('/reviews', reviewData);
 
             if (response.success) {
-                showDialog({
-                    title: '¡Reseña Publicada!',
-                    message: 'Gracias por compartir tu experiencia. Tu reseña ha sido publicada.',
-                    confirmText: 'Genial',
-                    cancelText: 'Cerrar',
-                    onConfirm: () => {
-                        // Limpiar formulario
-                        this.currentRating = 0;
-                        this.setRating(0);
-                        document.getElementById('reviewComment').value = '';
-                        
-                        // Recargar restaurante para mostrar nueva reseña
-                        this.loadRestaurant(this.currentRestaurant.id);
-                    }
-                });
+                // Mostrar notificación de éxito
+                Utils.showToast('¡Reseña publicada! Gracias por compartir tu experiencia.', 'success');
+                
+                // Limpiar formulario
+                this.currentRating = 0;
+                this.setRating(0);
+                document.getElementById('reviewComment').value = '';
+                
+                // Recargar restaurante para mostrar nueva reseña
+                this.loadRestaurant(this.currentRestaurant.id);
             } else {
                 showDialog({
                     title: 'Error',
                     message: response.error || 'No se pudo publicar la reseña. Intenta de nuevo.',
-                    confirmText: 'Entendido',
-                    cancelText: 'Cerrar'
+                    confirmText: 'Entendido'
                 });
             }
         } catch (error) {
@@ -390,8 +384,7 @@ const RestaurantDetail = {
             showDialog({
                 title: 'Error',
                 message: 'Ocurrió un error al publicar tu reseña. Por favor intenta de nuevo.',
-                confirmText: 'Entendido',
-                cancelText: 'Cerrar'
+                confirmText: 'Entendido'
             });
         }
     },
@@ -525,11 +518,7 @@ const RestaurantDetail = {
                     if (heartPath) {
                         heartPath.setAttribute('fill', 'none');
                     }
-                    showDialog({
-                        title: 'Removido de Favoritos',
-                        message: 'El restaurante ha sido removido de tus favoritos.',
-                        confirmText: 'Entendido'
-                    });
+                    Utils.showToast('Removido de favoritos', 'info');
                 }
             } else {
                 // Agregar a favoritos
@@ -543,11 +532,7 @@ const RestaurantDetail = {
                     if (heartPath) {
                         heartPath.setAttribute('fill', 'currentColor');
                     }
-                    showDialog({
-                        title: '¡Agregado a Favoritos!',
-                        message: 'El restaurante ha sido agregado a tus favoritos.',
-                        confirmText: 'Genial'
-                    });
+                    Utils.showToast('¡Agregado a favoritos!', 'success');
                 }
             }
         } catch (error) {

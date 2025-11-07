@@ -193,16 +193,8 @@ async function toggleRestaurantFavorite(id, event) {
             }
 
             // Mostrar notificación de éxito
-            if (typeof showDialog === 'function') {
-                showDialog({
-                    title: '¡Agregado a Favoritos!',
-                    message: `${restaurant.name} ha sido agregado a tus favoritos.`,
-                    confirmText: 'Genial',
-                    cancelText: 'Ver Favoritos',
-                    onCancel: function() {
-                        window.location.href = 'favorites.html';
-                    }
-                });
+            if (typeof Utils !== 'undefined' && Utils.showToast) {
+                Utils.showToast('¡Agregado a favoritos!', 'success');
             }
         } else {
             // Quitar de favoritos
@@ -221,6 +213,11 @@ async function toggleRestaurantFavorite(id, event) {
                 // Revertir si falla
                 restaurant.isFavorite = wasFavorite;
                 throw new Error(data.error || 'Error al eliminar favorito');
+            }
+
+            // Mostrar notificación
+            if (typeof Utils !== 'undefined' && Utils.showToast) {
+                Utils.showToast('Removido de favoritos', 'info');
             }
 
             // Si estamos en la página de favoritos, recargar
