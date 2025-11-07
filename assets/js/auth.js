@@ -168,26 +168,57 @@ const Auth = {
         if (!token || !user) {
             return false;
         }
-        
-        // Verificar si el token ha expirado
-        try {
-            // El token es un JWT, decodificar el payload
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            const now = Math.floor(Date.now() / 1000); // Tiempo actual en segundos
-            
-            if (payload.exp && now >= payload.exp) {
-                console.warn('Token expirado, cerrando sesión...');
-                this.logout();
-                return false;
-            }
-            
-            return true;
-        } catch (error) {
-            // Si hay error al decodificar, considerar token inválido
-            console.error('Error al verificar token:', error);
+
+        // 🔐 SEGURIDAD: Verificar expiración dual (lado cliente)
+        if (!Utils.isSessionValid()) {
+            console.warn('Sesión expirada (verificación dual), cerrando sesión...');
             this.logout();
             return false;
         }
+        
+        return true;
+    },
+
+    /**
+     * 🔐 SEGURIDAD: Obtiene el token desencriptado para enviar al servidor
+     * @returns {Promise<string|null>}
+     */
+    async getToken() {
+        const encryptedToken = localStorage.getItem(CONFIG.STORAGE_KEYS.TOKEN);
+        
+        if (!encryptedToken) return null;
+
+        // Verificar expiración dual antes de desencriptar
+        if (!Utils.isSessionValid()) {
+            console.warn('Sesión expirada, cerrando sesión...');
+            this.logout();
+            return null;
+        }
+
+        // Desencriptar token
+        const token = await Utils.decryptToken(encryptedToken);
+        
+        if (!token) {
+            console.error('No se pudo desencriptar el token');
+            this.logout();
+            return null;
+        }
+        
+        // Verificar si el token JWT ha expirado
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const now = Math.floor(Date.now() / 1000);
+            
+            if (payload.exp && now >= payload.exp) {
+                console.warn('Token JWT expirado, cerrando sesión...');
+                this.logout();
+                return null;
+            }
+        } catch (error) {
+            console.error('Error verificando expiración del token:', error);
+        }
+        
+        return token;
     },
     
     /**
@@ -309,16 +340,44 @@ const Auth = {
     
     /**
      * Cierra sesión y limpia todo el almacenamiento sensible
+     * Ahora también invalida el token en el servidor
      */
-    logout() {
-        // Limpiar datos de sesión
+    async logout() {
+        const encryptedToken = localStorage.getItem(CONFIG.STORAGE_KEYS.TOKEN);
+        
+        // 1. PRIMERO: Invalidar token en el servidor (si existe)
+        if (encryptedToken) {
+            try {
+                // 🔐 SEGURIDAD: Desencriptar token para enviarlo al servidor
+                const token = await Utils.decryptToken(encryptedToken);
+                
+                if (token) {
+                    // Usar fetch directo con keepalive para que la petición se complete aunque se cierre la página
+                    await fetch(`${CONFIG.API_URL}${CONFIG.ENDPOINTS.LOGOUT}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({}),
+                        keepalive: true  // ✅ ESTO es clave - mantiene la petición aunque se cierre la página
+                    });
+                }
+            } catch (error) {
+                // Si falla el logout en servidor, continuar de todas formas
+                console.warn('No se pudo invalidar token en servidor:', error.message);
+            }
+        }
+        
+        // 2. DESPUÉS: Limpiar datos locales
         localStorage.removeItem(CONFIG.STORAGE_KEYS.TOKEN);
         localStorage.removeItem(CONFIG.STORAGE_KEYS.USER);
         localStorage.removeItem('last_activity');
+        localStorage.removeItem('login_time');  // 🔐 SEGURIDAD: Limpiar tiempo de login
         
         // NO limpiar favoritos ni intentos de login (son datos del navegador)
         
-        // Redirigir al login
+        // 3. FINALMENTE: Redirigir al login
         window.location.href = '../index.html';
     },
     
@@ -355,9 +414,16 @@ const Auth = {
                 const { user, token } = response.data;
                 
                 if (user && token) {
-                    // Login exitoso
-                    localStorage.setItem(CONFIG.STORAGE_KEYS.TOKEN, token);
+                    // 🔐 SEGURIDAD: Encriptar token antes de guardar
+                    const encryptedToken = await Utils.encryptToken(token);
+                    
+                    // Guardar token encriptado
+                    localStorage.setItem(CONFIG.STORAGE_KEYS.TOKEN, encryptedToken);
                     localStorage.setItem(CONFIG.STORAGE_KEYS.USER, JSON.stringify(user));
+                    
+                    // 🔐 SEGURIDAD: Guardar tiempo de login para verificación dual
+                    localStorage.setItem('login_time', Date.now().toString());
+                    
                     this.updateLastActivity();
                     
                     return response.data;
@@ -514,12 +580,9 @@ function getUser() {
     return Auth.getUser();
 }
 
-/**
- * Función global para cerrar sesión
- */
-function logout() {
-    Auth.logout();
-}
+// NOTA: La función logout() global se define en cada página que la necesita
+// porque requiere acceso a showDialog() que puede estar implementado de diferentes formas
+// Ver dashboard-user.html, profile.html, etc.
 
 // Actualizar última actividad con cada interacción del usuario
 if (typeof document !== 'undefined') {
