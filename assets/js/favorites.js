@@ -80,7 +80,7 @@ function displayFavorites(favorites) {
  */
 function createRestaurantCard(restaurant) {
     const card = document.createElement('div');
-    card.className = 'bg-gray-800/70 backdrop-blur-sm rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2';
+    card.className = 'bg-white backdrop-blur-sm rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2';
 
     const imageUrl = restaurant.image_url || '../assets/img/default-restaurant.jpg';
     const rating = restaurant.average_rating || 0;
@@ -111,10 +111,10 @@ function createRestaurantCard(restaurant) {
         </div>
         
         <div class="p-6">
-            <h3 class="text-xl font-bold text-white mb-2">${restaurant.name}</h3>
-            <p class="text-gray-300 text-sm mb-4 line-clamp-2">${restaurant.description || 'Sin descripción'}</p>
+            <h3 class="text-xl font-bold text-black mb-2">${restaurant.name}</h3>
+            <p class="text-gray-800 text-sm mb-4 line-clamp-2">${restaurant.description || 'Sin descripción'}</p>
             
-            <div class="flex items-center gap-4 mb-4 text-sm text-gray-400">
+            <div class="flex items-center gap-4 mb-4 text-sm text-gray-600">
                 <span class="flex items-center gap-1">
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 9a1 1 0 112 0v4a1 1 0 11-2 0V9zm1-4a1 1 0 100 2 1 1 0 000-2z"/>
@@ -124,7 +124,7 @@ function createRestaurantCard(restaurant) {
             </div>
             
             ${restaurant.address ? `
-                <p class="text-gray-400 text-sm mb-4 flex items-start gap-2">
+                <p class="text-gray-600 text-sm mb-4 flex items-start gap-2">
                     <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
                     </svg>
