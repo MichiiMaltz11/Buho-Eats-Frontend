@@ -184,11 +184,11 @@
 
     <!-- Scripts -->
     <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/utils.js"></script>
     <script src="../assets/js/main.js"></script>
     <script src="../assets/js/header.js"></script>
     <script src="../assets/js/api.js"></script>
     <script src="../assets/js/auth.js"></script>
-    <script src="../assets/js/utils.js"></script>
     <script src="../assets/js/restaurant-api.js"></script>
     <script src="../assets/js/carousel.js"></script>
     <script src="../assets/js/restaurant-card.js"></script>
@@ -256,7 +256,7 @@
             }
         });
 
-        // Función de logout actualizada con diálogo personalizado
+        // Función de logout - sobrescribe la de auth.js para agregar el diálogo
         function logout() {
             showDialog({
                 title: 'Cerrar Sesión',
@@ -264,12 +264,8 @@
                 confirmText: 'Aceptar',
                 cancelText: 'Cancelar',
                 onConfirm: function() {
-                    localStorage.removeItem('auth_token');
-                    localStorage.removeItem('user_data');
-                    window.location.href = 'login.html';
-                },
-                onCancel: function() {
-                    console.log('Logout cancelado');
+                    // Llamar a Auth.logout() que ahora invalida el token en el servidor
+                    Auth.logout().catch(err => console.error('Error en logout:', err));
                 }
             });
         }
@@ -292,6 +288,32 @@
                 console.log('Respuesta recibida:', response);
                 
                 if (response.success) {
+                    // Cargar favoritos del usuario
+                    let userFavorites = [];
+                    
+                    // Verificar si está autenticado
+                    if (Auth.isAuthenticated()) {
+                        try {
+                            // Obtener token desencriptado
+                            const token = await Auth.getToken();
+                            if (token) {
+                                const favResponse = await fetch(`${CONFIG.API_URL}/favorites`, {
+                                    headers: {
+                                        'Authorization': `Bearer ${token}`
+                                    }
+                                });
+                                if (favResponse.ok) {
+                                    const favData = await favResponse.json();
+                                    if (favData.success && favData.data) {
+                                        userFavorites = favData.data.map(fav => fav.id);
+                                    }
+                                }
+                            }
+                        } catch (error) {
+                            console.log('No se pudieron cargar favoritos (usuario no autenticado?)');
+                        }
+                    }
+                    
                     // Verificar si tiene la estructura correcta
                     if (response.data && response.data.restaurants) {
                         console.log('Estructura correcta, mapeando datos...');
@@ -304,7 +326,7 @@
                             rating: restaurant.rating || restaurant.average_rating || 0,
                             image: restaurant.image_url || 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=' + encodeURIComponent(restaurant.name),
                             reviews: restaurant.total_reviews || 0,
-                            isFavorite: false,
+                            isFavorite: userFavorites.includes(restaurant.id),
                             // Datos adicionales
                             description: restaurant.description,
                             address: restaurant.address,
@@ -331,7 +353,7 @@
                                 rating: restaurant.rating || restaurant.average_rating || 0,
                                 image: restaurant.image_url || 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=' + encodeURIComponent(restaurant.name),
                                 reviews: restaurant.total_reviews || 0,
-                                isFavorite: false
+                                isFavorite: userFavorites.includes(restaurant.id)
                             }));
                             
                             console.log(`${window.restaurants.length} restaurantes cargados (estructura alternativa)`);
@@ -601,6 +623,20 @@
             // Por ahora solo muestra una alerta, luego redirigirá a la página de detalles
             window.location.href = `restaurant-detail.html?id=${id}`;
         }
+
+        // Escuchar cambios en favoritos
+        window.addEventListener('favoritesChanged', function(event) {
+            const { restaurantId, isFavorite } = event.detail;
+            
+            // Actualizar el estado en el array de restaurantes
+            const restaurant = window.restaurants?.find(r => r.id === restaurantId);
+            if (restaurant) {
+                restaurant.isFavorite = isFavorite;
+                
+                // Re-renderizar solo si estamos en la vista actual
+                renderRestaurants();
+            }
+        });
 
         // Inicializar el dashboard
         document.addEventListener('DOMContentLoaded', async function() {

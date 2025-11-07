@@ -100,7 +100,7 @@ function goToRestaurant(id) {
  * @param {number} id - ID del restaurante
  * @param {Event} event - Evento del click
  */
-function toggleRestaurantFavorite(id, event) {
+async function toggleRestaurantFavorite(id, event) {
     // Prevenir que se navegue al detalle
     event.stopPropagation();
     
@@ -111,19 +111,88 @@ function toggleRestaurantFavorite(id, event) {
         console.error(`Restaurant with id ${id} not found`);
         return;
     }
+
+    // Verificar autenticación
+    if (!Auth.isAuthenticated()) {
+        if (typeof showDialog === 'function') {
+            showDialog({
+                title: 'Iniciar Sesión',
+                message: 'Debes iniciar sesión para agregar favoritos.',
+                confirmText: 'Ir a Login',
+                cancelText: 'Cancelar',
+                onConfirm: function() {
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+        return;
+    }
+
+    // Obtener token desencriptado
+    const token = await Auth.getToken();
     
-    // Alternar estado de favorito
-    restaurant.isFavorite = !restaurant.isFavorite;
+    if (!token) {
+        if (typeof showDialog === 'function') {
+            showDialog({
+                title: 'Sesión Expirada',
+                message: 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.',
+                confirmText: 'Ir a Login',
+                cancelText: 'Cancelar',
+                onConfirm: function() {
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+        return;
+    }
     
-    // Guardar en localStorage
-    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    const apiUrl = typeof CONFIG !== 'undefined' ? CONFIG.API_URL : 'http://localhost:3000/api';
+    const wasFavorite = restaurant.isFavorite;
     
-    if (restaurant.isFavorite) {
-        // Agregar a favoritos
-        if (!favorites.includes(id)) {
-            favorites.push(id);
-            
-            // Mostrar notificación
+    try {
+        // Cambiar estado localmente (optimistic update)
+        restaurant.isFavorite = !restaurant.isFavorite;
+        
+        // Actualizar botón inmediatamente
+        const heartBtn = event.target.closest('button');
+        if (heartBtn) {
+            const heartIcon = heartBtn.querySelector('svg path');
+            if (restaurant.isFavorite) {
+                heartBtn.classList.remove('text-gray-400');
+                heartBtn.classList.add('text-red-500');
+                if (heartIcon) {
+                    heartIcon.setAttribute('fill', 'currentColor');
+                }
+            } else {
+                heartBtn.classList.remove('text-red-500');
+                heartBtn.classList.add('text-gray-400');
+                if (heartIcon) {
+                    heartIcon.setAttribute('fill', 'none');
+                }
+            }
+        }
+        
+        // Llamar al API
+        if (restaurant.isFavorite) {
+            // Agregar a favoritos
+            const response = await fetch(`${apiUrl}/favorites`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ restaurantId: id })
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                // Revertir si falla
+                restaurant.isFavorite = wasFavorite;
+                throw new Error(data.error || 'Error al agregar favorito');
+            }
+
+            // Mostrar notificación de éxito
             if (typeof showDialog === 'function') {
                 showDialog({
                     title: '¡Agregado a Favoritos!',
@@ -135,55 +204,76 @@ function toggleRestaurantFavorite(id, event) {
                     }
                 });
             }
-        }
-    } else {
-        // Quitar de favoritos
-        const index = favorites.indexOf(id);
-        if (index > -1) {
-            favorites.splice(index, 1);
-            
-            // Si estamos en la página de favoritos, eliminar la card
+        } else {
+            // Quitar de favoritos
+            const response = await fetch(`${apiUrl}/favorites`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ restaurantId: id })
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                // Revertir si falla
+                restaurant.isFavorite = wasFavorite;
+                throw new Error(data.error || 'Error al eliminar favorito');
+            }
+
+            // Si estamos en la página de favoritos, recargar
             if (window.location.pathname.includes('favorites.html')) {
-                // Re-renderizar sin este restaurante
-                if (typeof renderFavorites === 'function') {
-                    renderFavorites();
+                if (typeof loadFavorites === 'function') {
+                    loadFavorites();
                 }
             }
         }
-    }
-    
-    // Guardar en localStorage
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-    
-    // Disparar evento personalizado para notificar cambios
-    window.dispatchEvent(new CustomEvent('favoritesChanged', { detail: { restaurantId: id, isFavorite: restaurant.isFavorite } }));
-    
-    // Re-renderizar si no estamos en favoritos
-    if (!window.location.pathname.includes('favorites.html')) {
-        // Actualizar solo esta card
-        const container = event.target.closest('.bg-white');
-        if (container) {
-            const newCard = document.createElement('div');
-            newCard.innerHTML = renderRestaurantCard(restaurant);
-            container.parentNode.replaceChild(newCard.firstElementChild, container);
+        
+        // Disparar evento personalizado para notificar cambios
+        window.dispatchEvent(new CustomEvent('favoritesChanged', { 
+            detail: { 
+                restaurantId: id, 
+                isFavorite: restaurant.isFavorite 
+            } 
+        }));
+        
+    } catch (error) {
+        console.error('Error al actualizar favorito:', error);
+        
+        // Revertir estado
+        restaurant.isFavorite = wasFavorite;
+        
+        // Revertir UI
+        const heartBtn = event.target.closest('button');
+        if (heartBtn) {
+            const heartIcon = heartBtn.querySelector('svg path');
+            if (wasFavorite) {
+                heartBtn.classList.remove('text-gray-400');
+                heartBtn.classList.add('text-red-500');
+                if (heartIcon) {
+                    heartIcon.setAttribute('fill', 'currentColor');
+                }
+            } else {
+                heartBtn.classList.remove('text-red-500');
+                heartBtn.classList.add('text-gray-400');
+                if (heartIcon) {
+                    heartIcon.setAttribute('fill', 'none');
+                }
+            }
+        }
+        
+        if (typeof showDialog === 'function') {
+            showDialog({
+                title: 'Error',
+                message: error.message || 'No se pudo actualizar el favorito',
+                confirmText: 'OK'
+            });
         }
     }
 }
 
-/**
- * Carga el estado de favoritos desde localStorage
- */
-function loadFavoritesState() {
-    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    
-    if (window.restaurants && Array.isArray(window.restaurants)) {
-        window.restaurants.forEach(restaurant => {
-            restaurant.isFavorite = favorites.includes(restaurant.id);
-        });
-    }
-}
 
-// Auto-cargar estado de favoritos cuando se carga el script
-document.addEventListener('DOMContentLoaded', function() {
-    loadFavoritesState();
-});
+// Función global para alternar favoritos
+window.toggleRestaurantFavorite = toggleRestaurantFavorite;

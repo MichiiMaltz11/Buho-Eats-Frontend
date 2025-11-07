@@ -73,7 +73,7 @@ const Carousel = {
                         <div class="flex items-center space-x-4">
                             <div class="flex items-center">
                                 <span class="text-yellow-400 mr-1">⭐</span>
-                                <span class="text-white font-semibold">${restaurant.rating || '4.5'}</span>
+                                <span class="text-white font-semibold">${restaurant.average_rating || '0.0'}</span>
                             </div>
                             <span class="text-white/80">•</span>
                             <span class="text-white/80">${restaurant.cuisine_type || 'Variada'}</span>
