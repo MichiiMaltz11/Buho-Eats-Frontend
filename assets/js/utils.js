@@ -254,6 +254,169 @@ const Utils = {
             label: labels[Math.min(strength, 4)],
             suggestions: suggestions
         };
+    },
+
+    /**
+     * 🔐 SEGURIDAD: Genera una huella digital del dispositivo
+     * Usado como base para encriptación
+     */
+    getDeviceFingerprint() {
+        return navigator.userAgent + 
+               navigator.language + 
+               screen.width + 
+               screen.height +
+               'buho-eats-secret-key-2025';
+    },
+
+    /**
+     * 🔐 SEGURIDAD: Encripta un token usando Web Crypto API
+     * @param {string} token - Token JWT a encriptar
+     * @returns {Promise<string>} Token encriptado en base64
+     */
+    async encryptToken(token) {
+        try {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(token);
+            
+            // Generar clave desde fingerprint del dispositivo
+            const keyMaterial = await crypto.subtle.importKey(
+                'raw',
+                encoder.encode(this.getDeviceFingerprint()),
+                { name: 'PBKDF2' },
+                false,
+                ['deriveBits', 'deriveKey']
+            );
+            
+            const key = await crypto.subtle.deriveKey(
+                {
+                    name: 'PBKDF2',
+                    salt: encoder.encode('buho-eats-salt-2025'),
+                    iterations: 100000,
+                    hash: 'SHA-256'
+                },
+                keyMaterial,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['encrypt', 'decrypt']
+            );
+            
+            // Vector de inicialización aleatorio
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            
+            // Encriptar
+            const encrypted = await crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv },
+                key,
+                data
+            );
+            
+            // Combinar IV + datos encriptados
+            const combined = new Uint8Array(iv.length + encrypted.byteLength);
+            combined.set(iv);
+            combined.set(new Uint8Array(encrypted), iv.length);
+            
+            // Convertir a base64
+            return btoa(String.fromCharCode(...combined));
+        } catch (error) {
+            console.error('Error encriptando token:', error);
+            return token; // Fallback: retornar sin encriptar
+        }
+    },
+
+    /**
+     * 🔐 SEGURIDAD: Desencripta un token
+     * @param {string} encryptedToken - Token encriptado en base64
+     * @returns {Promise<string|null>} Token desencriptado o null si falla
+     */
+    async decryptToken(encryptedToken) {
+        try {
+            // 🔄 FALLBACK: Si el token parece ser un JWT sin encriptar, devolverlo directamente
+            // Esto maneja el caso de tokens guardados antes de implementar encriptación
+            if (encryptedToken.startsWith('eyJ')) {
+                console.log('🔄 Token sin encriptar detectado (migración automática)');
+                return encryptedToken;
+            }
+
+            const encoder = new TextEncoder();
+            
+            // Decodificar base64
+            const combined = new Uint8Array(
+                atob(encryptedToken).split('').map(c => c.charCodeAt(0))
+            );
+            
+            const iv = combined.slice(0, 12);
+            const data = combined.slice(12);
+            
+            // Generar la misma clave
+            const keyMaterial = await crypto.subtle.importKey(
+                'raw',
+                encoder.encode(this.getDeviceFingerprint()),
+                { name: 'PBKDF2' },
+                false,
+                ['deriveBits', 'deriveKey']
+            );
+            
+            const key = await crypto.subtle.deriveKey(
+                {
+                    name: 'PBKDF2',
+                    salt: encoder.encode('buho-eats-salt-2025'),
+                    iterations: 100000,
+                    hash: 'SHA-256'
+                },
+                keyMaterial,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['encrypt', 'decrypt']
+            );
+            
+            // Desencriptar
+            const decrypted = await crypto.subtle.decrypt(
+                { name: 'AES-GCM', iv },
+                key,
+                data
+            );
+            
+            return new TextDecoder().decode(decrypted);
+        } catch (error) {
+            console.error('Error desencriptando token:', error);
+            
+            // 🔄 FALLBACK ADICIONAL: Si falla la desencriptación pero parece JWT válido
+            if (encryptedToken.includes('.') && encryptedToken.split('.').length === 3) {
+                console.warn('⚠️ Usando token como JWT sin encriptar (fallback de emergencia)');
+                return encryptedToken;
+            }
+            
+            return null;
+        }
+    },
+
+    /**
+     * 🔐 SEGURIDAD: Verifica si la sesión ha expirado (dual check)
+     * @returns {boolean} true si la sesión está válida
+     */
+    isSessionValid() {
+        const loginTime = localStorage.getItem('login_time');
+        if (!loginTime) return false;
+
+        const maxDuration = 2 * 60 * 60 * 1000; // 2 horas en milisegundos
+        const elapsed = Date.now() - parseInt(loginTime);
+        
+        return elapsed < maxDuration;
+    },
+
+    /**
+     * 🔐 SEGURIDAD: Obtiene el tiempo restante de sesión
+     * @returns {number} Minutos restantes, o 0 si expiró
+     */
+    getSessionTimeRemaining() {
+        const loginTime = localStorage.getItem('login_time');
+        if (!loginTime) return 0;
+
+        const maxDuration = 2 * 60 * 60 * 1000; // 2 horas
+        const elapsed = Date.now() - parseInt(loginTime);
+        const remaining = maxDuration - elapsed;
+        
+        return remaining > 0 ? Math.floor(remaining / 60000) : 0; // Convertir a minutos
     }
 };
 

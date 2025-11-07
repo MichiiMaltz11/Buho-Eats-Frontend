@@ -5,6 +5,9 @@ const CONFIG = {
     // URL del backend
     API_URL: 'http://localhost:3000/api',
     
+    // URL base del servidor (sin /api, para archivos estáticos)
+    SERVER_URL: 'http://localhost:3000',
+    
     // Endpoints
     ENDPOINTS: {
         LOGIN: '/auth/login',

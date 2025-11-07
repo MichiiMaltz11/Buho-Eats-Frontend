@@ -15,10 +15,12 @@ const API = {
             'Content-Type': 'application/json',
         };
         
-        // Agregar token si existe
-        const token = localStorage.getItem(CONFIG.STORAGE_KEYS.TOKEN);
-        if (token) {
-            defaultHeaders['Authorization'] = `Bearer ${token}`;
+        // 🔐 SEGURIDAD: Obtener token desencriptado
+        if (typeof Auth !== 'undefined' && Auth.isAuthenticated()) {
+            const token = await Auth.getToken();
+            if (token) {
+                defaultHeaders['Authorization'] = `Bearer ${token}`;
+            }
         }
         
         const config = {
