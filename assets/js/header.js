@@ -32,27 +32,27 @@ document.addEventListener('click', function(event) {
  */
 async function loadUserInfo() {
     try {
-        // Primero intentar obtener firstName directamente (más reciente)
-        let firstName = localStorage.getItem('firstName');
+        // Obtener usuario desde Auth
+        const user = Auth.getUser();
         
-        // Si no existe, intentar obtenerlo de user_data
-        if (!firstName) {
-            const userDataStr = localStorage.getItem('user_data');
-            if (userDataStr) {
-                const userData = JSON.parse(userDataStr);
-                firstName = userData.firstName;
-            }
+        if (!user) {
+            console.warn('No hay usuario autenticado');
+            return;
         }
+        
+        const firstName = user.firstName || user.first_name;
         
         // Actualizar el nombre del usuario
         const userName = document.getElementById('userName');
         if (userName && firstName) {
             userName.textContent = firstName;
+            // Asegurar que sea visible en desktop (quitar hidden, mantener md:block)
+            userName.classList.remove('hidden');
         }
         
         // También actualizar el span dentro del botón de menú (para páginas que lo usan)
         const userNameSpan = document.querySelector('#userMenuButton span');
-        if (userNameSpan && firstName) {
+        if (userNameSpan && firstName && userNameSpan.id !== 'userName') {
             userNameSpan.textContent = firstName;
         }
         
@@ -147,9 +147,19 @@ window.loadUserInfo = loadUserInfo;
 window.showHomeOptionIfNeeded = showHomeOptionIfNeeded;
 window.fixHeaderLinks = fixHeaderLinks;
 
-// Ejecutar fixHeaderLinks cuando se carga el script
+// Ejecutar funciones cuando se carga el script
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', fixHeaderLinks);
+    document.addEventListener('DOMContentLoaded', () => {
+        fixHeaderLinks();
+        // Cargar info del usuario si está autenticado
+        if (typeof Auth !== 'undefined' && Auth.isAuthenticated()) {
+            loadUserInfo();
+        }
+    });
 } else {
     fixHeaderLinks();
+    // Cargar info del usuario si está autenticado
+    if (typeof Auth !== 'undefined' && Auth.isAuthenticated()) {
+        loadUserInfo();
+    }
 }
