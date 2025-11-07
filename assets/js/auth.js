@@ -62,7 +62,7 @@ function validatePassword(password) {
 }
 
 /**
- * Verifica si un token JWT ha expirado (simulación)
+ * Verifica si un token JWT ha expirado
  * @param {string} token
  * @returns {boolean}
  */
@@ -169,7 +169,7 @@ const Auth = {
             return false;
         }
 
-        // 🔐 SEGURIDAD: Verificar expiración dual (lado cliente)
+        // Verificar expiración dual (lado cliente)
         if (!Utils.isSessionValid()) {
             console.warn('Sesión expirada (verificación dual), cerrando sesión...');
             this.logout();
@@ -180,7 +180,7 @@ const Auth = {
     },
 
     /**
-     * 🔐 SEGURIDAD: Obtiene el token desencriptado para enviar al servidor
+     * Obtiene el token desencriptado para enviar al servidor
      * @returns {Promise<string|null>}
      */
     async getToken() {
@@ -307,7 +307,7 @@ const Auth = {
             exp: Math.floor(expiryTime / 1000) // En segundos
         };
         
-        // Simular estructura JWT: header.payload.signature
+        // Estructura JWT: header.payload.signature
         const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
         const payloadEncoded = btoa(JSON.stringify(payload));
         const signature = btoa('simulated-signature-' + Date.now());
@@ -345,10 +345,10 @@ const Auth = {
     async logout() {
         const encryptedToken = localStorage.getItem(CONFIG.STORAGE_KEYS.TOKEN);
         
-        // 1. PRIMERO: Invalidar token en el servidor (si existe)
+        // Invalidar token en el servidor (si existe)
         if (encryptedToken) {
             try {
-                // 🔐 SEGURIDAD: Desencriptar token para enviarlo al servidor
+                // Desencriptar token para enviarlo al servidor
                 const token = await Utils.decryptToken(encryptedToken);
                 
                 if (token) {
@@ -360,7 +360,7 @@ const Auth = {
                             'Authorization': `Bearer ${token}`
                         },
                         body: JSON.stringify({}),
-                        keepalive: true  // ✅ ESTO es clave - mantiene la petición aunque se cierre la página
+                        keepalive: true  // Mantiene la petición aunque se cierre la página
                     });
                 }
             } catch (error) {
@@ -369,15 +369,14 @@ const Auth = {
             }
         }
         
-        // 2. DESPUÉS: Limpiar datos locales
+        // Limpiar datos locales
         localStorage.removeItem(CONFIG.STORAGE_KEYS.TOKEN);
         localStorage.removeItem(CONFIG.STORAGE_KEYS.USER);
         localStorage.removeItem('last_activity');
-        localStorage.removeItem('login_time');  // 🔐 SEGURIDAD: Limpiar tiempo de login
+        localStorage.removeItem('login_time');  // Limpiar tiempo de login
         
-        // NO limpiar favoritos ni intentos de login (son datos del navegador)
         
-        // 3. FINALMENTE: Redirigir al login
+        // Redirigir al login
         window.location.href = '../index.html';
     },
     
@@ -414,14 +413,14 @@ const Auth = {
                 const { user, token } = response.data;
                 
                 if (user && token) {
-                    // 🔐 SEGURIDAD: Encriptar token antes de guardar
+                    // Encriptar token antes de guardar
                     const encryptedToken = await Utils.encryptToken(token);
                     
                     // Guardar token encriptado
                     localStorage.setItem(CONFIG.STORAGE_KEYS.TOKEN, encryptedToken);
                     localStorage.setItem(CONFIG.STORAGE_KEYS.USER, JSON.stringify(user));
                     
-                    // 🔐 SEGURIDAD: Guardar tiempo de login para verificación dual
+                    // Guardar tiempo de login para verificación dual
                     localStorage.setItem('login_time', Date.now().toString());
                     
                     this.updateLastActivity();
@@ -453,10 +452,9 @@ const Auth = {
     /**
      * Registra un nuevo usuario con validaciones
      * @param {object} userData - Datos del usuario
-     * @param {boolean} autoLogin - Si debe iniciar sesión automáticamente (default: false)
      * @returns {Promise}
      */
-    async register(userData, autoLogin = false) {
+    async register(userData) {
         // Validar email
         if (!isValidEmail(userData.email)) {
             throw new Error('Email inválido');
@@ -483,22 +481,8 @@ const Auth = {
             
             // Manejar estructura de respuesta: { success, data: { message, user, token } }
             if (response.success && response.data) {
-                const { user, token, message } = response.data;
-                
-                if (user && token) {
-                    // Registro exitoso
-                    
-                    // Solo guardar sesión si autoLogin es true
-                    if (autoLogin) {
-                        localStorage.setItem(CONFIG.STORAGE_KEYS.TOKEN, token);
-                        localStorage.setItem(CONFIG.STORAGE_KEYS.USER, JSON.stringify(user));
-                        this.updateLastActivity();
-                    }
-                    
-                    return response.data;
-                } else {
-                    throw new Error('Respuesta del servidor incompleta');
-                }
+                // Registro exitoso
+                return response.data;
             } else {
                 throw new Error(response.error || 'Error en el registro');
             }
