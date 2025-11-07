@@ -28,8 +28,17 @@
                         class="flex items-center space-x-2 bg-secondary hover:bg-opacity-90 text-white px-4 py-2 rounded-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-white"
                         onclick="toggleUserMenu()"
                     >
-                        <!-- Icono de usuario -->
-                        <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+                        <!-- Foto de perfil o icono por defecto -->
+                        <img 
+                            id="userProfilePhoto" 
+                            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23fff'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='18' font-weight='bold' fill='%233D405B'%3EU%3C/text%3E%3C/svg%3E" 
+                            alt="User avatar" 
+                            class="w-8 h-8 rounded-full object-cover"
+                            style="display: none;"
+                        >
+                        
+                        <!-- Fallback: Círculo con inicial -->
+                        <div id="userAvatarFallback" class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
                             <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
                             </svg>
