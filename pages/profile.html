@@ -29,7 +29,6 @@
     
     <!-- CSS personalizado -->
     <link rel="stylesheet" href="../assets/css/reset.css">
-    
     <style>
         /* Imagen de fondo con overlay oscuro */
         body {
@@ -69,7 +68,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50" data-page="profile">
     <!-- MODAL DE CONFIRMACIÓN -->
     <div id="customDialog" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden items-center justify-center">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
@@ -106,95 +105,7 @@
     </div>
 
     <!-- HEADER -->
-    <header class="bg-primary shadow-lg fixed top-0 left-0 right-0 z-50">
-        <nav class="container mx-auto px-4 py-4">
-            <div class="flex items-center justify-between">
-                <!-- Logo y Texto -->
-                <div class="flex items-center space-x-3">
-                    <!-- Logo principal -->
-                    <img src="../assets/img/logo-light.png" alt="Buho Eats Logo" class="h-12 w-auto" onerror="this.style.display='none'; document.getElementById('headerLogoFallback').style.display='flex';">
-
-
-                    <!-- Logo con tipografía -->
-                    <img src="../assets/img/logo-text-light.png" alt="Buho Eats" class="h-8 w-auto" onerror="this.style.display='none'; document.getElementById('headerTextFallback').style.display='block';">
-                    
-                </div>
-
-                <!-- Menú de usuario -->
-                <div class="flex items-center space-x-4">
-                    <!-- Botón de usuario -->
-                    <div class="relative">
-                        <button 
-                            id="userMenuButton" 
-                            class="flex items-center space-x-2 bg-secondary hover:bg-opacity-90 text-white px-4 py-2 rounded-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-white"
-                            onclick="toggleUserMenu()"
-                        >
-                            <!-- Icono de usuario -->
-                            <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                                <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                            
-                            <!-- Nombre del usuario-->
-                            <span class="hidden md:block font-medium">Usuario</span>
-                            
-                            <!-- Icono de flecha -->
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-
-                        <!-- Dropdown del menú de usuario -->
-                        <div 
-                            id="userMenuDropdown" 
-                            class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-50"
-                        >
-                            <a href="dashboard-user.html" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition">
-                                <div class="flex items-center space-x-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                    </svg>
-                                    <span>Inicio</span>
-                                </div>
-                            </a>
-                            
-                            <a href="profile.html" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition bg-gray-50">
-                                <div class="flex items-center space-x-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                    <span>Mi Perfil</span>
-                                </div>
-                            </a>
-                            
-                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 transition">
-                                <div class="flex items-center space-x-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                    </svg>
-                                    <span>Favoritos</span>
-                                </div>
-                            </a>
-                            
-                            
-                            
-                            <hr class="my-2">
-                            
-                            <a href="#" onclick="logout()" class="block px-4 py-2 text-danger hover:bg-red-50 transition">
-                                <div class="flex items-center space-x-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                    </svg>
-                                    <span>Cerrar Sesión</span>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </header>
+    <div id="header-container"></div>
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="container mx-auto px-4 py-8">
@@ -212,19 +123,41 @@
                     <!-- Preview de la foto -->
                     <div class="flex justify-center mb-6">
                         <div class="relative">
+                            <!-- Imagen de perfil -->
                             <img 
                                 id="profilePhotoPreview" 
-                                src="../assets/img/default-avatar.png" 
+                                src="" 
                                 alt="Foto de perfil" 
                                 class="profile-photo-preview"
-                                onerror="this.src='https://ui-avatars.com/api/?name=Usuario&size=150&background=588B8B&color=fff&bold=true'"
+                                style="display: none;"
+                                onerror="this.style.display='none'; document.getElementById('profilePhotoFallback').style.display='flex';"
                             >
+                            <!-- Fallback con inicial -->
+                            <div 
+                                id="profilePhotoFallback"
+                                class="profile-photo-preview bg-secondary flex items-center justify-center"
+                                style="display: flex;"
+                            >
+                                <span id="profileInitial" class="text-white font-bold text-5xl">U</span>
+                            </div>
+                            
                             <!-- Badge de editar -->
-                            <div class="absolute bottom-0 right-0 bg-secondary rounded-full p-2 shadow-lg cursor-pointer hover:bg-secondary/90 transition">
+                            <label 
+                                for="photoInput"
+                                class="absolute bottom-0 right-0 bg-secondary rounded-full p-2 shadow-lg cursor-pointer hover:bg-secondary/90 transition"
+                            >
                                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
+                            </label>
+                            
+                            <!-- Loading overlay -->
+                            <div 
+                                id="uploadingOverlay" 
+                                class="absolute inset-0 bg-black/50 rounded-full hidden items-center justify-center"
+                            >
+                                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
                             </div>
                         </div>
                     </div>
@@ -233,31 +166,27 @@
                     <input 
                         type="file" 
                         id="photoInput" 
-                        accept="image/*" 
+                        accept="image/jpeg,image/jpg,image/png,image/webp,image/gif" 
                         class="hidden" 
                         onchange="previewPhoto(event)"
                     >
 
-                    <!-- Botones de foto -->
+                    <!-- Información de la foto -->
+                    <div class="text-center mb-6">
+                        <p class="text-xs text-gray-500">
+                            Formatos: JPG, PNG, WebP, GIF • Máx: 5MB
+                        </p>
+                    </div>
+
+                    <!-- Botón de eliminar foto -->
                     <div class="space-y-3">
                         <button 
-                            onclick="document.getElementById('photoInput').click()"
-                            class="w-full bg-secondary text-white px-6 py-3 rounded-lg font-semibold hover:bg-secondary/90 transition"
-                        >
-                            Cambiar Foto
-                        </button>
-                        <button 
+                            type="button"
                             onclick="removePhoto()"
-                            class="w-full bg-danger text-white px-6 py-3 rounded-lg font-semibold hover:bg-danger/90 transition"
+                            class="w-full bg-danger text-white px-6 py-3 rounded-lg font-semibold hover:bg-danger/90 transition flex items-center justify-center gap-2"
                         >
                             Eliminar Foto
                         </button>
-                    </div>
-
-                    <!-- Información de la foto -->
-                    <div class="mt-6 text-sm text-gray-500 text-center">
-                        <p>Formatos permitidos: JPG, PNG</p>
-                        <p>Tamaño máximo: 2MB</p>
                     </div>
                 </div>
             </div>
@@ -279,6 +208,10 @@
                                 name="firstName"
                                 value="Juan"
                                 required
+                                minlength="2"
+                                maxlength="50"
+                                pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+"
+                                title="Solo se permiten letras y espacios"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent"
                                 placeholder="Ingresa tu nombre"
                             >
@@ -295,6 +228,10 @@
                                 name="lastName"
                                 value="Pérez"
                                 required
+                                minlength="2"
+                                maxlength="50"
+                                pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+"
+                                title="Solo se permiten letras y espacios"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary focus:border-transparent"
                                 placeholder="Ingresa tu apellido"
                             >
@@ -406,13 +343,6 @@
                             >
                                 Guardar Cambios
                             </button>
-                            <button 
-                                type="button"
-                                onclick="cancelEdit()"
-                                class="flex-1 bg-danger text-white px-6 py-3 rounded-lg font-semibold hover:bg-danger/90 transition-all transform hover:scale-105"
-                            >
-                                Cancelar
-                            </button>
                         </div>
                     </form>
                 </div>
@@ -421,344 +351,30 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-primary text-white mt-12">
-        <div class="container mx-auto px-4 py-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <!--Logo y descripción -->
-                <div class="col-span-1">
-                    <div class="flex items-center space-x-2 mb-4">
-                        <img src="../assets/img/logo-light.png" alt="Buho Eats" class="h-10 w-auto" onerror="this.style.display='none'; document.getElementById('footerLogoFallback').style.display='flex';">
-                        <div id="footerLogoFallback" class="h-10 w-10 bg-secondary rounded-full flex items-center justify-center" style="display: none;">
-                            <span class="text-xl">🦉</span>
-                        </div>
-                        <span class="text-xl font-bold">Buho Eats</span>
-                    </div>
-                    <p class="text-gray-300 text-sm">
-                        Descubre los mejores restaurantes locales y comparte tus experiencias.
-                    </p>
-                </div>
-
-                <!--  Enlaces rápidos -->
-                <div class="col-span-1">
-                    <h3 class="text-lg font-semibold mb-4">Enlaces Rápidos</h3>
-                    <ul class="space-y-2">
-                        <li><a href="dashboard-user.html" class="text-gray-300 hover:text-white transition text-sm">Inicio</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Explorar Restaurantes</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Mis Reseñas</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Favoritos</a></li>
-                    </ul>
-                </div>
-
-                <!-- Información -->
-                <div class="col-span-1">
-                    <h3 class="text-lg font-semibold mb-4">Información</h3>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Acerca de Nosotros</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Términos y Condiciones</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Política de Privacidad</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white transition text-sm">Contacto</a></li>
-                    </ul>
-                </div>
-
-                <!-- Redes sociales -->
-                <div class="col-span-1">
-                    <h3 class="text-lg font-semibold mb-4">Síguenos</h3>
-                    <div class="flex space-x-4 mb-4">
-                        <a href="#" class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center hover:bg-opacity-80 transition">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                            </svg>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center hover:bg-opacity-80 transition">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                            </svg>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center hover:bg-opacity-80 transition">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Copyright -->
-            <div class="mt-8 pt-8 border-t border-white/20 flex flex-col md:flex-row justify-between items-center text-sm text-gray-300">
-                <p>© 2025 Buho Eats. Todos los derechos reservados.</p>
-                <p class="mt-2 md:mt-0">Hecho con 💙 para descubrir la mejor comida local</p>
-            </div>
-        </div>
-    </footer>
+    <div id="footer-container"></div>
 
     <!-- Scripts -->
     <script src="../assets/js/config.js"></script>
-    <script src="../assets/js/api.js"></script>
-    <script src="../assets/js/auth.js"></script>
     <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/dialog.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/header.js"></script>
+    <script src="../assets/js/profile.js"></script>
     
     <script>
-        // Toggle del menú de usuario
-        function toggleUserMenu() {
-            const dropdown = document.getElementById('userMenuDropdown');
-            dropdown.classList.toggle('hidden');
-        }
-
-        // Cerrar el menú si se hace click fuera
-        document.addEventListener('click', function(event) {
-            const userMenuButton = document.getElementById('userMenuButton');
-            const dropdown = document.getElementById('userMenuDropdown');
-            
-            if (userMenuButton && dropdown) {
-                if (!userMenuButton.contains(event.target) && !dropdown.contains(event.target)) {
-                    dropdown.classList.add('hidden');
-                }
-            }
-        });
-
-       
-        let dialogCallback = null;
-
-        function showDialog(options) {
-            const dialog = document.getElementById('customDialog');
-            const title = document.getElementById('dialogTitle');
-            const message = document.getElementById('dialogMessage');
-            const confirmBtn = document.getElementById('dialogConfirmBtn');
-            const cancelBtn = document.getElementById('dialogCancelBtn');
-            
-            title.textContent = options.title || 'Confirmación';
-            message.textContent = options.message || '¿Estás seguro?';
-            confirmBtn.textContent = options.confirmText || 'Aceptar';
-            cancelBtn.textContent = options.cancelText || 'Cancelar';
-            
-            dialogCallback = {
-                onConfirm: options.onConfirm || null,
-                onCancel: options.onCancel || null
-            };
-            
-            dialog.classList.remove('hidden');
-            dialog.classList.add('flex');
-            
-            setTimeout(() => {
-                dialog.querySelector('.bg-white').classList.add('scale-100');
-            }, 10);
-        }
-
-        function closeDialog(confirmed) {
-            const dialog = document.getElementById('customDialog');
-            
-            dialog.querySelector('.bg-white').classList.remove('scale-100');
-            
-            setTimeout(() => {
-                dialog.classList.add('hidden');
-                dialog.classList.remove('flex');
-                
-                if (confirmed && dialogCallback?.onConfirm) {
-                    dialogCallback.onConfirm();
-                } else if (!confirmed && dialogCallback?.onCancel) {
-                    dialogCallback.onCancel();
-                }
-                
-                dialogCallback = null;
-            }, 200);
-        }
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                const dialog = document.getElementById('customDialog');
-                if (dialog && !dialog.classList.contains('hidden')) {
-                    closeDialog(false);
-                }
-            }
-        });
-
-        // Función de logout
+        // Función de logout con diálogo de confirmación
         function logout() {
             showDialog({
                 title: 'Cerrar Sesión',
                 message: '¿Estás seguro de que deseas cerrar sesión?',
-                confirmText: 'Sí, cerrar sesión',
+                confirmText: 'Aceptar',
                 cancelText: 'Cancelar',
                 onConfirm: function() {
-                    localStorage.removeItem('auth_token');
-                    localStorage.removeItem('user_data');
-                    window.location.href = 'login.html';
+                    Auth.logout().catch(err => console.error('Error en logout:', err));
                 }
             });
         }
-
-        
-        function previewPhoto(event) {
-            const file = event.target.files[0];
-            
-            if (file) {
-                // Validar tamaño (2MB máximo)
-                if (file.size > 2 * 1024 * 1024) {
-                    showDialog({
-                        title: 'Archivo muy grande',
-                        message: 'La foto no debe superar los 2MB. Por favor selecciona una imagen más pequeña.',
-                        confirmText: 'Entendido',
-                        cancelText: 'Cerrar'
-                    });
-                    return;
-                }
-                
-                // Validar tipo de archivo
-                if (!file.type.match('image/(jpeg|jpg|png)')) {
-                    showDialog({
-                        title: 'Formato no válido',
-                        message: 'Solo se permiten archivos JPG y PNG.',
-                        confirmText: 'Entendido',
-                        cancelText: 'Cerrar'
-                    });
-                    return;
-                }
-                
-                // Mostrar preview
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('profilePhotoPreview').src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function removePhoto() {
-            showDialog({
-                title: 'Eliminar Foto',
-                message: '¿Estás seguro de que deseas eliminar tu foto de perfil?',
-                confirmText: 'Sí, eliminar',
-                cancelText: 'Cancelar',
-                onConfirm: function() {
-                    document.getElementById('profilePhotoPreview').src = 'https://ui-avatars.com/api/?name=Usuario&size=150&background=588B8B&color=fff&bold=true';
-                    document.getElementById('photoInput').value = '';
-                }
-            });
-        }
-
-        
-        function togglePassword(fieldId) {
-            const field = document.getElementById(fieldId);
-            const type = field.getAttribute('type') === 'password' ? 'text' : 'password';
-            field.setAttribute('type', type);
-        }
-
-       
-        function saveProfile(event) {
-            event.preventDefault();
-            
-            const firstName = document.getElementById('firstName').value.trim();
-            const lastName = document.getElementById('lastName').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const currentPassword = document.getElementById('currentPassword').value;
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            // Validar campos básicos
-            if (!firstName || !lastName || !email) {
-                showDialog({
-                    title: 'Campos requeridos',
-                    message: 'Por favor completa todos los campos obligatorios.',
-                    confirmText: 'Entendido',
-                    cancelText: 'Cerrar'
-                });
-                return;
-            }
-            
-            // Validar email
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                showDialog({
-                    title: 'Email inválido',
-                    message: 'Por favor ingresa un correo electrónico válido.',
-                    confirmText: 'Entendido',
-                    cancelText: 'Cerrar'
-                });
-                return;
-            }
-            
-            // Si está cambiando la contraseña
-            if (currentPassword || newPassword || confirmPassword) {
-                if (!currentPassword) {
-                    showDialog({
-                        title: 'Contraseña actual requerida',
-                        message: 'Debes ingresar tu contraseña actual para cambiarla.',
-                        confirmText: 'Entendido',
-                        cancelText: 'Cerrar'
-                    });
-                    return;
-                }
-                
-                if (!newPassword) {
-                    showDialog({
-                        title: 'Nueva contraseña requerida',
-                        message: 'Debes ingresar tu nueva contraseña.',
-                        confirmText: 'Entendido',
-                        cancelText: 'Cerrar'
-                    });
-                    return;
-                }
-                
-                if (newPassword.length < 6) {
-                    showDialog({
-                        title: 'Contraseña débil',
-                        message: 'La contraseña debe tener al menos 6 caracteres.',
-                        confirmText: 'Entendido',
-                        cancelText: 'Cerrar'
-                    });
-                    return;
-                }
-                
-                if (newPassword !== confirmPassword) {
-                    showDialog({
-                        title: 'Contraseñas no coinciden',
-                        message: 'La nueva contraseña y su confirmación no coinciden.',
-                        confirmText: 'Entendido',
-                        cancelText: 'Cerrar'
-                    });
-                    return;
-                }
-            }
-            
-            // Guardar
-            showDialog({
-                title: '¡Perfil Actualizado!',
-                message: 'Tus cambios han sido guardados exitosamente.',
-                confirmText: 'Genial',
-                cancelText: 'Cerrar',
-                onConfirm: function() {
-                    // Limpiar campos de contraseña
-                    document.getElementById('currentPassword').value = '';
-                    document.getElementById('newPassword').value = '';
-                    document.getElementById('confirmPassword').value = '';
-                    
-                    console.log('Perfil guardado:', { firstName, lastName, email });
-                }
-            });
-        }
-
-        function cancelEdit() {
-            showDialog({
-                title: 'Cancelar Cambios',
-                message: '¿Estás seguro? Se perderán todos los cambios no guardados.',
-                confirmText: 'Sí, cancelar',
-                cancelText: 'No, continuar editando',
-                onConfirm: function() {
-                    // Recargar la página o volver a los valores originales
-                    window.location.reload();
-                }
-            });
-        }
-
-        // Verificar autenticación al cargar la página
-        document.addEventListener('DOMContentLoaded', function() {
-            if (!isAuthenticated()) {
-                window.location.href = 'login.html';
-                return;
-            }
-        });
-
-       
     </script>
 </body>
 </html>
