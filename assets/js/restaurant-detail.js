@@ -38,6 +38,9 @@ const RestaurantDetail = {
                 this.renderRestaurant();
                 this.renderReviews();
                 this.loadMenu(id);
+                
+                // Verificar si está en favoritos
+                await this.checkIfFavorite();
             } else {
                 this.showError('Restaurante no encontrado');
                 setTimeout(() => {
@@ -181,21 +184,54 @@ const RestaurantDetail = {
             return;
         }
 
-        reviewsList.innerHTML = reviews.map(review => `
-            <div class="border-b border-gray-200 pb-6 last:border-b-0">
-                <div class="flex justify-between items-start mb-2">
-                    <div>
-                        <h4 class="font-semibold text-gray-800">${this.escapeHtml(review.first_name)} ${this.escapeHtml(review.last_name)}</h4>
-                        <div class="flex items-center mt-1">
-                            ${'<span class="text-yellow-400 text-sm">★</span>'.repeat(review.rating)}
-                            ${'<span class="text-gray-300 text-sm">★</span>'.repeat(5 - review.rating)}
+        reviewsList.innerHTML = reviews.map(review => {
+            // Debug: Ver qué trae cada review
+            console.log('Review data:', {
+                first_name: review.first_name,
+                profile_photo: review.profile_photo,
+                hasPhoto: review.profile_photo && review.profile_photo.trim() !== ''
+            });
+            
+            // Determinar foto de perfil o usar fallback SVG
+            const hasPhoto = review.profile_photo && review.profile_photo.trim() !== '';
+            const profilePhotoHtml = hasPhoto 
+                ? `<img 
+                    src="${review.profile_photo}" 
+                    alt="${this.escapeHtml(review.first_name)}" 
+                    class="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                  >
+                  <div class="w-12 h-12 rounded-full bg-secondary flex items-center justify-center border-2 border-gray-200" style="display:none;">
+                    <span class="text-white font-bold text-lg">${this.escapeHtml(review.first_name.charAt(0).toUpperCase())}</span>
+                  </div>`
+                : `<div class="w-12 h-12 rounded-full bg-secondary flex items-center justify-center border-2 border-gray-200">
+                    <span class="text-white font-bold text-lg">${this.escapeHtml(review.first_name.charAt(0).toUpperCase())}</span>
+                  </div>`;
+            
+            return `
+                <div class="border-b border-gray-200 pb-6 last:border-b-0">
+                    <div class="flex items-start space-x-4">
+                        <!-- Foto de perfil del usuario o inicial -->
+                        ${profilePhotoHtml}
+                        
+                        <!-- Contenido de la reseña -->
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">${this.escapeHtml(review.first_name)} ${this.escapeHtml(review.last_name)}</h4>
+                                    <div class="flex items-center mt-1">
+                                        ${'<span class="text-yellow-400 text-sm">★</span>'.repeat(review.rating)}
+                                        ${'<span class="text-gray-300 text-sm">★</span>'.repeat(5 - review.rating)}
+                                    </div>
+                                </div>
+                                <span class="text-gray-400 text-xs">${this.formatDate(review.created_at)}</span>
+                            </div>
+                            <p class="text-gray-600 text-sm">${this.escapeHtml(review.comment)}</p>
                         </div>
                     </div>
-                    <span class="text-gray-400 text-xs">${this.formatDate(review.created_at)}</span>
                 </div>
-                <p class="text-gray-600 text-sm">${this.escapeHtml(review.comment)}</p>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     },
 
     /**
@@ -260,6 +296,7 @@ const RestaurantDetail = {
     async submitReview() {
         const comment = document.getElementById('reviewComment')?.value.trim();
 
+        // Validar rating
         if (this.currentRating === 0) {
             showDialog({
                 title: 'Calificación requerida',
@@ -270,10 +307,44 @@ const RestaurantDetail = {
             return;
         }
 
+        // Validar que rating esté en rango válido
+        if (this.currentRating < 1 || this.currentRating > 5) {
+            showDialog({
+                title: 'Calificación inválida',
+                message: 'La calificación debe estar entre 1 y 5 estrellas.',
+                confirmText: 'Entendido',
+                cancelText: 'Cerrar'
+            });
+            return;
+        }
+
+        // Validar comentario no vacío
         if (!comment) {
             showDialog({
                 title: 'Comentario requerido',
                 message: 'Por favor escribe un comentario sobre tu experiencia.',
+                confirmText: 'Entendido',
+                cancelText: 'Cerrar'
+            });
+            return;
+        }
+
+        // Validar longitud mínima del comentario
+        if (comment.length < 10) {
+            showDialog({
+                title: 'Comentario muy corto',
+                message: 'El comentario debe tener al menos 10 caracteres.',
+                confirmText: 'Entendido',
+                cancelText: 'Cerrar'
+            });
+            return;
+        }
+
+        // Validar longitud máxima del comentario
+        if (comment.length > 500) {
+            showDialog({
+                title: 'Comentario muy largo',
+                message: 'El comentario no puede exceder 500 caracteres.',
                 confirmText: 'Entendido',
                 cancelText: 'Cerrar'
             });
@@ -438,32 +509,44 @@ const RestaurantDetail = {
     async toggleFavorite() {
         try {
             const heartIcon = document.getElementById('heartIcon');
+            const heartPath = heartIcon?.querySelector('path');
             const isFavorite = heartIcon?.classList.contains('text-red-500');
 
             if (isFavorite) {
                 // Remover de favoritos
-                const response = await API.delete(`/favorites/${this.currentRestaurant.id}`);
+                const response = await API.request('/favorites', {
+                    method: 'DELETE',
+                    body: { restaurantId: this.currentRestaurant.id }
+                });
+                
                 if (response.success) {
-                    heartIcon.classList.remove('text-red-500', 'fill-current');
+                    heartIcon.classList.remove('text-red-500');
                     heartIcon.classList.add('text-gray-400');
+                    if (heartPath) {
+                        heartPath.setAttribute('fill', 'none');
+                    }
                     showDialog({
                         title: 'Removido de Favoritos',
                         message: 'El restaurante ha sido removido de tus favoritos.',
-                        confirmText: 'Entendido',
-                        cancelText: 'Cerrar'
+                        confirmText: 'Entendido'
                     });
                 }
             } else {
                 // Agregar a favoritos
-                const response = await API.post('/favorites', { restaurantId: this.currentRestaurant.id });
+                const response = await API.post('/favorites', { 
+                    restaurantId: this.currentRestaurant.id 
+                });
+                
                 if (response.success) {
                     heartIcon.classList.remove('text-gray-400');
-                    heartIcon.classList.add('text-red-500', 'fill-current');
+                    heartIcon.classList.add('text-red-500');
+                    if (heartPath) {
+                        heartPath.setAttribute('fill', 'currentColor');
+                    }
                     showDialog({
                         title: '¡Agregado a Favoritos!',
                         message: 'El restaurante ha sido agregado a tus favoritos.',
-                        confirmText: 'Genial',
-                        cancelText: 'Cerrar'
+                        confirmText: 'Genial'
                     });
                 }
             }
@@ -472,8 +555,7 @@ const RestaurantDetail = {
             showDialog({
                 title: 'Error',
                 message: 'No se pudo actualizar los favoritos. Intenta de nuevo.',
-                confirmText: 'Entendido',
-                cancelText: 'Cerrar'
+                confirmText: 'Entendido'
             });
         }
     },
@@ -483,20 +565,40 @@ const RestaurantDetail = {
      */
     async checkIfFavorite() {
         try {
+            // Verificar si hay sesión activa
+            if (!Auth.isAuthenticated()) {
+                // Usuario no autenticado, no marcar como favorito
+                return;
+            }
+
             const response = await API.get('/favorites');
-            if (response.success && response.data && response.data.favorites) {
-                const isFavorite = response.data.favorites.some(
-                    fav => fav.restaurant_id === this.currentRestaurant.id
+            if (response.success && response.data) {
+                // response.data es un array de restaurantes favoritos
+                const isFavorite = response.data.some(
+                    fav => fav.id === this.currentRestaurant.id
                 );
 
                 const heartIcon = document.getElementById('heartIcon');
-                if (heartIcon && isFavorite) {
-                    heartIcon.classList.remove('text-gray-400');
-                    heartIcon.classList.add('text-red-500', 'fill-current');
+                if (heartIcon) {
+                    if (isFavorite) {
+                        heartIcon.classList.remove('text-gray-400');
+                        heartIcon.classList.add('text-red-500');
+                        const path = heartIcon.querySelector('path');
+                        if (path) {
+                            path.setAttribute('fill', 'currentColor');
+                        }
+                    } else {
+                        heartIcon.classList.remove('text-red-500');
+                        heartIcon.classList.add('text-gray-400');
+                        const path = heartIcon.querySelector('path');
+                        if (path) {
+                            path.setAttribute('fill', 'none');
+                        }
+                    }
                 }
             }
         } catch (error) {
-            console.error('Error al verificar favorito:', error);
+            console.log('No se pudo verificar favorito (usuario no autenticado)');
         }
     },
 
@@ -543,4 +645,27 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Verificar si es favorito
     await RestaurantDetail.checkIfFavorite();
+
+    // Agregar contador de caracteres al textarea de reseñas
+    const reviewComment = document.getElementById('reviewComment');
+    const charCount = document.getElementById('charCount');
+    
+    if (reviewComment && charCount) {
+        reviewComment.addEventListener('input', function() {
+            const count = this.value.length;
+            charCount.textContent = count;
+            
+            // Cambiar color si se acerca al límite
+            if (count >= 450) {
+                charCount.classList.add('text-danger');
+                charCount.classList.remove('text-gray-500');
+            } else if (count >= 400) {
+                charCount.classList.add('text-yellow-600');
+                charCount.classList.remove('text-gray-500', 'text-danger');
+            } else {
+                charCount.classList.add('text-gray-500');
+                charCount.classList.remove('text-yellow-600', 'text-danger');
+            }
+        });
+    }
 });
