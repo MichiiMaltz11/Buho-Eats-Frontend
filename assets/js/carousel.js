@@ -14,7 +14,7 @@ const Carousel = {
      */
     async init(restaurants = null) {
         try {
-            // Si no se pasan restaurantes, obtenerlos de la API
+            // Obtenerlos de la API
             if (!restaurants) {
                 console.log('Cargando restaurantes para el carrusel...');
                 const response = await RestaurantAPI.getAll({ limit: 4, sort: 'created_at', order: 'DESC' });

@@ -15,7 +15,7 @@ const API = {
             'Content-Type': 'application/json',
         };
         
-        // 🔐 SEGURIDAD: Obtener token desencriptado
+        // Obtener token desencriptado
         if (typeof Auth !== 'undefined' && Auth.isAuthenticated()) {
             const token = await Auth.getToken();
             if (token) {
@@ -36,7 +36,7 @@ const API = {
             const response = await fetch(url, config);
             const data = await response.json();
             
-            // Si la respuesta no es OK, lanzar error con el mensaje del backend
+            // Si la respuesta no es ok, lanzar error con el mensaje del backend
             if (!response.ok || !data.success) {
                 const error = new Error(data.error || 'Error en la petición');
                 error.status = response.status;
@@ -49,7 +49,7 @@ const API = {
             // Si es un error de red o JSON parsing
             if (!error.status) {
                 console.error('Error de red o conexión:', error);
-                throw new Error('No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:3000');
+                throw new Error('No se pudo conectar con el servidor. Verifica que el backend esté corriendo');
             }
             
             console.error('Error en API:', error);
