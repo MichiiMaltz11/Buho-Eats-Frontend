@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Dashboard Admin - Buho Eats</title>
+    
+    <!-- Tailwind CSS (Offline) -->
+    <script src="../libs/tailwind.js"></script>
+    
+    <!-- Configuración de Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3D405B',
+                        secondary: '#588B8B',
+                        success: '#06BB0C',
+                        danger: '#C11D0C',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" href="../assets/css/main.css">
+    
+    <style>
+        /* Imagen de fondo con overlay oscuro */
+        body {
+            background-image: url('../assets/img/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+        
+        /* Overlay oscuro semitransparente */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.2);
+            z-index: -1;
+        }
+    
+        /* Espacio para el header fijo */
+        main {
+            padding-top: 120px !important;
+            min-height: calc(100vh - 120px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50" data-page="dashboard">
+    <!-- MODAL DE CONFIRMACIÓN -->
+    <div id="customDialog" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
+            <!-- Header del modal -->
+            <div class="p-6">
+                <h3 id="dialogTitle" class="text-2xl font-bold text-primary">
+                    <!-- Título se agregará dinámicamente -->
+                </h3>
+            </div>
+            
+            <!-- Contenido del modal -->
+            <div class="p-6">
+                <p id="dialogMessage" class="text-gray-600">
+                    <!-- Mensaje se agregará dinámicamente -->
+                </p>
+            </div>
+            
+            <!-- Botones del modal -->
+            <div class="p-6 flex gap-3">
+                <button 
+                    id="dialogCancelBtn" 
+                    class="flex-1 px-6 py-3 bg-danger text-white rounded-lg font-semibold hover:bg-danger/90 transition-all transform hover:scale-105"
+                    onclick="closeDialog(false)"
+                >
+                    Cancelar
+                </button>
+                <button 
+                    id="dialogConfirmBtn" 
+                    class="flex-1 px-6 py-3 bg-success text-white rounded-lg font-semibold hover:bg-success/90 transition-all transform hover:scale-105"
+                    onclick="closeDialog(true)"
+                >
+                    Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <div id="header-container">
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Título de bienvenida con buscador -->
+        <div class="mb-8 flex justify-between items-center gap-4">
+            <h2 class="text-3xl font-bold text-primary mb-2">¡Bienvenido!</h2>
+            
+            <!-- Buscador de restaurantes -->
+            <div class="relative flex-1 max-w-md">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        id="searchInput"
+                        placeholder="Buscar restaurante..." 
+                        class="w-full px-4 py-3 pl-12 rounded-lg border-2 border-gray-300 focus:border-secondary focus:outline-none transition shadow-md"
+                        onfocus="showSearchResults()"
+                        oninput="searchRestaurants()"
+                    >
+                    <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                
+                <!-- Dropdown de resultados -->
+                <div 
+                    id="searchDropdown"
+                    class="hidden absolute left-0 right-0 mt-2 bg-white rounded-lg shadow-2xl z-50 overflow-hidden"
+                >
+                    <div class="p-4">
+                        <!-- Resultados de búsqueda en tiempo real -->
+                        <div id="searchResults" class="max-h-96 overflow-y-auto">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARRUSEL DE RESTAURANTES DESTACADOS -->
+        <div id="carousel-container"></div>
+
+        <!-- LISTADO DE RESTAURANTES CON PAGINACIÓN -->
+        <div class="mb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-primary">Todos los Restaurantes</h3>
+                <div class="text-sm text-gray-600">
+                    Mostrando <span id="showingStart">1</span>-<span id="showingEnd">6</span> de <span id="totalRestaurants">18</span>
+                </div>
+            </div>
+
+            <!-- Grid de cards de restaurantes -->
+            <div id="restaurantsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            </div>
+
+            <!-- Controles de paginación -->
+            <div class="flex justify-center items-center space-x-4">
+                <button onclick="previousPage()" id="prevBtn" class="px-4 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed" disabled>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        <span>Anterior</span>
+                    </div>
+                </button>
+
+                <div class="flex items-center space-x-2" id="pageNumbers">
+                </div>
+
+                <button onclick="nextPage()" id="nextBtn" class="px-4 py-2 bg-secondary hover:bg-secondary/90 text-white rounded-lg transition">
+                    <div class="flex items-center space-x-2">
+                        <span>Siguiente</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/header.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/restaurant-api.js"></script>
+    <script src="../assets/js/carousel.js"></script>
+    <script src="../assets/js/restaurant-card.js"></script>
+    <script src="../assets/js/admin.js"></script>
+    
+    <script>
+        let dialogCallback = null;
+
+        function showDialog(options) {
+            const dialog = document.getElementById('customDialog');
+            const title = document.getElementById('dialogTitle');
+            const message = document.getElementById('dialogMessage');
+            const confirmBtn = document.getElementById('dialogConfirmBtn');
+            const cancelBtn = document.getElementById('dialogCancelBtn');
+            
+            // Configurar contenido
+            title.textContent = options.title || 'Confirmación';
+            message.textContent = options.message || '¿Estás seguro?';
+            confirmBtn.textContent = options.confirmText || 'Aceptar';
+            cancelBtn.textContent = options.cancelText || 'Cancelar';
+            
+            // Guardar callbacks
+            dialogCallback = {
+                onConfirm: options.onConfirm || null,
+                onCancel: options.onCancel || null
+            };
+            
+            // Mostrar el diálogo
+            dialog.classList.remove('hidden');
+            dialog.classList.add('flex');
+            
+            // Animación de entrada
+            setTimeout(() => {
+                dialog.querySelector('.bg-white').classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeDialog(confirmed) {
+            const dialog = document.getElementById('customDialog');
+            
+            // Animación de salida
+            dialog.querySelector('.bg-white').classList.remove('scale-100');
+            
+            setTimeout(() => {
+                dialog.classList.add('hidden');
+                dialog.classList.remove('flex');
+                
+                // Ejecutar callback correspondiente
+                if (confirmed && dialogCallback?.onConfirm) {
+                    dialogCallback.onConfirm();
+                } else if (!confirmed && dialogCallback?.onCancel) {
+                    dialogCallback.onCancel();
+                }
+                
+                dialogCallback = null;
+            }, 200);
+        }
+
+        // Cerrar con ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const dialog = document.getElementById('customDialog');
+                if (!dialog.classList.contains('hidden')) {
+                    closeDialog(false);
+                }
+            }
+        });
+
+        // Función de logout - sobrescribe la de auth.js para agregar el diálogo
+        function logout() {
+            showDialog({
+                title: 'Cerrar Sesión',
+                message: '¿Estás seguro de que deseas cerrar sesión?',
+                confirmText: 'Aceptar',
+                cancelText: 'Cancelar',
+                onConfirm: function() {
+                    // Llamar a Auth.logout() que ahora invalida el token en el servidor
+                    Auth.logout().catch(err => console.error('Error en logout:', err));
+                }
+            });
+        }
+
+        // Datos de restaurantes (se cargarán desde la API)
+        window.restaurants = [];
+        window.isLoadingRestaurants = false;
+
+        /**
+         * Cargar restaurantes desde la API
+         */
+        async function loadRestaurants(filters = {}) {
+            try {
+                window.isLoadingRestaurants = true;
+                showLoadingState();
+
+                console.log('Cargando restaurantes desde API...');
+                const response = await RestaurantAPI.getAll(filters);
+                
+                console.log('Respuesta recibida:', response);
+                
+                if (response.success) {
+                    // Cargar favoritos del usuario
+                    let userFavorites = [];
+                    
+                    // Verificar si está autenticado
+                    if (Auth.isAuthenticated()) {
+                        try {
+                            // Obtener token desencriptado
+                            const token = await Auth.getToken();
+                            if (token) {
+                                const favResponse = await fetch(`${CONFIG.API_URL}/favorites`, {
+                                    headers: {
+                                        'Authorization': `Bearer ${token}`
+                                    }
+                                });
+                                if (favResponse.ok) {
+                                    const favData = await favResponse.json();
+                                    if (favData.success && favData.data) {
+                                        userFavorites = favData.data.map(fav => fav.id);
+                                    }
+                                }
+                            }
+                        } catch (error) {
+                            console.log('No se pudieron cargar favoritos (usuario no autenticado?)');
+                        }
+                    }
+                    
+                    // Verificar si tiene la estructura correcta
+                    if (response.data && response.data.restaurants) {
+                        console.log('Estructura correcta, mapeando datos...');
+                        
+                        // Mapear los datos de la API al formato que usa el frontend
+                        window.restaurants = response.data.restaurants.map(restaurant => ({
+                            id: restaurant.id,
+                            name: restaurant.name,
+                            category: restaurant.cuisine_type || 'Sin categoría',
+                            rating: restaurant.rating || restaurant.average_rating || 0,
+                            image: restaurant.image_url || 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=' + encodeURIComponent(restaurant.name),
+                            reviews: restaurant.total_reviews || 0,
+                            isFavorite: userFavorites.includes(restaurant.id),
+                            // Datos adicionales
+                            description: restaurant.description,
+                            address: restaurant.address,
+                            phone: restaurant.phone,
+                            price_range: restaurant.price_range,
+                            opening_hours: restaurant.opening_hours
+                        }));
+
+                        console.log(`${window.restaurants.length} restaurantes cargados`);
+                        console.log('Primer restaurante:', window.restaurants[0]);
+
+                        totalPages = Math.ceil(window.restaurants.length / itemsPerPage);
+                        currentPage = 1;
+                        renderRestaurants();
+                        hideLoadingState();
+                    } else {
+                        // Si la respuesta no tiene data.restaurants, intentar con la estructura alternativa
+                        console.warn('Estructura alternativa detectada');
+                        if (response.restaurants) {
+                            window.restaurants = response.restaurants.map(restaurant => ({
+                                id: restaurant.id,
+                                name: restaurant.name,
+                                category: restaurant.cuisine_type || 'Sin categoría',
+                                rating: restaurant.rating || restaurant.average_rating || 0,
+                                image: restaurant.image_url || 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=' + encodeURIComponent(restaurant.name),
+                                reviews: restaurant.total_reviews || 0,
+                                isFavorite: userFavorites.includes(restaurant.id)
+                            }));
+                            
+                            console.log(`${window.restaurants.length} restaurantes cargados (estructura alternativa)`);
+                            totalPages = Math.ceil(window.restaurants.length / itemsPerPage);
+                            currentPage = 1;
+                            renderRestaurants();
+                            hideLoadingState();
+                        } else {
+                            throw new Error('Estructura de respuesta no reconocida');
+                        }
+                    }
+                } else {
+                    throw new Error(response.message || response.error || 'Error desconocido al cargar restaurantes');
+                }
+            } catch (error) {
+                console.error('Error cargando restaurantes:', error);
+                showError('No se pudieron cargar los restaurantes. ' + error.message);
+                hideLoadingState();
+            } finally {
+                window.isLoadingRestaurants = false;
+            }
+        }
+
+        /**
+         * Mostrar estado de carga
+         */
+        function showLoadingState() {
+            const grid = document.getElementById('restaurantsGrid');
+            if (grid) {
+                grid.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-12">
+                        <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-secondary mb-4"></div>
+                        <p class="text-gray-600 text-lg">Cargando restaurantes...</p>
+                    </div>
+                `;
+            }
+        }
+
+        /**
+         * Ocultar estado de carga
+         */
+        function hideLoadingState() {
+            // El renderRestaurants() se encargará de mostrar el contenido
+        }
+
+        /**
+         * Mostrar mensaje de error
+         */
+        function showError(message) {
+            const grid = document.getElementById('restaurantsGrid');
+            if (grid) {
+                grid.innerHTML = `
+                    <div class="col-span-full bg-red-50 border-2 border-red-200 rounded-lg p-6 text-center">
+                        <svg class="w-12 h-12 text-red-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h3 class="text-xl font-bold text-red-700 mb-2">Error al cargar restaurantes</h3>
+                        <p class="text-red-600">${message}</p>
+                        <button 
+                            onclick="loadRestaurants()" 
+                            class="mt-4 px-6 py-2 bg-secondary text-white rounded-lg hover:bg-secondary/90 transition"
+                        >
+                            Reintentar
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        
+        let currentPage = 1;
+        const itemsPerPage = 6;
+        let totalPages = Math.ceil(window.restaurants.length / itemsPerPage);
+
+        function showSearchResults() {
+            const dropdown = document.getElementById('searchDropdown');
+            const searchInput = document.getElementById('searchInput');
+            
+           
+        }
+        
+        // Cerrar dropdown si se hace clic fuera
+        document.addEventListener('click', function(event) {
+            const searchInput = document.getElementById('searchInput');
+            const dropdown = document.getElementById('searchDropdown');
+            
+            if (searchInput && dropdown && !searchInput.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+        
+        function searchRestaurants() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            const searchResults = document.getElementById('searchResults');
+            const dropdown = document.getElementById('searchDropdown');
+            
+            dropdown.classList.remove('hidden');
+            
+            // Si no hay término de búsqueda, mostrar mensaje
+            if (!searchTerm) {
+                searchResults.innerHTML = '<p class="text-gray-500 text-center py-4">Escribe para buscar restaurantes</p>';
+                return;
+            }
+            
+            // Filtrar solo por nombre
+            const results = window.restaurants.filter(restaurant => 
+                restaurant.name.toLowerCase().includes(searchTerm)
+            );
+            
+            // Mostrar resultados en el dropdown
+            if (results.length === 0) {
+                searchResults.innerHTML = '<p class="text-gray-500 text-center py-4">No se encontraron restaurantes</p>';
+            } else {
+                searchResults.innerHTML = results.slice(0, 5).map(restaurant => `
+                    <div 
+                        onclick="goToRestaurantFromSearch(${restaurant.id})"
+                        class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition"
+                    >
+                        <img src="${restaurant.image}" alt="${restaurant.name}" class="w-16 h-16 object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/64/3D405B/FFFFFF?text=🍽️'">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-primary">${restaurant.name}</h4>
+                            <p class="text-sm text-gray-600">${restaurant.category}</p>
+                            <div class="flex items-center gap-1 mt-1">
+                                <span class="text-yellow-400">⭐</span>
+                                <span class="text-sm font-semibold">${restaurant.rating.toFixed(1)}</span>
+                                <span class="text-sm text-gray-500">(${restaurant.reviews})</span>
+                            </div>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
+                `).join('');
+                
+                // Si hay más de 5 resultados, mostrar enlace para ver todos
+                if (results.length > 5) {
+                    searchResults.innerHTML += `
+                        <div class="p-3 text-center border-t">
+                            <button 
+                                onclick="searchAllRestaurants('${searchTerm}')"
+                                class="text-secondary font-semibold hover:underline"
+                            >
+                                Ver todos los ${results.length} resultados
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        /**
+         * Buscar todos los restaurantes y filtrar en el grid principal
+         */
+        function searchAllRestaurants(searchTerm) {
+            const dropdown = document.getElementById('searchDropdown');
+            dropdown.classList.add('hidden');
+            
+            // Filtrar solo por nombre
+            const filtered = window.restaurants.filter(restaurant => 
+                restaurant.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            
+            if (filtered.length > 0) {
+                currentPage = 1;
+                renderRestaurantCards(filtered, 'restaurantsGrid');
+                
+                // Actualizar info de paginación
+                document.getElementById('showingStart').textContent = 1;
+                document.getElementById('showingEnd').textContent = filtered.length;
+                document.getElementById('totalRestaurants').textContent = filtered.length;
+                
+                // Scroll al grid
+                document.getElementById('restaurantsGrid').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        function goToRestaurantFromSearch(id) {
+            window.location.href = `restaurant-detail.html?id=${id}`;
+        }
+
+        function renderRestaurants() {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const restaurantsToShow = window.restaurants.slice(startIndex, endIndex);
+            
+            // Usar el componente de cards
+            renderRestaurantCards(restaurantsToShow, 'restaurantsGrid');
+            
+            updatePaginationInfo();
+            updatePaginationButtons();
+        }
+
+        function updatePaginationInfo() {
+            const startIndex = (currentPage - 1) * itemsPerPage + 1;
+            const endIndex = Math.min(currentPage * itemsPerPage, window.restaurants.length);
+            
+            document.getElementById('showingStart').textContent = window.restaurants.length > 0 ? startIndex : 0;
+            document.getElementById('showingEnd').textContent = endIndex;
+            document.getElementById('totalRestaurants').textContent = window.restaurants.length;
+        }
+
+        function updatePaginationButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const pageNumbers = document.getElementById('pageNumbers');
+            
+            // Botón anterior
+            if (currentPage === 1) {
+                prevBtn.disabled = true;
+                prevBtn.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+                prevBtn.classList.remove('bg-secondary', 'text-white', 'hover:bg-secondary/90');
+            } else {
+                prevBtn.disabled = false;
+                prevBtn.classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+                prevBtn.classList.add('bg-secondary', 'text-white', 'hover:bg-secondary/90');
+            }
+            
+            // Botón siguiente
+            if (currentPage === totalPages) {
+                nextBtn.disabled = true;
+                nextBtn.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+                nextBtn.classList.remove('bg-secondary', 'text-white', 'hover:bg-secondary/90');
+            } else {
+                nextBtn.disabled = false;
+                nextBtn.classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+                nextBtn.classList.add('bg-secondary', 'text-white', 'hover:bg-secondary/90');
+            }
+            
+            // Números de página
+            pageNumbers.innerHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.textContent = i;
+                pageBtn.onclick = () => goToPage(i);
+                pageBtn.className = `w-10 h-10 rounded-lg transition ${
+                    i === currentPage 
+                        ? 'bg-primary text-white' 
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`;
+                pageNumbers.appendChild(pageBtn);
+            }
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderRestaurants();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderRestaurants();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            renderRestaurants();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goToRestaurant(id) {
+            // Por ahora solo muestra una alerta, luego redirigirá a la página de detalles
+            window.location.href = `restaurant-detail.html?id=${id}`;
+        }
+
+        // Escuchar cambios en favoritos
+        window.addEventListener('favoritesChanged', function(event) {
+            const { restaurantId, isFavorite } = event.detail;
+            
+            // Actualizar el estado en el array de restaurantes
+            const restaurant = window.restaurants?.find(r => r.id === restaurantId);
+            if (restaurant) {
+                restaurant.isFavorite = isFavorite;
+                
+                // Re-renderizar solo si estamos en la vista actual
+                renderRestaurants();
+            }
+        });
+
+        // Inicializar el dashboard
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Verificar autenticación primero
+            if (!isAuthenticated()) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Cargar restaurantes desde la API
+            await loadRestaurants();
+        });
+    </script>
+ </body>
+ </html>
+
