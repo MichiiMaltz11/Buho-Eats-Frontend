@@ -1,10 +1,44 @@
 (function(){
   // admin.js - simple dashboard logic
   async function fetchJSON(url, opts={}){
-    const token = Auth.getToken();
-    const headers = Object.assign({}, opts.headers || {}, token ? { Authorization: 'Bearer ' + token } : {});
+    // Asegurarnos de obtener el token (Auth.getToken puede ser async)
+    let token = null;
+    try {
+      if (typeof Auth !== 'undefined' && typeof Auth.getToken === 'function') {
+        token = await Auth.getToken();
+      }
+    } catch (e) {
+      console.warn('No se pudo obtener token:', e);
+      token = null;
+    }
+
+    const headers = Object.assign({}, opts.headers || {});
+    if (token) headers.Authorization = 'Bearer ' + token;
+
     const res = await fetch(url, Object.assign({}, opts, { headers }));
-    return res.json();
+
+    // Intentar parsear JSON; si no es OK, devolver objeto con error
+    let text;
+    try {
+      text = await res.text();
+    } catch (e) {
+      text = null;
+    }
+
+    if (!res.ok) {
+      try {
+        const parsed = text ? JSON.parse(text) : { error: res.statusText };
+        return Object.assign({ success: false, statusCode: res.status }, parsed);
+      } catch (e) {
+        return { success: false, statusCode: res.status, error: text || res.statusText };
+      }
+    }
+
+    try {
+      return text ? JSON.parse(text) : {};
+    } catch (e) {
+      return { success: true, data: text };
+    }
   }
 
 
