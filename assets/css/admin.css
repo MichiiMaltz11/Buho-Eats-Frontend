@@ -1,0 +1,98 @@
+/* Agina de admin, estilos y funciones */
+:root{
+  --primary: #3D405B;
+  --secondary: #588B8B;
+  --success: #06BB0C;
+  --danger: #C11D0C;
+  --muted: #666;
+  --card-bg: #fff;
+  --page-bg: #f7f7f8;
+}
+
+/* Layout */
+.admin-container{ max-width:1200px; margin:0 auto; padding:20px; }
+.admin-header{ display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:24px; }
+.admin-title{ font-size:28px; font-weight:700; color:var(--primary); }
+.search-box{ max-width:480px; flex:1; position:relative; }
+.search-box input{ width:100%; padding:12px 14px 12px 44px; border:2px solid #d1d5db; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.04); }
+.search-box .icon{ position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#9ca3af; }
+.search-dropdown{ position:absolute; left:0; right:0; margin-top:8px; background:#fff; border-radius:10px; box-shadow:0 8px 20px rgba(0,0,0,0.08); z-index:60; max-height:320px; overflow:auto; }
+
+
+.stats-grid{ display:grid; grid-template-columns: repeat(1,1fr); gap:16px; margin-bottom:20px; }
+@media(min-width:800px){ .stats-grid{ grid-template-columns: repeat(5,1fr); } }
+.stat-card{ background:var(--card-bg); padding:16px; border-radius:10px; box-shadow:0 2px 8px rgba(61,64,91,0.06); border:1px solid rgba(0,0,0,0.03); }
+.stat-card .title{ color:#6b7280; font-size:13px; }
+.stat-card .value{ font-size:22px; font-weight:700; }
+
+
+.card{ background:var(--card-bg); padding:16px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.04); border:1px solid rgba(0,0,0,0.04); }
+.card + .card{ margin-top:12px; }
+
+
+.reports-list .report{ padding:14px; border-radius:8px; background:#fff; border:1px solid rgba(0,0,0,0.04); }
+.reports-list .actions{ margin-top:8px; display:flex; gap:8px; }
+
+.users-table{ width:100%; border-collapse:collapse; table-layout: fixed; }
+.users-table th, .users-table td{ padding:10px 8px; text-align:center; vertical-align:middle; border-bottom:1px solid #eee; }
+
+.users-table td{ word-break:break-word; overflow-wrap:break-word; }
+.users-table th{ font-weight:700; text-align:center; }
+
+
+.users-table td { text-align: center !important; }
+
+/* Asegurarse que las celdas de acciones no se corten */
+.users-table td:last-child{ white-space:nowrap; }
+
+/* Asegurarse que las listas no corten contenido emergente */
+#users-list, .reports-list, .admin-container { overflow: visible; }
+
+/* Asegurarse que las celdas rompan contenido largo y las acciones se mantengan visibles */
+.users-table td:last-child{ white-space:nowrap; vertical-align:middle; }
+.users-table td .btn{ display:inline-block; margin-right:6px; }
+.users-table { overflow: visible; }
+
+/* si el menu de acciones es visible, asegurarse que no se sobrepongan objetos*/
+.users-list, #users-list, .admin-panel { overflow: visible; }
+
+/* Restaurantes */
+.restaurants-grid{ display:grid; grid-template-columns:1fr; gap:16px; }
+@media(min-width:700px){ .restaurants-grid{ grid-template-columns:repeat(2,1fr); } }
+@media(min-width:1100px){ .restaurants-grid{ grid-template-columns:repeat(3,1fr); } }
+.restaurant-card img{ width:100%; height:160px; object-fit:cover; border-radius:8px; margin-bottom:10px; }
+
+/* Botones */
+.btn{ padding:8px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:600; }
+.btn-primary{ background:var(--secondary); color:#fff; }
+.btn-secondary{ background:var(--primary); color:#fff; }
+.btn-success{ background:var(--success); color:#fff; }
+.btn-danger{ background:var(--danger); color:#fff; }
+.btn-muted{ background:#e5e7eb; color:var(--muted); }
+.btn.small{ padding:6px 8px; font-size:13px; }
+.btn.disabled, .btn[disabled]{ opacity:0.6; cursor:not-allowed; }
+
+/* Paginacion */
+.pagination{ display:flex; gap:8px; justify-content:center; align-items:center; margin-top:12px; }
+.page-btn{ width:40px; height:40px; border-radius:6px; background:#eee; border:none; cursor:pointer; }
+.page-btn.active{ background:var(--primary); color:#fff; }
+
+/* Modal */
+.modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.5); z-index:200; }
+.modal.open{ display:flex; }
+.modal-content{ background:#fff; border-radius:12px; max-width:520px; width:100%; box-shadow:0 8px 30px rgba(0,0,0,0.2); overflow:hidden; }
+.modal-body{ padding:18px; }
+.modal-actions{ padding:18px; display:flex; gap:10px; }
+
+/* Utilidades */
+.text-muted{ color:var(--muted); }
+.title-lg{ font-size:20px; font-weight:700; }
+.mt-2{ margin-top:8px; }
+.mb-2{ margin-bottom:8px; }
+
+/* buscar item */
+.search-item{ display:flex; gap:10px; padding:10px; align-items:center; cursor:pointer; }
+.search-item:hover{ background:#fafafa; }
+
+/* Responsive */
+@media(max-width:640px){ .admin-header{ flex-direction:column; align-items:flex-start; } .search-box{ width:100%; } }

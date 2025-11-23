@@ -15,7 +15,26 @@
     const headers = Object.assign({}, opts.headers || {});
     if (token) headers.Authorization = 'Bearer ' + token;
 
-    const res = await fetch(url, Object.assign({}, opts, { headers }));
+    // Normalizar URL de la API: si es relativa a /api, usar CONFIG.API_URL
+    let fetchUrl = url;
+    try {
+      const isAbsolute = /^https?:\/\//i.test(url);
+      if (!isAbsolute) {
+        const apiBase = (typeof CONFIG !== 'undefined' && CONFIG.API_URL) ? CONFIG.API_URL : 'http://localhost:3000/api';
+        if (url.startsWith('/')) {
+          if (url.startsWith('/api')) fetchUrl = apiBase + url.substring(4);
+          else fetchUrl = apiBase + url;
+        } else if (url.startsWith('api')) {
+          fetchUrl = apiBase + url.substring(3);
+        } else {
+          fetchUrl = apiBase + (url.startsWith('/') ? '' : '/') + url;
+        }
+      }
+    } catch (e) {
+      fetchUrl = url;
+    }
+
+    const res = await fetch(fetchUrl, Object.assign({}, opts, { headers }));
 
     // Intentar parsear JSON; si no es OK, devolver objeto con error
     let text;
@@ -42,23 +61,45 @@
   }
 
 
-  //Admin dropdown para menu de administrador
+  // Admin dropdown para menu de administrador (inicialización defensiva)
   const btn = document.querySelector('.dropdown-btn');
   const menu = document.querySelector('.dropdown-content');
 
-  btn.addEventListener('click', () => {
-    menu.style.display = menu.style.display === "block" ? "none" : "block";
-  });
+  // Proteger contra elementos no presentes en algunas páginas
+  if (btn && menu) {
+    try {
+      btn.addEventListener('click', () => {
+        try {
+          menu.style.display = menu.style.display === "block" ? "none" : "block";
+        } catch (err) {
+          console.warn('Error al alternar el menú admin:', err);
+        }
+      });
 
-  // Cerrar al hacer clic fuera
-  window.addEventListener('click', function(e) {
-    if (!btn.contains(e.target)) {
-      menu.style.display = "none";
+      // Cerrar al hacer clic fuera
+      window.addEventListener('click', function(e) {
+        try {
+          if (!btn.contains(e.target)) {
+            menu.style.display = "none";
+          }
+        } catch (err) {
+          // No bloquear si el botón desaparece dinámicamente
+        }
+      });
+    } catch (err) {
+      console.warn('Error inicializando handlers del dropdown admin:', err);
     }
-  });
+  } else {
+    // No romper si los elementos no están en la página
+    console.debug('admin.js: elementos .dropdown-btn o .dropdown-content no encontrados — omitiendo inicialización del dropdown');
+  }
 
   function renderStats(data){
     const container = document.getElementById('stats');
+    if (!container) {
+      console.debug('renderStats: #stats element not found, skipping render');
+      return;
+    }
     container.innerHTML = '';
     const items = [
       { title: 'Usuarios', value: data.totalUsers },
@@ -78,6 +119,10 @@
 
   function renderReports(list){
     const container = document.getElementById('reports-list');
+    if (!container) {
+      console.debug('renderReports: #reports-list element not found, skipping render');
+      return;
+    }
     container.innerHTML = '';
     if (!list || list.length === 0){
       container.innerHTML = '<div class="text-muted">No hay reportes pendientes.</div>';
@@ -128,29 +173,64 @@
 
   function renderUsers(list){
     const container = document.getElementById('users-list');
+    if (!container) {
+      console.debug('renderUsers: #users-list element not found, skipping render');
+      return;
+    }
+    console.debug('renderUsers called, users count:', Array.isArray(list) ? list.length : typeof list, list && list.slice ? list.slice(0,3) : list);
     container.innerHTML = '';
     if (!list || list.length === 0){
       container.innerHTML = '<div class="text-muted">No hay usuarios que mostrar.</div>';
       return;
     }
     const table = document.createElement('table');
-    table.className = 'users-table';
+    // Ensure the table uses the full width of its container and stable layout
+    table.className = 'users-table w-full';
+    table.style.width = '100%';
+    // Use fixed layout so columns distribute and actions column stays visible
+    table.style.tableLayout = 'fixed';
     table.innerHTML = `<thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Strikes</th><th>Activo</th><th>Acciones</th></tr></thead>`;
     const tb = document.createElement('tbody');
     list.forEach(u=>{
       const tr = document.createElement('tr');
       tr.className = 'border-t';
-      tr.innerHTML = `<td>${u.first_name} ${u.last_name}</td><td>${u.email}</td><td>${u.role}</td><td>${u.strikes}</td><td>${u.is_active? 'Sí':'No'}</td><td><button class="btn btn-danger small" data-id="${u.id}">Ban</button></td>`;
+      // Disable unban button if user is active (not banned)
+      const unbanDisabled = u.is_active ? 'disabled' : '';
+      const unbanTitle = u.is_active ? 'Usuario no está baneado' : 'Desbanear usuario';
+      tr.innerHTML = `<td>${u.first_name} ${u.last_name}</td><td>${u.email}</td><td>${u.role}</td><td>${u.strikes}</td><td>${u.is_active? 'Sí':'No'}</td><td>
+        <button class="btn ban-btn btn-danger small" data-id="${u.id}">Ban</button>
+        <button class="btn unban-btn btn-success small" data-id="${u.id}" ${unbanDisabled} title="${unbanTitle}">Desban</button>
+      </td>`;
       tb.appendChild(tr);
     });
     table.appendChild(tb);
     container.appendChild(table);
 
-    container.querySelectorAll('.btn-danger').forEach(b=> b.addEventListener('click', async (e)=>{
-      const id = e.target.dataset.id;
+    // Ban handlers (scoped to this container)
+    container.querySelectorAll('.ban-btn').forEach(b=> b.addEventListener('click', async (e)=>{
+      const id = e.currentTarget.dataset.id;
       if (!confirm('¿Confirmas banear al usuario?')) return;
-      await fetchJSON(`/api/admin/users/${id}/ban`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ reason: 'Ban manual desde dashboard' }) });
-      loadUsers(); loadStats();
+      const res = await fetchJSON(`/api/admin/users/${id}/ban`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ reason: 'Ban manual desde dashboard' }) });
+      if (res && res.success) {
+        await loadUsers(); await loadStats();
+      } else {
+        alert('Error al banear: ' + (res && (res.error || res.message) ? (res.error || res.message) : JSON.stringify(res)));
+      }
+    }));
+
+    // Unban handlers
+    container.querySelectorAll('.unban-btn').forEach(b=> b.addEventListener('click', async (e)=>{
+      const id = e.currentTarget.dataset.id;
+      // If button is disabled, ignore
+      if (e.currentTarget.disabled) return;
+      if (!confirm('¿Confirmas reactivar este usuario?')) return;
+      const res = await fetchJSON(`/api/admin/users/${id}/unban`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ resetStrikes: true }) });
+      if (res && res.success) {
+        await loadUsers(); await loadStats();
+        alert('Usuario reactivado.');
+      } else {
+        alert('Error al reactivar: ' + (res && (res.error || res.message) ? (res.error || res.message) : JSON.stringify(res)));
+      }
     }));
   }
   
@@ -167,11 +247,43 @@
       container.innerHTML = '<div class="text-muted">No hay restaurantes para mostrar.</div>';
       return;
     }
+    // Determinar si el usuario es admin: usar Auth.hasRole si está disponible, si no, comprobar localStorage directamente
+    let isAdmin = false;
+    try {
+      if (typeof Auth !== 'undefined' && typeof Auth.hasRole === 'function') {
+        isAdmin = Auth.hasRole('admin');
+      }
+    } catch (e) {
+      isAdmin = false;
+    }
+    if (!isAdmin) {
+      try {
+        const raw = localStorage.getItem((typeof CONFIG !== 'undefined' && CONFIG.STORAGE_KEYS && CONFIG.STORAGE_KEYS.USER) ? CONFIG.STORAGE_KEYS.USER : 'user_data');
+        if (raw) {
+          const userObj = JSON.parse(raw);
+          if (userObj && userObj.role && userObj.role === 'admin') isAdmin = true;
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
 
     list.forEach(r=>{
       const card = document.createElement('div');
       card.className = 'card restaurant-card';
-      const image = r.image || (r.image_url ? r.image_url : 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=' + encodeURIComponent(r.name));
+      let image = r.image || (r.image_url ? r.image_url : 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=' + encodeURIComponent(r.name));
+      // Normalizar imágenes: si la URL no es absoluta, usar CONFIG.SERVER_URL
+      try {
+        const isAbsolute = /^https?:\/\//i.test(image);
+        if (!isAbsolute) {
+          const serverBase = (typeof CONFIG !== 'undefined' && CONFIG.SERVER_URL) ? CONFIG.SERVER_URL : 'http://localhost:3000';
+          // Asegurar que image no tenga una doble barra
+          if (image.startsWith('/')) image = serverBase + image;
+          else image = serverBase + '/' + image;
+        }
+      } catch (e) {
+        // En caso de cualquier error, conservar el valor original
+      }
       card.innerHTML = `
         <div>
           <img src="${image}" onerror="this.src='https://via.placeholder.com/400x300/3D405B/FFFFFF?text=🍽️'">
@@ -182,12 +294,51 @@
           </div>
           <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;">
             <div class="text-muted">Reviews: ${r.total_reviews || r.reviews || 0} — Rating: ${Number(r.average_rating || r.rating || 0).toFixed(1)}</div>
-            <button class="btn btn-primary small" onclick="window.location.href='restaurant-detail.html?id=${r.id}'">Ver</button>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <button class="btn btn-primary small" onclick="window.location.href='restaurant-detail.html?id=${r.id}'">Ver</button>
+              ${ isAdmin ? `<button class="btn btn-outline small edit-restaurant-btn" data-id="${r.id}">Editar</button><button class="btn btn-danger small delete-restaurant-btn" data-id="${r.id}">Eliminar</button>` : '' }
+            </div>
           </div>
         </div>
       `;
       container.appendChild(card);
     });
+
+    //anilizar handlers de edición/eliminación si es admin
+    try {
+      if (isAdmin) {
+        // Delete
+        container.querySelectorAll('.delete-restaurant-btn').forEach(b => b.addEventListener('click', async (e) => {
+          const id = e.currentTarget.dataset.id;
+          if (!confirm('¿Confirmas eliminar este restaurante? Esta acción es reversible (soft-delete).')) return;
+          const res = await fetchJSON(`/api/restaurants/${id}`, { method: 'DELETE' });
+          if (res && res.success) {
+            alert('Restaurante eliminado.');
+            await loadRestaurants();
+            await loadStats();
+          } else {
+            alert('Error al eliminar: ' + (res && (res.error || res.message) ? (res.error || res.message) : JSON.stringify(res)));
+          }
+        }));
+
+        // editar Nombre (simple ejemplo)
+        container.querySelectorAll('.edit-restaurant-btn').forEach(b => b.addEventListener('click', async (e) => {
+          const id = e.currentTarget.dataset.id;
+          const newName = prompt('Nuevo nombre para el restaurante:');
+          if (!newName) return;
+          const payload = { name: newName };
+          const res = await fetchJSON(`/api/restaurants/${id}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+          if (res && res.success) {
+            alert('Restaurante actualizado.');
+            await loadRestaurants();
+          } else {
+            alert('Error al actualizar: ' + (res && (res.error || res.message) ? (res.error || res.message) : JSON.stringify(res)));
+          }
+        }));
+      }
+    } catch (err) {
+      console.warn('No se pudieron enlazar handlers admin para restaurantes:', err);
+    }
   }
 
   function renderRestaurants(){
@@ -243,7 +394,7 @@
     }
   }
 
-  // Search helpers (simple in-memory search over window.restaurants)
+  // Búsqueda de restaurantes
   function showSearchResults() {
     const dropdown = document.getElementById('searchDropdown');
     if (dropdown) dropdown.classList.remove('hidden');
@@ -301,7 +452,7 @@
   async function loadRestaurants(){
     const res = await fetchJSON('/api/admin/restaurants?limit=1000');
     if (res && res.success){
-      // Expecting an array of restaurants in res.data.data or res.data
+      // Soportar tanto data.data como data directamente
       const list = (res.data && res.data.data) ? res.data.data : (res.data || res);
       window.restaurants = Array.isArray(list) ? list : [];
       currentPage = 1;
@@ -310,7 +461,7 @@
   }
 
   async function init(){
-    // load header component (existing header.js will fill header-placeholder)
+    // Inicializar header si está presente
     if (window.Header) Header.init();
     await loadStats();
     await loadReports();
@@ -318,10 +469,10 @@
     await loadRestaurants();
   }
 
-  // Wait for DOM
+  // Iniciar al cargar el DOM
   document.addEventListener('DOMContentLoaded', init);
   
-  // Dialog helpers (used by some pages) — use modal.open class
+  // Diálogo de confirmación reutilizable
   let dialogCallback = null;
   window.showDialog = function(options){
     const dialog = document.getElementById('customDialog');
@@ -345,4 +496,103 @@
     if (!confirmed && dialogCallback?.onCancel) dialogCallback.onCancel();
     dialogCallback = null;
   };
+
+  //muestra solo el panel solicitado
+  function showOnlyPanel(name) {
+    try {
+      const panels = {
+        stats: document.getElementById('stats'),
+        reports: document.getElementById('reports-list'),
+        users: document.getElementById('users-list'),
+        restaurants: document.getElementById('restaurantsGrid')
+      };
+
+      // esconder todos los paneles
+      Object.values(panels).forEach(p => { if (p) p.style.display = 'none'; });
+      const carousel = document.getElementById('carousel-container'); if (carousel) carousel.style.display = 'none';
+
+      // mostrar solo el panel solicitado
+      const panel = panels[name];
+      if (panel) panel.style.display = '';
+
+      // Refrescar datos del panel solicitado
+      if (name === 'stats') loadStats();
+      if (name === 'reports') loadReports();
+      if (name === 'users') loadUsers();
+
+      // Mostrar el botón "Mostrar todo"
+      const toView = panel || document.getElementById('admin-panels');
+      if (toView) toView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (e) {
+      console.warn('showOnlyPanel error', e);
+    }
+  }
+
+  // muestra todos los paneles
+  function showAllPanels() {
+    try {
+      const panelsContainer = document.getElementById('admin-panels');
+      const panels = {
+        stats: document.getElementById('stats'),
+        reports: document.getElementById('reports-list'),
+        users: document.getElementById('users-list'),
+        restaurants: document.getElementById('restaurantsGrid')
+      };
+      // Mostrar todos los paneles
+      Object.values(panels).forEach(p => { if (p) p.style.display = ''; });
+      // Mostrar el carrusel
+      const carousel = document.getElementById('carousel-container'); if (carousel) carousel.style.display = 'none';
+
+      // Refrescar todos los datos
+      loadStats(); loadReports(); loadUsers(); loadRestaurants();
+
+      // Ocultar el botón "Mostrar todo"
+      const showAllBtn = document.getElementById('showAllBtn'); if (showAllBtn) showAllBtn.classList.add('hidden');
+
+      //    Actualizar el hash de la ubicación para eliminar fragmentos
+      history.replaceState(null, '', location.pathname + location.search);
+
+      // Desplazarse al contenedor de paneles
+      if (panelsContainer) panelsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (e) {
+      console.warn('showAllPanels error', e);
+    }
+  }
+
+  // Manejar clics en enlaces admin-only con fragmentos
+  document.addEventListener('click', function(e){
+    try {
+      const a = e.target.closest && e.target.closest('.admin-only');
+      if (!a) return;
+      const href = a.getAttribute('href') || '';
+      if (!href.includes('#')) return; 
+      const frag = href.split('#')[1];
+      if (!frag) return;
+      // Mapear fragmentos a paneles
+      const map = {
+        'stats': 'stats',
+        'reports': 'reports',
+        'reported-reviews': 'reports',
+        'users': 'users',
+        'restaurants': 'restaurants'
+      };
+      const panelKey = map[frag] || null;
+      if (panelKey) {
+        e.preventDefault();
+        showOnlyPanel(panelKey);
+        // mostrar el botón "Mostrar todo"
+        const showAllBtn = document.getElementById('showAllBtn'); if (showAllBtn) showAllBtn.classList.remove('hidden');
+        // Actualizar el hash de la ubicación sin recargar
+        history.replaceState(null, '', '#'+frag);
+      }
+    } catch (err) {
+      // ignorar errores
+    }
+  });
+
+  // Manejar clic en botón "Mostrar todo"
+  document.addEventListener('DOMContentLoaded', function(){
+    const showAllBtn = document.getElementById('showAllBtn');
+    if (showAllBtn) showAllBtn.addEventListener('click', function(){ showAllPanels(); });
+  });
 })();
