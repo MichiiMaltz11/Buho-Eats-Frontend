@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas - Buho Eats</title>
+
+    <!-- Tailwind -->
+    <script src="../libs/tailwind.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3D405B',
+                        secondary: '#588B8B',
+                        accent: '#F2CC8F'
+                    }
+                }
+            }
+        };
+    </script>
+
+    <link rel="stylesheet" href="../assets/css/reset.css">
+
+</head>
+
+<body class="bg-gray-100" data-page="owner-stats">
+
+    <header class="bg-primary text-white py-4 px-6 shadow-lg">
+        <h1 class="text-xl font-bold">Estadísticas del Restaurante</h1>
+    </header>
+
+    <main class="max-w-4xl mx-auto mt-10">
+
+        <div class="bg-white p-6 rounded-xl shadow">
+            <h2 class="text-2xl font-bold text-primary mb-6">Resumen</h2>
+
+            <div id="statsBox" class="text-gray-600">
+                Cargando estadísticas...
+            </div>
+        </div>
+
+    </main>
+
+    <!-- JS -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/owner.js"></script>
+
+    <script>
+        if (!Auth.requireRole("owner")) return;
+
+        async function loadStats() {
+            const statsBox = document.getElementById("statsBox");
+
+            const stats = await Owner.loadStats();
+
+            if (!stats || !stats.data) {
+                statsBox.innerHTML = "<p class='text-gray-500'>No hay estadísticas disponibles.</p>";
+                return;
+            }
+
+            const s = stats.data;
+
+            statsBox.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <div class="p-5 bg-secondary text-white rounded-lg shadow">
+                        <h3 class="text-lg font-bold">Pedidos Totales</h3>
+                        <p class="text-3xl font-semibold mt-2">${s.totalOrders || 0}</p>
+                    </div>
+
+                    <div class="p-5 bg-primary text-white rounded-lg shadow">
+                        <h3 class="text-lg font-bold">Ingresos Totales</h3>
+                        <p class="text-3xl font-semibold mt-2">$${(s.totalRevenue || 0).toFixed(2)}</p>
+                    </div>
+
+                    <div class="p-5 bg-accent text-dark rounded-lg shadow">
+                        <h3 class="text-lg font-bold">Rating Promedio</h3>
+                        <p class="text-3xl font-semibold mt-2">${(s.avgRating || 0).toFixed(1)} ⭐</p>
+                    </div>
+
+                    <div class="p-5 bg-gray-300 text-dark rounded-lg shadow">
+                        <h3 class="text-lg font-bold">Platillos en Menú</h3>
+                        <p class="text-3xl font-semibold mt-2">${s.menuItems || 0}</p>
+                    </div>
+
+                </div>
+            `;
+        }
+
+        loadStats();
+    </script>
+
+</body>
+
+</html>
