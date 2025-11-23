@@ -55,22 +55,6 @@ async function loadUserInfo() {
         if (userNameSpan && firstName && userNameSpan.id !== 'userName') {
             userNameSpan.textContent = firstName;
         }
-
-        // Mostrar/ocultar opciones de admin en el dropdown según el rol
-        try {
-            const isAdmin = (user.role && user.role === 'admin') || (user.roles && Array.isArray(user.roles) && user.roles.includes('admin'));
-            const adminEls = document.querySelectorAll('.admin-only');
-            adminEls.forEach(el => {
-                if (isAdmin) {
-                    el.classList.remove('hidden');
-                } else {
-                    el.classList.add('hidden');
-                }
-            });
-        } catch (e) {
-            // No bloquear si falla
-            console.warn('No se pudo evaluar rol de usuario para mostrar opciones admin', e);
-        }
         
         // Cargar foto de perfil desde el backend
         try {
@@ -124,67 +108,12 @@ async function loadUserInfo() {
 function showHomeOptionIfNeeded() {
     const currentPage = document.body.getAttribute('data-page');
     const homeOption = document.getElementById('menuHomeOption');
-    if (!homeOption) return;
-
-    // Obtener el nombre del archivo actual
-    const path = window.location.pathname || '';
-    const filename = path.split('/').pop() || '';
-
-    // Determinar si el usuario es admin
-    let isAdmin = false;
-    try {
-        if (typeof Auth !== 'undefined' && typeof Auth.hasRole === 'function') {
-            isAdmin = Auth.hasRole('admin');
-        } else {
-            const raw = localStorage.getItem((typeof CONFIG !== 'undefined' && CONFIG.STORAGE_KEYS && CONFIG.STORAGE_KEYS.USER) ? CONFIG.STORAGE_KEYS.USER : 'user_data');
-            if (raw) {
-                const userObj = JSON.parse(raw);
-                if (userObj && userObj.role === 'admin') isAdmin = true;
-            }
-        }
-    } catch (e) {
-        isAdmin = false;
-    }
-
-    // Ajustar el enlace de "Inicio" según el rol
-    homeOption.setAttribute('href', isAdmin ? 'dashboard-admin.html' : 'dashboard-user.html');
-
-    // Mostrar opción "Inicio" solo si estamos en una subpágina de admin o en una página que no es dashboard-user/index
-    const onAdminSubpage = filename && filename.startsWith('dashboard-admin') && filename !== (isAdmin ? 'dashboard-admin.html' : '');
-    const onUserHome = filename === 'dashboard-user.html';
-
-    if (onAdminSubpage || (!onUserHome && !filename.includes('index.html') && !filename.startsWith('dashboard'))) {
+    
+    if (homeOption && currentPage !== 'dashboard') {
         homeOption.classList.remove('hidden');
         homeOption.classList.add('block');
     }
-
-    // Estilizar la opción "Inicio" si estamos en una subpágina de admin
-    if (onAdminSubpage) {
-        homeOption.classList.add('font-semibold');
-        homeOption.style.color = '#3D405B';
-    } else {
-        homeOption.classList.remove('font-semibold');
-        homeOption.style.color = '';
-    }
 }
-
-// Función de logout global
-window.logout = async function() {
-    try {
-        if (typeof Auth !== 'undefined' && typeof Auth.logout === 'function') {
-            await Auth.logout();
-        } else {
-            // Fallback: clear storage and redirect to login
-            localStorage.removeItem((typeof CONFIG !== 'undefined' && CONFIG.STORAGE_KEYS && CONFIG.STORAGE_KEYS.TOKEN) ? CONFIG.STORAGE_KEYS.TOKEN : 'auth_token');
-            localStorage.removeItem((typeof CONFIG !== 'undefined' && CONFIG.STORAGE_KEYS && CONFIG.STORAGE_KEYS.USER) ? CONFIG.STORAGE_KEYS.USER : 'user_data');
-            window.location.href = '../index.html';
-        }
-    } catch (e) {
-        console.error('Error during logout:', e);
-        // Fallback redireccionar a la página principal
-        window.location.href = '../index.html';
-    }
-};
 
 /**
  * Corregir rutas del header dependiendo de la página actual
@@ -234,3 +163,56 @@ if (document.readyState === 'loading') {
         loadUserInfo();
     }
 }
+
+// ===========================================================
+// FUNCIONALIDADES ESPECÍFICAS PARA OWNER
+// ===========================================================
+
+document.addEventListener('DOMContentLoaded', async () => {
+    if (!Auth.isAuthenticated()) return;
+
+    const user = Auth.getUser();
+    if (!user) return;
+
+    // Si el usuario NO es owner, no hacemos nada
+    if (user.role !== "owner") return;
+
+    console.log("OWNER detectado en header.js");
+
+    // -------- OCULTAR opciones que un owner NO usa --------
+
+    // Ocultar "Favoritos"
+    const favOption = document.getElementById('menuFavoritesOption');
+    if (favOption) favOption.classList.add("hidden");
+
+    // Ocultar "Explorar Restaurantes"
+    const exploreOption = document.getElementById('menuExploreOption');
+    if (exploreOption) exploreOption.classList.add("hidden");
+
+    // -------- MOSTRAR opción Estadísticas --------
+    const statsOption = document.getElementById('menuStatsOption');
+    if (statsOption) {
+        statsOption.classList.remove("hidden");
+        statsOption.classList.add("block");
+
+        statsOption.addEventListener("click", () => {
+            window.location.href = "/pages/statistics.html";
+        });
+    }
+
+    // -------- MOSTRAR opción "Mi Restaurante" --------
+    const restaurantOption = document.getElementById('menuMyRestaurantOption');
+    if (restaurantOption) {
+        restaurantOption.classList.remove("hidden");
+        restaurantOption.classList.add("block");
+
+        restaurantOption.addEventListener("click", () => {
+            const restaurantId = localStorage.getItem("restaurantId");
+            if (restaurantId) {
+                window.location.href = `/pages/restaurant-detail.html?id=${restaurantId}&mode=owner`;
+            } else {
+                alert("Tu restaurante aún no está configurado.");
+            }
+        });
+    }
+});

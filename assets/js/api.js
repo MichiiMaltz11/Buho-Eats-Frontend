@@ -1,76 +1,89 @@
 /**
  * Módulo para manejar peticiones al API
+ * Incluye: manejo de token, JSON, multipart y errores del backend
  */
+
 const API = {
+
     /**
-     * Realiza una petición HTTP al backend
-     * @param {string} endpoint - Endpoint del API
-     * @param {object} options - Opciones de la petición (method, body, headers)
-     * @returns {Promise} - Promesa con la respuesta
+     * Método general para hacer peticiones
      */
     async request(endpoint, options = {}) {
         const url = `${CONFIG.API_URL}${endpoint}`;
-        
-        const defaultHeaders = {
-            'Content-Type': 'application/json',
-        };
-        
-        // Obtener token desencriptado
-        if (typeof Auth !== 'undefined' && Auth.isAuthenticated()) {
-            const token = await Auth.getToken();
-            if (token) {
-                defaultHeaders['Authorization'] = `Bearer ${token}`;
-            }
+
+        const token = await Auth.getToken();
+
+        // Construir headers
+        const headers = options.headers || {};
+
+        // Si NO es multipart, agregar JSON
+        if (!options.isMultipart) {
+            headers["Content-Type"] = "application/json";
         }
-        
-        const config = {
-            method: options.method || 'GET',
-            headers: { ...defaultHeaders, ...options.headers },
-        };
-        
-        if (options.body) {
-            config.body = JSON.stringify(options.body);
+
+        // Agregar token si existe
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
         }
-        
+
+        const fetchOptions = {
+            method: options.method || "GET",
+            headers,
+        };
+
+        // Body JSON
+        if (options.body && !options.isMultipart) {
+            fetchOptions.body = JSON.stringify(options.body);
+        }
+
+        // Body multipart (FormData)
+        if (options.body && options.isMultipart) {
+            fetchOptions.body = options.body;
+        }
+
         try {
-            const response = await fetch(url, config);
-            const data = await response.json();
-            
-            // Si la respuesta no es ok, lanzar error con el mensaje del backend
-            if (!response.ok || !data.success) {
-                const error = new Error(data.error || 'Error en la petición');
-                error.status = response.status;
-                error.data = data;
-                throw error;
+            const response = await fetch(url, fetchOptions);
+            const result = await response.json().catch(() => null);
+
+            if (!response.ok) {
+                throw {
+                    status: response.status,
+                    error: result?.error || "Error de servidor"
+                };
             }
-            
-            return data;
+
+            return result;
         } catch (error) {
-            // Si es un error de red o JSON parsing
-            if (!error.status) {
-                console.error('Error de red o conexión:', error);
-                throw new Error('No se pudo conectar con el servidor. Verifica que el backend esté corriendo');
-            }
-            
-            console.error('Error en API:', error);
+            console.error("API Error:", error);
             throw error;
         }
     },
-    
-    // Métodos auxiliares
+
+    /** Métodos HTTP helpers */
     get(endpoint) {
-        return this.request(endpoint, { method: 'GET' });
+        return this.request(endpoint, { method: "GET" });
     },
-    
+
     post(endpoint, body) {
-        return this.request(endpoint, { method: 'POST', body });
+        return this.request(endpoint, { method: "POST", body });
     },
-    
+
     put(endpoint, body) {
-        return this.request(endpoint, { method: 'PUT', body });
+        return this.request(endpoint, { method: "PUT", body });
     },
-    
+
     delete(endpoint) {
-        return this.request(endpoint, { method: 'DELETE' });
+        return this.request(endpoint, { method: "DELETE" });
     },
+
+    /**
+     * POST especial para enviar imágenes del Owner
+     */
+    upload(endpoint, formData) {
+        return this.request(endpoint, {
+            method: "POST",
+            body: formData,
+            isMultipart: true
+        });
+    }
 };
