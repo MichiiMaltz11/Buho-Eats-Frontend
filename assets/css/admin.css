@@ -1,4 +1,4 @@
-/* Agina de admin, estilos y funciones */
+/* Admin page styles — no Tailwind required */
 :root{
   --primary: #3D405B;
   --secondary: #588B8B;
@@ -6,7 +6,18 @@
   --danger: #C11D0C;
   --muted: #666;
   --card-bg: #fff;
-  --page-bg: #f7f7f8;
+  --page-bg: #333333;
+}
+
+body {
+    background-color: var(--page-bg);
+    color: var(--page-bg);
+    /* Imagen de fondo */
+    background-image: url('../img/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
 }
 
 /* Layout */
@@ -18,45 +29,46 @@
 .search-box .icon{ position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#9ca3af; }
 .search-dropdown{ position:absolute; left:0; right:0; margin-top:8px; background:#fff; border-radius:10px; box-shadow:0 8px 20px rgba(0,0,0,0.08); z-index:60; max-height:320px; overflow:auto; }
 
-
+/* estadisticas */
 .stats-grid{ display:grid; grid-template-columns: repeat(1,1fr); gap:16px; margin-bottom:20px; }
 @media(min-width:800px){ .stats-grid{ grid-template-columns: repeat(5,1fr); } }
 .stat-card{ background:var(--card-bg); padding:16px; border-radius:10px; box-shadow:0 2px 8px rgba(61,64,91,0.06); border:1px solid rgba(0,0,0,0.03); }
 .stat-card .title{ color:#6b7280; font-size:13px; }
 .stat-card .value{ font-size:22px; font-weight:700; }
 
-
+/* Card generica */
 .card{ background:var(--card-bg); padding:16px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.04); border:1px solid rgba(0,0,0,0.04); }
 .card + .card{ margin-top:12px; }
 
-
+/* Lista de reportes y tabla de usuarios */
 .reports-list .report{ padding:14px; border-radius:8px; background:#fff; border:1px solid rgba(0,0,0,0.04); }
 .reports-list .actions{ margin-top:8px; display:flex; gap:8px; }
 
 .users-table{ width:100%; border-collapse:collapse; table-layout: fixed; }
 .users-table th, .users-table td{ padding:10px 8px; text-align:center; vertical-align:middle; border-bottom:1px solid #eee; }
 
+/* permite el ajuste de texto en celdas */
 .users-table td{ word-break:break-word; overflow-wrap:break-word; }
 .users-table th{ font-weight:700; text-align:center; }
 
-
+/* centrar todo el texto en la tabla de usuarios */
 .users-table td { text-align: center !important; }
 
-/* Asegurarse que las celdas de acciones no se corten */
+/* preferir las columnas */
 .users-table td:last-child{ white-space:nowrap; }
 
-/* Asegurarse que las listas no corten contenido emergente */
+/* Asegurar el contenedor no se superponga */
 #users-list, .reports-list, .admin-container { overflow: visible; }
 
-/* Asegurarse que las celdas rompan contenido largo y las acciones se mantengan visibles */
+/* Asegurarse que los botones no se borran */
 .users-table td:last-child{ white-space:nowrap; vertical-align:middle; }
 .users-table td .btn{ display:inline-block; margin-right:6px; }
 .users-table { overflow: visible; }
 
-/* si el menu de acciones es visible, asegurarse que no se sobrepongan objetos*/
+/* Si las opciones del menu se usan asegurarse que sean visibles */
 .users-list, #users-list, .admin-panel { overflow: visible; }
 
-/* Restaurantes */
+/* plantilla restaurantes */
 .restaurants-grid{ display:grid; grid-template-columns:1fr; gap:16px; }
 @media(min-width:700px){ .restaurants-grid{ grid-template-columns:repeat(2,1fr); } }
 @media(min-width:1100px){ .restaurants-grid{ grid-template-columns:repeat(3,1fr); } }
@@ -72,6 +84,19 @@
 .btn.small{ padding:6px 8px; font-size:13px; }
 .btn.disabled, .btn[disabled]{ opacity:0.6; cursor:not-allowed; }
 
+/* variante usada en restaurantes */
+.btn-outline{ background: transparent; border: 2px solid var(--secondary); color: var(--secondary); }
+.btn-outline.small{ padding:6px 8px; }
+
+/* hover para que hagan juego con los restaurantes */
+.btn-primary:hover, .btn-secondary:hover, .btn-success:hover, .btn-danger:hover, .btn-outline:hover { opacity: 0.92; transform: translateY(-1px); transition: all 120ms ease; }
+.btn:focus { outline: 3px solid rgba(88,139,139,0.15); }
+
+/* Acciones de reporte: alinear*/
+.reports-list .actions .btn, .report .actions .btn { display: inline-flex; align-items: center; gap:8px; padding:8px 12px; border-radius:8px; font-weight:600; }
+.reports-list .actions .btn.small, .report .actions .btn.small { padding:6px 10px; font-size:13px; }
+.reports-list .actions { display:flex; gap:8px; margin-top:8px; }
+
 /* Paginacion */
 .pagination{ display:flex; gap:8px; justify-content:center; align-items:center; margin-top:12px; }
 .page-btn{ width:40px; height:40px; border-radius:6px; background:#eee; border:none; cursor:pointer; }
@@ -84,15 +109,39 @@
 .modal-body{ padding:18px; }
 .modal-actions{ padding:18px; display:flex; gap:10px; }
 
-/* Utilidades */
+/* utilidades */
 .text-muted{ color:var(--muted); }
 .title-lg{ font-size:20px; font-weight:700; }
 .mt-2{ margin-top:8px; }
 .mb-2{ margin-bottom:8px; }
 
-/* buscar item */
+/* resultado de busqueda */
 .search-item{ display:flex; gap:10px; padding:10px; align-items:center; cursor:pointer; }
 .search-item:hover{ background:#fafafa; }
 
 /* Responsive */
 @media(max-width:640px){ .admin-header{ flex-direction:column; align-items:flex-start; } .search-box{ width:100%; } }
+
+/* Header para las paginas de admin */
+header[role="banner"], header, .HeaderPrincipal, #header-container header {
+  background: var(--primary);
+  color: #222120;
+  box-shadow: var(--box-shadow-lg);
+}
+
+/* Header interno*/
+
+#header-container #userMenuButton { background: var(--secondary); }
+#userMenuDropdown { min-width: 220px; }
+
+/* Footer para que haga juego */
+footer, #footer-container footer { background: var(--primary); color: #fff; }
+footer .container { max-width: 1100px; }
+footer a { color: rgba(255, 255, 255, 0.9); }
+footer .text-gray-300 { color: rgba(255,255,255,0.8); }
+
+
+#header-container { position: relative; z-index: 60; }
+
+
+

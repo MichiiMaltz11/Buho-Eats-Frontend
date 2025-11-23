@@ -304,7 +304,7 @@
       container.appendChild(card);
     });
 
-    //anilizar handlers de edición/eliminación si es admin
+    // Attach admin handlers for edit/delete if user is admin
     try {
       if (isAdmin) {
         // Delete
@@ -321,7 +321,7 @@
           }
         }));
 
-        // editar Nombre (simple ejemplo)
+        // Edit (simple inline prompt for quick edits)
         container.querySelectorAll('.edit-restaurant-btn').forEach(b => b.addEventListener('click', async (e) => {
           const id = e.currentTarget.dataset.id;
           const newName = prompt('Nuevo nombre para el restaurante:');
@@ -394,7 +394,7 @@
     }
   }
 
-  // Búsqueda de restaurantes
+  // Search helpers (simple in-memory search over window.restaurants)
   function showSearchResults() {
     const dropdown = document.getElementById('searchDropdown');
     if (dropdown) dropdown.classList.remove('hidden');
@@ -445,6 +445,67 @@
     const res = await fetchJSON('/api/admin/reports?status=pendiente');
     if (res && res.success){ renderReports(res.data.data); }
   }
+
+  /**
+   * Load reported reviews (excluding those with pending reports).
+   * Tries several admin endpoints for compatibility and filters out reports with status 'pendiente'.
+   */
+  async function loadReportedReviews(){
+    const container = document.getElementById('reportedReviewsList');
+    if (!container) return;
+    container.innerHTML = '<div class="p-6 bg-white rounded shadow">Cargando reseñas reportadas...</div>';
+
+    // We'll fetch processed reports (aprobado/rechazado) and also pending ones to exclude reviews
+    try {
+      const [approvedRes, rejectedRes, pendingRes] = await Promise.all([
+        fetchJSON('/api/admin/reports?status=aprobado'),
+        fetchJSON('/api/admin/reports?status=rechazado'),
+        fetchJSON('/api/admin/reports?status=pendiente')
+      ]);
+
+      // Collect arrays from responses
+      const collect = (r) => {
+        if (!r) return [];
+        if (Array.isArray(r)) return r;
+        if (r.data && Array.isArray(r.data)) return r.data;
+        if (r.data && r.data.data && Array.isArray(r.data.data)) return r.data.data;
+        return [];
+      };
+
+      const approved = collect(approvedRes);
+      const rejected = collect(rejectedRes);
+      const pending = collect(pendingRes);
+
+      // Build a set of review_ids that have pending reports so we can exclude them
+      const pendingReviewIds = new Set(pending.map(p => p.review_id));
+
+      // Combine approved and rejected reports
+      const processed = [...approved, ...rejected].filter(r => r && !pendingReviewIds.has(r.review_id));
+
+      if (!processed || processed.length === 0) {
+        container.innerHTML = '<div class="p-6 bg-white rounded shadow">No hay reseñas reportadas (excluyendo pendientes).</div>';
+        return;
+      }
+
+      // Group by review_id
+      const byReview = {};
+      processed.forEach(rep => {
+        const reviewId = rep.review_id;
+        if (!reviewId) return;
+        if (!byReview[reviewId]) byReview[reviewId] = { id: reviewId, review_comment: rep.review_comment, review_user_id: rep.review_user_id, restaurant_name: rep.restaurant_name, reports: [] };
+        byReview[reviewId].reports.push({ report_id: rep.report_id, status: rep.status, reason: rep.reason, reporter_first: rep.reporter_first, reporter_last: rep.reporter_last, reporter_email: rep.reporter_email, created_at: rep.created_at });
+      });
+
+      const aggregated = Object.values(byReview).map(item => {
+        return Object.assign({}, item, { _reports: item.reports, _reportCount: item.reports.length });
+      });
+
+      renderReportedReviews(aggregated);
+    } catch (e) {
+      console.warn('loadReportedReviews error', e);
+      container.innerHTML = '<div class="p-6 bg-yellow-50 border rounded">No se pudieron obtener las reseñas reportadas.</div>';
+    }
+  }
   async function loadUsers(){
     const res = await fetchJSON('/api/admin/users?limit=10');
     if (res && res.success){ renderUsers(res.data.data); }
@@ -452,7 +513,7 @@
   async function loadRestaurants(){
     const res = await fetchJSON('/api/admin/restaurants?limit=1000');
     if (res && res.success){
-      // Soportar tanto data.data como data directamente
+      // Expecting an array of restaurants in res.data.data or res.data
       const list = (res.data && res.data.data) ? res.data.data : (res.data || res);
       window.restaurants = Array.isArray(list) ? list : [];
       currentPage = 1;
@@ -461,18 +522,29 @@
   }
 
   async function init(){
-    // Inicializar header si está presente
+    // load header component (existing header.js will fill header-placeholder)
     if (window.Header) Header.init();
+    // If we are on the reported-reviews page, only load reported reviews
+    try {
+      const path = (location.pathname || '').split('/').pop() || '';
+      if (path === 'dashboard-admin-reported-reviews.html' || location.hash.includes('reported-reviews')) {
+        await loadReportedReviews();
+        return;
+      }
+    } catch (e) {
+      // ignore
+    }
+
     await loadStats();
     await loadReports();
     await loadUsers();
     await loadRestaurants();
   }
 
-  // Iniciar al cargar el DOM
+  // Wait for DOM
   document.addEventListener('DOMContentLoaded', init);
   
-  // Diálogo de confirmación reutilizable
+  // Dialog helpers (used by some pages) — use modal.open class
   let dialogCallback = null;
   window.showDialog = function(options){
     const dialog = document.getElementById('customDialog');
@@ -497,7 +569,7 @@
     dialogCallback = null;
   };
 
-  //muestra solo el panel solicitado
+  // Utility to show only one admin panel (stats, reports, users, restaurants)
   function showOnlyPanel(name) {
     try {
       const panels = {
@@ -507,20 +579,20 @@
         restaurants: document.getElementById('restaurantsGrid')
       };
 
-      // esconder todos los paneles
+      // Hide everything first
       Object.values(panels).forEach(p => { if (p) p.style.display = 'none'; });
       const carousel = document.getElementById('carousel-container'); if (carousel) carousel.style.display = 'none';
 
-      // mostrar solo el panel solicitado
+      // Show requested panel
       const panel = panels[name];
       if (panel) panel.style.display = '';
 
-      // Refrescar datos del panel solicitado
+      // If showing stats, ensure stats are loaded
       if (name === 'stats') loadStats();
       if (name === 'reports') loadReports();
       if (name === 'users') loadUsers();
 
-      // Mostrar el botón "Mostrar todo"
+      // Scroll into view
       const toView = panel || document.getElementById('admin-panels');
       if (toView) toView.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (e) {
@@ -528,7 +600,7 @@
     }
   }
 
-  // muestra todos los paneles
+  // Show all panels (but keep carousel hidden as requested)
   function showAllPanels() {
     try {
       const panelsContainer = document.getElementById('admin-panels');
@@ -538,37 +610,37 @@
         users: document.getElementById('users-list'),
         restaurants: document.getElementById('restaurantsGrid')
       };
-      // Mostrar todos los paneles
+      // Show all panels
       Object.values(panels).forEach(p => { if (p) p.style.display = ''; });
-      // Mostrar el carrusel
+      // Keep carousel hidden per request
       const carousel = document.getElementById('carousel-container'); if (carousel) carousel.style.display = 'none';
 
-      // Refrescar todos los datos
+      // Refresh data
       loadStats(); loadReports(); loadUsers(); loadRestaurants();
 
-      // Ocultar el botón "Mostrar todo"
+      // Hide the showAllBtn
       const showAllBtn = document.getElementById('showAllBtn'); if (showAllBtn) showAllBtn.classList.add('hidden');
 
-      //    Actualizar el hash de la ubicación para eliminar fragmentos
+      // Update URL (remove hash)
       history.replaceState(null, '', location.pathname + location.search);
 
-      // Desplazarse al contenedor de paneles
+      // Scroll to top of admin panels
       if (panelsContainer) panelsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (e) {
       console.warn('showAllPanels error', e);
     }
   }
 
-  // Manejar clics en enlaces admin-only con fragmentos
+  // Intercept clicks on admin links in the header to show only the target panel
   document.addEventListener('click', function(e){
     try {
       const a = e.target.closest && e.target.closest('.admin-only');
       if (!a) return;
       const href = a.getAttribute('href') || '';
-      if (!href.includes('#')) return; 
+      if (!href.includes('#')) return; // let normal links behave
       const frag = href.split('#')[1];
       if (!frag) return;
-      // Mapear fragmentos a paneles
+      // Map fragments to panel keys
       const map = {
         'stats': 'stats',
         'reports': 'reports',
@@ -580,19 +652,60 @@
       if (panelKey) {
         e.preventDefault();
         showOnlyPanel(panelKey);
-        // mostrar el botón "Mostrar todo"
+        // Show the "Mostrar todo" button
         const showAllBtn = document.getElementById('showAllBtn'); if (showAllBtn) showAllBtn.classList.remove('hidden');
-        // Actualizar el hash de la ubicación sin recargar
+        // Update location hash without jumping
         history.replaceState(null, '', '#'+frag);
       }
     } catch (err) {
-      // ignorar errores
+      // ignore
     }
   });
 
-  // Manejar clic en botón "Mostrar todo"
+  // Wire up the showAllBtn click
   document.addEventListener('DOMContentLoaded', function(){
     const showAllBtn = document.getElementById('showAllBtn');
     if (showAllBtn) showAllBtn.addEventListener('click', function(){ showAllPanels(); });
   });
+
+  // Expose reported reviews loader and renderer for pages that want to call it directly
+  try { window.loadReportedReviews = loadReportedReviews; } catch(e) { /* ignore */ }
+
+  // Render function for reported reviews
+  function renderReportedReviews(list){
+    const container = document.getElementById('reportedReviewsList');
+    if (!container) {
+      console.debug('renderReportedReviews: #reportedReviewsList element not found');
+      return;
+    }
+    container.innerHTML = '';
+    if (!list || list.length === 0) {
+      container.innerHTML = '<div class="p-6 bg-white rounded shadow">No hay reseñas reportadas para mostrar (o todas las reportadas están pendientes).</div>';
+      return;
+    }
+
+    list.forEach(r => {
+      const el = document.createElement('div');
+      el.className = 'card p-4 bg-white rounded shadow';
+      const reviewer = r.user_name || (r.user && (r.user.first_name + ' ' + r.user.last_name)) || r.review_user || '—';
+      const restaurant = r.restaurant_name || (r.restaurant && r.restaurant.name) || r.restaurant || '—';
+      const created = r.created_at || r.date || r.review_date || '';
+      const comment = r.comment || r.review_comment || r.body || '';
+      const statusSummary = (r._reports && r._reports.length > 0) ? r._reports.map(rep => rep.status || rep.estado || '—').join(', ') : 'Sin reportes';
+
+      el.innerHTML = `
+        <div class="flex justify-between items-start">
+          <div>
+            <div class="font-bold text-primary">Reseña #${r.id || r.review_id || ''} — ${restaurant}</div>
+            <div class="text-sm text-gray-600">Por: ${reviewer} — ${created}</div>
+          </div>
+          <div class="text-sm text-gray-500">Reportes: ${r._reportCount || 0}</div>
+        </div>
+        <div class="mt-3 text-gray-700">${comment || '<em>(sin comentario)</em>'}</div>
+        <div class="mt-3 text-sm text-gray-600">Estado(s) de reportes: ${statusSummary}</div>
+      `;
+
+      container.appendChild(el);
+    });
+  }
 })();

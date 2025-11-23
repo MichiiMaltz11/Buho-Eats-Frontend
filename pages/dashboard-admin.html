@@ -139,41 +139,22 @@
         <!-- CARRUSEL DE RESTAURANTES DESTACADOS -->
         <div id="carousel-container"></div>
 
-        <!-- LISTADO DE RESTAURANTES CON PAGINACIÓN -->
+        <!-- ADMIN PANELS: Stats, Reports, Users -->
+       
+
+        <!-- Gestión de restaurantes ahora en su propia vista -->
         <div class="mb-12">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-primary">Todos los Restaurantes</h3>
-                <div class="text-sm text-gray-600">
-                    Mostrando <span id="showingStart">1</span>-<span id="showingEnd">6</span> de <span id="totalRestaurants">18</span>
-                </div>
-            </div>
-
-            <!-- Grid de cards de restaurantes -->
-            <div id="restaurantsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            </div>
-
-            <!-- Controles de paginación -->
-            <div class="flex justify-center items-center space-x-4">
-                <button onclick="previousPage()" id="prevBtn" class="px-4 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed" disabled>
-                    <div class="flex items-center space-x-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                        </svg>
-                        <span>Anterior</span>
+            <div class="card p-6 bg-white rounded-lg shadow-md">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-2xl font-bold text-primary">Gestión de Restaurantes</h3>
+                        <p class="text-gray-600 mt-1">Todas las operaciones de editar, eliminar y administrar restaurantes se encuentran en la vista dedicada.</p>
                     </div>
-                </button>
-
-                <div class="flex items-center space-x-2" id="pageNumbers">
-                </div>
-
-                <button onclick="nextPage()" id="nextBtn" class="px-4 py-2 bg-secondary hover:bg-secondary/90 text-white rounded-lg transition">
-                    <div class="flex items-center space-x-2">
-                        <span>Siguiente</span>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
+                    <div class="flex items-center gap-3">
+                        <a href="dashboard-admin-restaurants.html" class="px-4 py-2 bg-secondary text-white rounded-lg shadow hover:bg-secondary/90">Ir a Gestión de Restaurantes</a>
+                        <button onclick="loadRestaurants()" class="px-4 py-2 border rounded-lg">Refrescar</button>
                     </div>
-                </button>
+                </div>
             </div>
         </div>
     </main>
@@ -526,7 +507,7 @@
                 document.getElementById('totalRestaurants').textContent = filtered.length;
                 
                 // Scroll al grid
-                document.getElementById('restaurantsGrid').scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('restaurantsal gridGrid').scrollIntoView({ behavior: 'smooth' });
             }
         }
         
