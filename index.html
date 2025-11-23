@@ -3,14 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
     <title>Buho Eats</title>
-    
+
+    <!-- Redirección inmediata al Login -->
     <script>
-        window.location.href = './pages/login.html';
+        // Evita errores si el navegador bloquea JS al inicio
+        document.addEventListener("DOMContentLoaded", () => {
+            window.location.replace("./pages/login.html");
+        });
     </script>
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: sans-serif;
+            height: 100vh;
+            margin: 0;
+            background: #f5f5f5;
+            color: #333;
+        }
+    </style>
 </head>
+
 <body>
-    <p>Redirigiendo...</p>
+    <p>Redirigiendo a Buho Eats...</p>
 </body>
 </html>
