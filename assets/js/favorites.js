@@ -82,7 +82,17 @@ function createRestaurantCard(restaurant) {
     const card = document.createElement('div');
     card.className = 'bg-white backdrop-blur-sm rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2';
 
-    const imageUrl = restaurant.image_url || '../assets/img/default-restaurant.jpg';
+    // Función auxiliar para URLs de imágenes
+    const getImageUrl = (imageUrl) => {
+        if (!imageUrl) return '../assets/img/default-restaurant.jpg';
+        if (imageUrl.match(/^https?:\/\//)) return imageUrl;
+        if (imageUrl.startsWith('/uploads/')) {
+            return CONFIG.API_URL.replace(/\/api.*/, '') + imageUrl;
+        }
+        return imageUrl;
+    };
+
+    const imageUrl = getImageUrl(restaurant.image_url);
     const rating = restaurant.average_rating || 0;
     const totalReviews = restaurant.total_reviews || 0;
 

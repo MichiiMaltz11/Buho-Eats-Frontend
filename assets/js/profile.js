@@ -567,4 +567,14 @@ document.addEventListener('DOMContentLoaded', async function() {
             userNameSpan.textContent = firstName;
         }
     }
+    
+    // Configurar menú según el rol del usuario
+    setTimeout(() => {
+        if (typeof configureAdminMenu === 'function') {
+            configureAdminMenu();
+        }
+        if (typeof configureOwnerMenu === 'function') {
+            configureOwnerMenu();
+        }
+    }, 100);
 });

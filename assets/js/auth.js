@@ -174,24 +174,42 @@ const Auth = {
         if (!email || !password) throw new Error('Email y contraseña requeridos');
         if (!isValidEmail(email)) throw new Error('Email inválido');
 
-        const response = await API.post(CONFIG.ENDPOINTS.LOGIN, {
-            email,
-            password,
-        });
+        try {
+            const response = await API.post(CONFIG.ENDPOINTS.LOGIN, {
+                email,
+                password,
+            });
 
-        if (!response.success)
-            throw new Error(response.error || 'Credenciales incorrectas');
+            if (!response.success)
+                throw new Error(response.error || 'Credenciales incorrectas');
 
-        const { token, user } = response.data;
-        if (!token || !user) throw new Error('Respuesta incompleta');
+            const { token, user } = response.data;
+            if (!token || !user) throw new Error('Respuesta incompleta');
 
         const encryptedToken = await Utils.encryptToken(token);
-        localStorage.setItem(CONFIG.STORAGE_KEYS.TOKEN, encryptedToken);
-        localStorage.setItem(CONFIG.STORAGE_KEYS.USER, JSON.stringify(user));
-        localStorage.setItem('login_time', Date.now().toString());
+        
+        // Limpiar datos de sesión anterior
+        localStorage.removeItem('firstName');
+        localStorage.removeItem('lastName');
+        
+        // Guardar nueva sesión
+            localStorage.setItem(CONFIG.STORAGE_KEYS.TOKEN, encryptedToken);
+            localStorage.setItem(CONFIG.STORAGE_KEYS.USER, JSON.stringify(user));
+            localStorage.setItem('login_time', Date.now().toString());
+            localStorage.setItem('firstName', user.firstName || user.first_name);
 
-        this.updateLastActivity();
-        return response.data;
+            this.updateLastActivity();
+            return response.data;
+        } catch (error) {
+            console.log('Login error capturado:', error);
+            console.log('error.error:', error.error);
+            // Si el error viene del API, extraer el mensaje real
+            if (error.error) {
+                throw new Error(error.error);
+            }
+            // Si ya es un Error object, relanzarlo
+            throw error;
+        }
     },
 
     /** REGISTER con soporte OWNER */
@@ -208,21 +226,29 @@ const Auth = {
             lastName: sanitizeInput(userData.lastName),
             email: sanitizeInput(userData.email.toLowerCase()),
             password: userData.password,
-            role: userData.role,
+            role: userData.role || 'user',
         };
 
         // AGREGAR CAMPOS DE OWNER
         if (userData.role === 'owner') {
-            sanitized.restaurant = {
-                name: sanitizeInput(userData.businessName),
-                address: sanitizeInput(userData.businessAddress),
-            };
+            sanitized.businessName = sanitizeInput(userData.businessName);
+            sanitized.businessAddress = sanitizeInput(userData.businessAddress);
         }
 
         const response = await API.post(CONFIG.ENDPOINTS.REGISTER, sanitized);
 
-        if (!response.success)
-            throw new Error(response.error || 'Error en registro');
+        if (!response.success) {
+            // Mejorar mensajes de error según el código de estado
+            let errorMsg = response.error || 'Error en registro';
+            
+            if (response.statusCode === 409 || errorMsg.includes('ya existe') || errorMsg.includes('already exists')) {
+                errorMsg = 'Este correo electrónico ya está registrado. Por favor, usa otro correo o inicia sesión.';
+            } else if (response.statusCode === 400) {
+                errorMsg = errorMsg || 'Datos inválidos. Verifica la información ingresada.';
+            }
+            
+            throw new Error(errorMsg);
+        }
 
         return response.data;
     },
@@ -242,7 +268,14 @@ const Auth = {
         const role = this.getUserRole();
         const allowed = Array.isArray(roles) ? roles : [roles];
         if (!allowed.includes(role)) {
-            alert('No tienes permisos');
+            const roleNames = {
+                'user': 'usuario',
+                'owner': 'propietario',
+                'admin': 'administrador'
+            };
+            const requiredRoleName = roleNames[allowed[0]] || allowed[0];
+            const currentRoleName = roleNames[role] || role;
+            alert(`Acceso denegado. Esta página es solo para ${requiredRoleName}s. Tu rol actual es: ${currentRoleName}`);
             this.redirectToDashboard();
             return false;
         }
@@ -256,7 +289,7 @@ const Auth = {
                 window.location.href = '../pages/dashboard-admin.html';
                 break;
             case 'owner':
-                window.location.href = '../pages/dashboard-owner.html';
+                window.location.href = '../pages/owner-restaurant.html';
                 break;
             default:
                 window.location.href = '../pages/dashboard-user.html';
@@ -271,6 +304,36 @@ function isAuthenticated() {
 
 function getUser() {
     return Auth.getUser();
+}
+
+function logout() {
+    console.log('logout() llamado');
+    console.log('showDialog disponible?', typeof showDialog);
+    console.log('window.showDialog disponible?', typeof window.showDialog);
+    
+    // Usar window.showDialog para asegurar que está definida
+    if (typeof window.showDialog === 'function') {
+        console.log('Usando showDialog');
+        window.showDialog({
+            title: 'Cerrar Sesión',
+            message: '¿Estás seguro de que deseas cerrar sesión?',
+            confirmText: 'Aceptar',
+            cancelText: 'Cancelar',
+            onConfirm: function() {
+                console.log('Logout confirmado');
+                Auth.logout().catch(err => console.error('Error en logout:', err));
+            },
+            onCancel: function() {
+                console.log('Logout cancelado');
+            }
+        });
+    } else {
+        console.log('showDialog no disponible, usando confirm()');
+        // Si no está disponible el diálogo, usar confirm() nativo
+        if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+            Auth.logout().catch(err => console.error('Error en logout:', err));
+        }
+    }
 }
 
 /** Eventos para registrar actividad */

@@ -14,14 +14,52 @@ document.addEventListener('DOMContentLoaded', function() {
  * Inicializa la aplicación
  */
 function init() {
-    // Verificar autenticación si es necesario
-    // Auth.requireAuth();
+    // Proteger rutas según la página actual
+    protectRoute();
     
     // Cargar componentes
     loadComponents();
     
     // Inicializar eventos
     setupEventListeners();
+}
+
+/**
+ * Protege rutas según el rol del usuario
+ */
+function protectRoute() {
+    const body = document.body;
+    const page = body.getAttribute('data-page');
+    
+    // Páginas de owner - solo accesibles por owners
+    if (page === 'owner-restaurant' || page === 'owner-stats') {
+        if (!Auth.requireRole('owner')) {
+            return;
+        }
+    }
+    
+    // Páginas de admin - solo accesibles por admins
+    if (page && page.startsWith('dashboard-admin')) {
+        if (!Auth.requireRole('admin')) {
+            return;
+        }
+    }
+    
+    // Páginas de usuario - solo accesibles por usuarios con rol 'user'
+    const userOnlyPages = ['dashboard-user', 'favorites', 'restaurant-detail'];
+    if (userOnlyPages.includes(page)) {
+        if (!Auth.requireRole('user')) {
+            return;
+        }
+    }
+    
+    // Páginas que requieren autenticación (cualquier rol autenticado)
+    const protectedPages = ['profile'];
+    if (protectedPages.includes(page)) {
+        if (!Auth.requireAuth()) {
+            return;
+        }
+    }
 }
 
 /**
@@ -46,9 +84,15 @@ async function loadComponents() {
     const headerContainer = document.getElementById('header-container');
     if (headerContainer) {
         try {
-            const response = await fetch('../components/header.html');
+            // Agregar timestamp para evitar caché
+            const response = await fetch(`../components/header.html?v=${Date.now()}`);
             if (response.ok) {
-                const html = await response.text();
+                let html = await response.text();
+                
+                // Limpiar scripts inyectados por Live Server
+                html = html.replace(/<script[^>]*>\s*\/\/ <!\[CDATA\[[\s\S]*?\/\/ \]\]>\s*<\/script>/g, '');
+                html = html.replace(/<!-- Code injected by live-server -->[\s\S]*?<script[\s\S]*?<\/script>/g, '');
+                
                 headerContainer.innerHTML = html;
                 
                 // Cargar información del usuario después de cargar el header
@@ -58,6 +102,9 @@ async function loadComponents() {
                     }
                     if (typeof window.showHomeOptionIfNeeded === 'function') {
                         window.showHomeOptionIfNeeded();
+                    }
+                    if (typeof window.configureOwnerMenu === 'function') {
+                        window.configureOwnerMenu();
                     }
                 }, 300);
             }

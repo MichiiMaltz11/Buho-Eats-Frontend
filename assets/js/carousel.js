@@ -55,6 +55,16 @@ const Carousel = {
         const container = document.getElementById('carousel');
         if (!container) return;
 
+        // Función auxiliar para URLs de imágenes
+        const getImageUrl = (imageUrl) => {
+            if (!imageUrl) return 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&h=400&fit=crop';
+            if (imageUrl.match(/^https?:\/\//)) return imageUrl;
+            if (imageUrl.startsWith('/uploads/')) {
+                return CONFIG.API_URL.replace(/\/api.*/, '') + imageUrl;
+            }
+            return imageUrl;
+        };
+
         container.innerHTML = this.restaurants.map((restaurant, index) => {
             const slideNumber = index + 1;
             const isActive = slideNumber === 1;
@@ -62,7 +72,7 @@ const Carousel = {
             return `
                 <div class="carousel-item absolute w-full h-full transition-opacity duration-500 ${isActive ? '' : 'opacity-0'}" data-slide="${slideNumber}">
                     <img 
-                        src="${restaurant.image_url || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&h=400&fit=crop'}" 
+                        src="${getImageUrl(restaurant.image_url)}" 
                         alt="${restaurant.name}" 
                         class="w-full h-full object-cover"
                         onerror="this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&h=400&fit=crop'"

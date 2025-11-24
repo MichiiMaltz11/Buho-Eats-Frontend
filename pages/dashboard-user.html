@@ -58,7 +58,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-50" data-page="dashboard">
+<body class="bg-gray-50" data-page="dashboard-user">
     <!-- MODAL DE CONFIRMACIÓN -->
     <div id="customDialog" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden items-center justify-center">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
@@ -188,8 +188,8 @@
     <script src="../assets/js/api.js"></script>
     <script src="../assets/js/auth.js"></script>
     <script src="../assets/js/restaurant-api.js"></script>
-    <script src="../assets/js/carousel.js"></script>
     <script src="../assets/js/restaurant-card.js"></script>
+    <script src="../assets/js/carousel.js"></script>
     
     <script>
         let dialogCallback = null;
@@ -312,6 +312,16 @@
                         }
                     }
                     
+                    // Función auxiliar para prepender URL del backend a las imágenes
+                    const getImageUrl = (imageUrl) => {
+                        if (!imageUrl) return 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=Restaurant';
+                        if (imageUrl.match(/^https?:\/\//)) return imageUrl;
+                        if (imageUrl.startsWith('/uploads/')) {
+                            return CONFIG.API_URL.replace(/\/api.*/, '') + imageUrl;
+                        }
+                        return imageUrl;
+                    };
+
                     // Verificar si tiene la estructura correcta
                     if (response.data && response.data.restaurants) {
                         console.log('Estructura correcta, mapeando datos...');
@@ -322,7 +332,7 @@
                             name: restaurant.name,
                             category: restaurant.cuisine_type || 'Sin categoría',
                             rating: restaurant.rating || restaurant.average_rating || 0,
-                            image: restaurant.image_url || 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=' + encodeURIComponent(restaurant.name),
+                            image: getImageUrl(restaurant.image_url),
                             reviews: restaurant.total_reviews || 0,
                             isFavorite: userFavorites.includes(restaurant.id),
                             // Datos adicionales
@@ -349,7 +359,7 @@
                                 name: restaurant.name,
                                 category: restaurant.cuisine_type || 'Sin categoría',
                                 rating: restaurant.rating || restaurant.average_rating || 0,
-                                image: restaurant.image_url || 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=' + encodeURIComponent(restaurant.name),
+                                image: getImageUrl(restaurant.image_url),
                                 reviews: restaurant.total_reviews || 0,
                                 isFavorite: userFavorites.includes(restaurant.id)
                             }));

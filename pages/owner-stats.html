@@ -15,7 +15,9 @@
                     colors: {
                         primary: '#3D405B',
                         secondary: '#588B8B',
-                        accent: '#F2CC8F'
+                        accent: '#F2CC8F',
+                        danger: '#C11D0C',
+                        success: '#06BB0C'
                     }
                 }
             }
@@ -23,77 +25,240 @@
     </script>
 
     <link rel="stylesheet" href="../assets/css/reset.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
 
 </head>
 
-<body class="bg-gray-100" data-page="owner-stats">
-
-    <header class="bg-primary text-white py-4 px-6 shadow-lg">
-        <h1 class="text-xl font-bold">Estadísticas del Restaurante</h1>
-    </header>
-
-    <main class="max-w-4xl mx-auto mt-10">
-
-        <div class="bg-white p-6 rounded-xl shadow">
-            <h2 class="text-2xl font-bold text-primary mb-6">Resumen</h2>
-
-            <div id="statsBox" class="text-gray-600">
-                Cargando estadísticas...
+<body class="bg-gray-50" data-page="owner-stats">
+    
+    <!-- MODAL DE CONFIRMACIÓN -->
+    <div id="customDialog" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
+            <div class="p-6">
+                <h3 id="dialogTitle" class="text-2xl font-bold text-primary"></h3>
             </div>
+            <div class="p-6">
+                <p id="dialogMessage" class="text-gray-600"></p>
+            </div>
+            <div class="p-6 flex gap-3">
+                <button 
+                    id="dialogCancelBtn" 
+                    class="flex-1 px-6 py-3 bg-danger text-white rounded-lg font-semibold hover:bg-danger/90 transition-all transform hover:scale-105"
+                    onclick="closeDialog(false)"
+                >
+                    Cancelar
+                </button>
+                <button 
+                    id="dialogConfirmBtn" 
+                    class="flex-1 px-6 py-3 bg-success text-white rounded-lg font-semibold hover:bg-success/90 transition-all transform hover:scale-105"
+                    onclick="closeDialog(true)"
+                >
+                    Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Header Component -->
+    <div id="header-container"></div>
+
+    <main class="container mx-auto px-4 py-8 mt-20">
+        
+        <!-- Título -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-primary mb-2">Estadísticas del Restaurante</h1>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingStats" class="text-center py-12">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <p class="mt-4 text-gray-600">Cargando estadísticas...</p>
+        </div>
+
+        <!-- Stats Content -->
+        <div id="statsContent" class="hidden">
+            
+            <!-- Métricas Principales -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                
+                <!-- Rating Promedio -->
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-accent">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm font-medium mb-1">Rating Promedio</p>
+                            <p id="avgRating" class="text-4xl font-bold text-primary">0.0</p>
+                        </div>
+                        <div class="text-5xl">⭐</div>
+                    </div>
+                </div>
+
+                <!-- Total de Reseñas -->
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-secondary">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm font-medium mb-1">Total de Reseñas</p>
+                            <p id="totalReviews" class="text-4xl font-bold text-primary">0</p>
+                        </div>
+                        <div class="text-5xl">💬</div>
+                    </div>
+                </div>
+
+                <!-- Platillos en Menú -->
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-primary">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm font-medium mb-1">Platillos en Menú</p>
+                            <p id="totalMenuItems" class="text-4xl font-bold text-primary">0</p>
+                        </div>
+                        <div class="text-5xl">🍽️</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Distribución de Calificaciones -->
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-xl font-bold text-primary mb-6">Distribución de Calificaciones</h2>
+                <div id="ratingDistribution" class="space-y-4">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Error State -->
+        <div id="errorStats" class="hidden bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+            <div class="text-5xl mb-4">⚠️</div>
+            <p class="text-red-800 font-semibold mb-2">Error al cargar estadísticas</p>
+            <p class="text-red-600">No se pudieron obtener los datos del restaurante</p>
         </div>
 
     </main>
 
-    <!-- JS -->
+    <!-- Footer Container -->
+    <div id="footer-container"></div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-20 right-4 z-50 space-y-2"></div>
+
+    <!-- Scripts -->
     <script src="../assets/js/config.js"></script>
     <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/dialog.js"></script>
     <script src="../assets/js/api.js"></script>
     <script src="../assets/js/auth.js"></script>
-    <script src="../assets/js/owner.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/header.js"></script>
 
     <script>
-        if (!Auth.requireRole("owner")) return;
-
-        async function loadStats() {
-            const statsBox = document.getElementById("statsBox");
-
-            const stats = await Owner.loadStats();
-
-            if (!stats || !stats.data) {
-                statsBox.innerHTML = "<p class='text-gray-500'>No hay estadísticas disponibles.</p>";
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Verificar autenticación y rol
+            if (!Auth.isAuthenticated()) {
+                window.location.href = 'login.html';
                 return;
             }
 
-            const s = stats.data;
+            const user = Auth.getUser();
+            if (!user || user.role !== 'owner') {
+                Utils.showToast('Acceso denegado', 'error');
+                setTimeout(() => {
+                    window.location.href = 'dashboard-user.html';
+                }, 1000);
+                return;
+            }
 
-            statsBox.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            // Cargar header y footer
+            await loadComponents();
 
-                    <div class="p-5 bg-secondary text-white rounded-lg shadow">
-                        <h3 class="text-lg font-bold">Pedidos Totales</h3>
-                        <p class="text-3xl font-semibold mt-2">${s.totalOrders || 0}</p>
-                    </div>
+            // Configurar header
+            if (typeof loadUserInfo === 'function') loadUserInfo();
+            if (typeof configureOwnerMenu === 'function') configureOwnerMenu();
 
-                    <div class="p-5 bg-primary text-white rounded-lg shadow">
-                        <h3 class="text-lg font-bold">Ingresos Totales</h3>
-                        <p class="text-3xl font-semibold mt-2">$${(s.totalRevenue || 0).toFixed(2)}</p>
-                    </div>
+            // Cargar estadísticas
+            loadStats();
+        });
 
-                    <div class="p-5 bg-accent text-dark rounded-lg shadow">
-                        <h3 class="text-lg font-bold">Rating Promedio</h3>
-                        <p class="text-3xl font-semibold mt-2">${(s.avgRating || 0).toFixed(1)} ⭐</p>
-                    </div>
+        // Función para cargar estadísticas
+        async function loadStats() {
+            const loadingStats = document.getElementById('loadingStats');
+            const statsContent = document.getElementById('statsContent');
+            const errorStats = document.getElementById('errorStats');
 
-                    <div class="p-5 bg-gray-300 text-dark rounded-lg shadow">
-                        <h3 class="text-lg font-bold">Platillos en Menú</h3>
-                        <p class="text-3xl font-semibold mt-2">${s.menuItems || 0}</p>
-                    </div>
+            try {
+                const token = await Auth.getToken();
+                const response = await fetch(`${CONFIG.API_URL}/owner/stats`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
 
-                </div>
-            `;
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(result.error || 'Error al cargar estadísticas');
+                }
+
+                const data = result.data;
+
+                // Ocultar loading, mostrar contenido
+                loadingStats.classList.add('hidden');
+                statsContent.classList.remove('hidden');
+
+                // Actualizar métricas principales
+                document.getElementById('avgRating').textContent = (data.averageRating || 0).toFixed(1);
+                document.getElementById('totalReviews').textContent = data.totalReviews || 0;
+                document.getElementById('totalMenuItems').textContent = data.totalMenuItems || 0;
+
+                // Renderizar distribución de calificaciones
+                renderRatingDistribution(data.ratingDistribution, data.totalReviews);
+
+            } catch (error) {
+                console.error('Error cargando estadísticas:', error);
+                loadingStats.classList.add('hidden');
+                errorStats.classList.remove('hidden');
+                Utils.showToast(error.message || 'Error al cargar estadísticas', 'error');
+            }
         }
 
-        loadStats();
+        // Renderizar distribución de calificaciones
+        function renderRatingDistribution(distribution, total) {
+            const container = document.getElementById('ratingDistribution');
+            
+            if (!distribution || distribution.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-4">No hay reseñas todavía</p>';
+                return;
+            }
+
+            // Crear mapa de distribución (inicializar todas las estrellas en 0)
+            const distMap = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0};
+            distribution.forEach(d => {
+                distMap[d.rating] = d.count;
+            });
+
+            container.innerHTML = '';
+            
+            // Mostrar de 5 estrellas a 1 estrella
+            for (let stars = 5; stars >= 1; stars--) {
+                const count = distMap[stars] || 0;
+                const percentage = total > 0 ? (count / total * 100).toFixed(1) : 0;
+                
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-4';
+                div.innerHTML = `
+                    <div class="flex items-center gap-2 w-24">
+                        <span class="font-semibold text-gray-700">${stars}</span>
+                        <span class="text-yellow-500">⭐</span>
+                    </div>
+                    <div class="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden">
+                        <div class="bg-accent h-full transition-all duration-500" style="width: ${percentage}%"></div>
+                    </div>
+                    <div class="w-20 text-right">
+                        <span class="text-sm font-medium text-gray-600">${count} (${percentage}%)</span>
+                    </div>
+                `;
+                container.appendChild(div);
+            }
+        }
     </script>
 
 </body>

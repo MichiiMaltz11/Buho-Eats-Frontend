@@ -1,5 +1,20 @@
 (function(){
   // admin.js - simple dashboard logic
+  
+  // Función para escapar HTML y prevenir XSS
+  function escapeHtml(text) {
+    if (text === null || text === undefined) return '';
+    const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#x27;',
+      '/': '&#x2F;',
+    };
+    return String(text).replace(/[&<>"'/]/g, (char) => map[char]);
+  }
+  
   async function fetchJSON(url, opts={}){
     // Asegurarnos de obtener el token (Auth.getToken puede ser async)
     let token = null;
@@ -102,17 +117,23 @@
     }
     container.innerHTML = '';
     const items = [
-      { title: 'Usuarios', value: data.totalUsers },
-      { title: 'Restaurantes', value: data.totalRestaurants },
-      { title: 'Reseñas activas', value: data.totalReviews },
-      { title: 'Reportes pendientes', value: data.pendingReports },
-      { title: 'Usuarios baneados', value: data.bannedUsers }
+      { title: 'Usuarios', value: data.totalUsers, icon: '👥', color: 'text-blue-500' },
+      { title: 'Restaurantes', value: data.totalRestaurants, icon: '🍽️', color: 'text-orange-500' },
+      { title: 'Reseñas', value: data.totalReviews, icon: '⭐', color: 'text-yellow-500' },
+      { title: 'Reportes pendientes', value: data.pendingReports, icon: '⚠️', color: 'text-red-500' },
+      { title: 'Usuarios baneados', value: data.bannedUsers, icon: '🚫', color: 'text-gray-500' }
     ];
 
     items.forEach(it => {
       const card = document.createElement('div');
-      card.className = 'p-4 border rounded shadow bg-white';
-      card.innerHTML = `<div class="text-sm text-gray-500">${it.title}</div><div class="text-2xl font-bold">${it.value}</div>`;
+      card.className = 'p-6 border rounded shadow bg-white text-center';
+      card.innerHTML = `
+        <div class="flex flex-col items-center justify-center gap-3">
+          <span class="text-4xl ${it.color}">${it.icon}</span>
+          <span class="text-base text-gray-600 font-semibold">${it.title}</span>
+          <div class="text-3xl font-bold text-gray-800">${it.value}</div>
+        </div>
+      `;
       container.appendChild(card);
     });
   }
@@ -128,23 +149,34 @@
       container.innerHTML = '<div class="text-muted">No hay reportes pendientes.</div>';
       return;
     }
+    
+    // Mapeo de motivos a descripciones
+    const motivosDescriptivos = {
+      'spam': 'Spam o publicidad',
+      'ofensivo': 'Contenido ofensivo',
+      'falso': 'Información falsa o engañosa',
+      'inapropiado': 'Contenido inapropiado',
+      'otro': 'Otro motivo'
+    };
+    
     list.forEach(r => {
       const el = document.createElement('div');
       el.className = 'card report';
+      const motivoDescriptivo = motivosDescriptivos[r.reason] || r.reason;
       el.innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
           <div>
-            <div style="font-weight:700;">Reporte #${r.report_id} — ${r.restaurant_name}</div>
-            <div class="text-muted">Reportado por: ${r.reporter_first} ${r.reporter_last} (${r.reporter_email})</div>
+            <div style="font-weight:700;">Reporte #${escapeHtml(r.report_id)} — ${escapeHtml(r.restaurant_name)}</div>
+            <div class="text-muted">Reportado por: ${escapeHtml(r.reporter_first)} ${escapeHtml(r.reporter_last)} (${escapeHtml(r.reporter_email)})</div>
           </div>
-          <div class="text-muted">${r.created_at}</div>
+          <div class="text-muted">${escapeHtml(r.created_at)}</div>
         </div>
-        <div style="margin-top:6px;"><strong>Motivo:</strong> ${r.reason}</div>
-        <div style="margin-top:6px;"><strong>Reseña:</strong> ${r.review_comment || '(sin comentario)'}</div>
+        <div style="margin-top:6px;"><strong>Motivo:</strong> ${escapeHtml(motivoDescriptivo)}</div>
+        <div style="margin-top:6px;"><strong>Reseña:</strong> ${escapeHtml(r.review_comment || '(sin comentario)')}</div>
         <div class="reports-actions" style="margin-top:8px;">
-          <button class="btn btn-success small" data-id="${r.report_id}">Aprobar</button>
-          <button class="btn btn-muted small" data-id="${r.report_id}">Eliminar</button>
-          <button class="btn btn-danger small" data-id="${r.report_id}" data-userid="${r.review_user_id}">Eliminar + Strike</button>
+          <button class="btn btn-success small" data-id="${escapeHtml(r.report_id)}">Aprobar</button>
+          <button class="btn btn-muted small" data-id="${escapeHtml(r.report_id)}">Eliminar</button>
+          <button class="btn btn-danger small" data-id="${escapeHtml(r.report_id)}" data-userid="${escapeHtml(r.review_user_id)}">Eliminar + Strike</button>
         </div>
       `;
 
@@ -197,9 +229,9 @@
       // Disable unban button if user is active (not banned)
       const unbanDisabled = u.is_active ? 'disabled' : '';
       const unbanTitle = u.is_active ? 'Usuario no está baneado' : 'Desbanear usuario';
-      tr.innerHTML = `<td>${u.first_name} ${u.last_name}</td><td>${u.email}</td><td>${u.role}</td><td>${u.strikes}</td><td>${u.is_active? 'Sí':'No'}</td><td>
-        <button class="btn ban-btn btn-danger small" data-id="${u.id}">Ban</button>
-        <button class="btn unban-btn btn-success small" data-id="${u.id}" ${unbanDisabled} title="${unbanTitle}">Desban</button>
+      tr.innerHTML = `<td>${escapeHtml(u.first_name)} ${escapeHtml(u.last_name)}</td><td>${escapeHtml(u.email)}</td><td>${escapeHtml(u.role)}</td><td>${escapeHtml(u.strikes)}</td><td>${u.is_active? 'Sí':'No'}</td><td>
+        <button class="btn ban-btn btn-danger small" data-id="${escapeHtml(u.id)}">Ban</button>
+        <button class="btn unban-btn btn-success small" data-id="${escapeHtml(u.id)}" ${unbanDisabled} title="${escapeHtml(unbanTitle)}">Desban</button>
       </td>`;
       tb.appendChild(tr);
     });
@@ -209,7 +241,36 @@
     // Ban handlers (scoped to this container)
     container.querySelectorAll('.ban-btn').forEach(b=> b.addEventListener('click', async (e)=>{
       const id = e.currentTarget.dataset.id;
-      if (!confirm('¿Confirmas banear al usuario?')) return;
+      
+      // Encontrar el usuario para saber su rol
+      const user = list.find(u => u.id == id);
+      const isOwner = user && user.role === 'owner';
+      
+      // Personalizar mensaje según el rol
+      const title = isOwner ? 'Desactivar Propietario' : 'Banear Usuario';
+      const message = isOwner 
+        ? '¿Estás seguro de que deseas desactivar a este propietario? Esta acción desactivará su cuenta y su restaurante.'
+        : '¿Estás seguro de que deseas banear a este usuario? Esta acción desactivará su cuenta y eliminará sus reseñas.';
+      const confirmText = isOwner ? 'Desactivar' : 'Banear';
+      
+      // Usar modal si está disponible, si no usar confirm
+      const confirmed = await new Promise(resolve => {
+        if (typeof showDialog === 'function') {
+          showDialog({
+            title: title,
+            message: message,
+            confirmText: confirmText,
+            cancelText: 'Cancelar',
+            onConfirm: () => resolve(true),
+            onCancel: () => resolve(false)
+          });
+        } else {
+          resolve(confirm(message));
+        }
+      });
+      
+      if (!confirmed) return;
+      
       const res = await fetchJSON(`/api/admin/users/${id}/ban`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ reason: 'Ban manual desde dashboard' }) });
       if (res && res.success) {
         await loadUsers(); await loadStats();
@@ -223,13 +284,52 @@
       const id = e.currentTarget.dataset.id;
       // If button is disabled, ignore
       if (e.currentTarget.disabled) return;
-      if (!confirm('¿Confirmas reactivar este usuario?')) return;
+      
+      // Usar modal si está disponible, si no usar confirm
+      const confirmed = await new Promise(resolve => {
+        if (typeof showDialog === 'function') {
+          showDialog({
+            title: 'Reactivar Usuario',
+            message: '¿Estás seguro de que deseas reactivar a este usuario? Se restablecerán sus strikes a 0.',
+            confirmText: 'Reactivar',
+            cancelText: 'Cancelar',
+            onConfirm: () => resolve(true),
+            onCancel: () => resolve(false)
+          });
+        } else {
+          resolve(confirm('¿Confirmas reactivar este usuario?'));
+        }
+      });
+      
+      if (!confirmed) return;
+      
       const res = await fetchJSON(`/api/admin/users/${id}/unban`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ resetStrikes: true }) });
       if (res && res.success) {
         await loadUsers(); await loadStats();
-        alert('Usuario reactivado.');
+        
+        // Mostrar modal de éxito
+        if (typeof showDialog === 'function') {
+          showDialog({
+            title: 'Usuario Reactivado',
+            message: 'El usuario ha sido reactivado exitosamente y puede volver a iniciar sesión.',
+            confirmText: 'Entendido',
+            onConfirm: () => {}
+          });
+        } else {
+          alert('Usuario reactivado.');
+        }
       } else {
-        alert('Error al reactivar: ' + (res && (res.error || res.message) ? (res.error || res.message) : JSON.stringify(res)));
+        const errorMsg = 'Error al reactivar: ' + (res && (res.error || res.message) ? (res.error || res.message) : JSON.stringify(res));
+        if (typeof showDialog === 'function') {
+          showDialog({
+            title: 'Error',
+            message: errorMsg,
+            confirmText: 'Entendido',
+            onConfirm: () => {}
+          });
+        } else {
+          alert(errorMsg);
+        }
       }
     }));
   }
@@ -286,17 +386,17 @@
       }
       card.innerHTML = `
         <div>
-          <img src="${image}" onerror="this.src='https://via.placeholder.com/400x300/3D405B/FFFFFF?text=🍽️'">
+          <img src="${escapeHtml(image)}" onerror="this.src='https://via.placeholder.com/400x300/3D405B/FFFFFF?text=🍽️'">
           <div class="mt-2">
-            <div style="font-weight:700;font-size:16px;">${r.name}</div>
-            <div class="text-muted">${r.cuisine_type || r.category || ''} • ${r.price_range || ''}</div>
-            <div class="text-muted mt-2">Owner: ${r.owner_name || r.owner || '—'}</div>
+            <div style="font-weight:700;font-size:16px;">${escapeHtml(r.name)}</div>
+            <div class="text-muted">${escapeHtml(r.cuisine_type || r.category || '')} • ${escapeHtml(r.price_range || '')}</div>
+            <div class="text-muted mt-2">Owner: ${escapeHtml(r.owner_name || r.owner || '—')}</div>
           </div>
           <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;">
-            <div class="text-muted">Reviews: ${r.total_reviews || r.reviews || 0} — Rating: ${Number(r.average_rating || r.rating || 0).toFixed(1)}</div>
+            <div class="text-muted">Reviews: ${escapeHtml(r.total_reviews || r.reviews || 0)} — Rating: ${escapeHtml(Number(r.average_rating || r.rating || 0).toFixed(1))}</div>
             <div style="display:flex;gap:6px;align-items:center;">
-              <button class="btn btn-primary small" onclick="window.location.href='restaurant-detail.html?id=${r.id}'">Ver</button>
-              ${ isAdmin ? `<button class="btn btn-outline small edit-restaurant-btn" data-id="${r.id}">Editar</button><button class="btn btn-danger small delete-restaurant-btn" data-id="${r.id}">Eliminar</button>` : '' }
+              <button class="btn btn-primary small" onclick="window.location.href='restaurant-detail.html?id=${escapeHtml(r.id)}'">Ver</button>
+              ${ isAdmin ? `<button class="btn btn-outline small edit-restaurant-btn" data-id="${escapeHtml(r.id)}">Editar</button><button class="btn btn-danger small delete-restaurant-btn" data-id="${escapeHtml(r.id)}">Eliminar</button>` : '' }
             </div>
           </div>
         </div>
@@ -341,22 +441,81 @@
     }
   }
 
-  function renderRestaurants(){
-    totalPages = Math.max(1, Math.ceil(window.restaurants.length / itemsPerPage));
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const restaurantsToShow = window.restaurants.slice(startIndex, endIndex);
-    renderRestaurantCards(restaurantsToShow, 'restaurantsGrid');
-    updatePaginationInfo();
-    updatePaginationButtons();
+  function renderRestaurants(list, isAdmin){
+    // Si se pasa una lista, usarla; si no, usar window.restaurants
+    const restaurantList = list || window.restaurants || [];
+    
+    // Determinar el contenedor correcto
+    const containerId = document.getElementById('restaurants-list') ? 'restaurants-list' : 'restaurantsGrid';
+    const container = document.getElementById(containerId);
+    
+    if (!container) {
+      console.warn('No se encontró contenedor de restaurantes');
+      return;
+    }
+    
+    // Si no hay restaurantes, mostrar mensaje
+    if (restaurantList.length === 0) {
+      container.innerHTML = '<div class="col-span-full text-center py-12"><p class="text-gray-500">No hay restaurantes disponibles</p></div>';
+      return;
+    }
+    
+    // Si isAdmin es true, mostrar todos sin paginación
+    if (isAdmin) {
+      container.innerHTML = restaurantList.map(restaurant => {
+        const imageUrl = restaurant.image || restaurant.image_url || '../assets/img/restaurants/default/burger-1.jpg';
+        const ownerName = restaurant.owner_name || (restaurant.owner_first && restaurant.owner_last ? `${restaurant.owner_first} ${restaurant.owner_last}` : 'Sin propietario');
+        const isActive = restaurant.is_active !== 0; // is_active puede ser 0 o 1
+        const statusBadge = isActive 
+          ? '<span class="inline-block px-2 py-1 text-xs font-semibold rounded bg-green-100 text-green-800">✓ Activo</span>' 
+          : '<span class="inline-block px-2 py-1 text-xs font-semibold rounded bg-red-100 text-red-800">✗ Deshabilitado</span>';
+        const cardOpacity = isActive ? '' : 'opacity-60';
+        
+        return `
+        <div class="restaurant-card bg-white rounded-lg shadow-md overflow-hidden ${cardOpacity}">
+          <img src="${imageUrl}" alt="${escapeHtml(restaurant.name)}" class="w-full h-48 object-cover" onerror="this.src='../assets/img/restaurants/default/burger-1.jpg'">
+          <div class="p-4">
+            <div class="flex items-start justify-between mb-2">
+              <h3 class="text-xl font-bold text-primary">${escapeHtml(restaurant.name)}</h3>
+              ${statusBadge}
+            </div>
+            <p class="text-gray-600 mb-2">${escapeHtml(restaurant.category || restaurant.cuisine_type || 'Sin categoría')}</p>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-yellow-400">⭐</span>
+              <span class="font-semibold">${(restaurant.rating || restaurant.average_rating || 0).toFixed(1)}</span>
+              <span class="text-gray-500">(${restaurant.reviews || restaurant.total_reviews || 0} reseñas)</span>
+            </div>
+            <div class="text-sm text-gray-500">
+              <span class="font-semibold">Propietario:</span> ${escapeHtml(ownerName)}
+            </div>
+          </div>
+        </div>
+      `;
+      }).join('');
+      // No llamar a updatePaginationInfo ni updatePaginationButtons en modo admin
+    } else {
+      // Modo con paginación
+      totalPages = Math.max(1, Math.ceil(restaurantList.length / itemsPerPage));
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const restaurantsToShow = restaurantList.slice(startIndex, endIndex);
+      renderRestaurantCards(restaurantsToShow, containerId);
+      updatePaginationInfo();
+      updatePaginationButtons();
+    }
   }
 
   function updatePaginationInfo() {
     const startIndex = (currentPage - 1) * itemsPerPage + 1;
     const endIndex = Math.min(currentPage * itemsPerPage, window.restaurants.length);
-    document.getElementById('showingStart').textContent = window.restaurants.length > 0 ? startIndex : 0;
-    document.getElementById('showingEnd').textContent = endIndex;
-    document.getElementById('totalRestaurants').textContent = window.restaurants.length;
+    
+    const showingStart = document.getElementById('showingStart');
+    const showingEnd = document.getElementById('showingEnd');
+    const totalRestaurants = document.getElementById('totalRestaurants');
+    
+    if (showingStart) showingStart.textContent = window.restaurants.length > 0 ? startIndex : 0;
+    if (showingEnd) showingEnd.textContent = endIndex;
+    if (totalRestaurants) totalRestaurants.textContent = window.restaurants.length;
   }
 
   function updatePaginationButtons() {
@@ -411,18 +570,18 @@
     if (results.length === 0) { searchResults.innerHTML = '<p class="text-gray-500 text-center py-4">No se encontraron restaurantes</p>'; }
     else {
       searchResults.innerHTML = results.slice(0,5).map(restaurant => `
-        <div onclick="goToRestaurantFromSearch(${restaurant.id})" class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition">
-          <img src="${restaurant.image || ''}" alt="${restaurant.name}" class="w-16 h-16 object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/64/3D405B/FFFFFF?text=🍽️'">
+        <div onclick="goToRestaurantFromSearch(${escapeHtml(restaurant.id)})" class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition">
+          <img src="${escapeHtml(restaurant.image || '')}" alt="${escapeHtml(restaurant.name)}" class="w-16 h-16 object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/64/3D405B/FFFFFF?text=🍽️'">
           <div class="flex-1">
-            <h4 class="font-bold text-primary">${restaurant.name}</h4>
-            <p class="text-sm text-gray-600">${restaurant.cuisine_type || restaurant.category || ''}</p>
-            <div class="flex items-center gap-1 mt-1"><span class="text-yellow-400">⭐</span><span class="text-sm font-semibold">${(restaurant.rating||restaurant.average_rating||0).toFixed(1)}</span><span class="text-sm text-gray-500">(${restaurant.reviews||restaurant.total_reviews||0})</span></div>
+            <h4 class="font-bold text-primary">${escapeHtml(restaurant.name)}</h4>
+            <p class="text-sm text-gray-600">${escapeHtml(restaurant.cuisine_type || restaurant.category || '')}</p>
+            <div class="flex items-center gap-1 mt-1"><span class="text-yellow-400">⭐</span><span class="text-sm font-semibold">${escapeHtml((restaurant.rating||restaurant.average_rating||0).toFixed(1))}</span><span class="text-sm text-gray-500">(${escapeHtml(restaurant.reviews||restaurant.total_reviews||0)})</span></div>
           </div>
           <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
         </div>
       `).join('');
       if (results.length > 5) {
-        searchResults.innerHTML += `<div class="p-3 text-center border-t"><button onclick="searchAllRestaurants('${searchTerm}')" class="text-secondary font-semibold hover:underline">Ver todos los ${results.length} resultados</button></div>`;
+        searchResults.innerHTML += `<div class="p-3 text-center border-t"><button onclick="searchAllRestaurants('${escapeHtml(searchTerm)}')" class="text-secondary font-semibold hover:underline">Ver todos los ${escapeHtml(results.length)} resultados</button></div>`;
       }
     }
   }
@@ -517,7 +676,9 @@
       const list = (res.data && res.data.data) ? res.data.data : (res.data || res);
       window.restaurants = Array.isArray(list) ? list : [];
       currentPage = 1;
-      renderRestaurants();
+      // Si estamos en dashboard-admin, usar modo isAdmin=true para cards bonitas
+      const isDashboardAdmin = (location.pathname || '').includes('dashboard-admin');
+      renderRestaurants(window.restaurants, isDashboardAdmin);
     }
   }
 
@@ -529,6 +690,11 @@
       const path = (location.pathname || '').split('/').pop() || '';
       if (path === 'dashboard-admin-reported-reviews.html' || location.hash.includes('reported-reviews')) {
         await loadReportedReviews();
+        return;
+      }
+      // Si estamos en dashboard-admin.html, NO cargar nada aquí porque tiene su propia inicialización
+      if (path === 'dashboard-admin.html') {
+        console.log('admin.js: Omitiendo init() en dashboard-admin.html (usa su propia inicialización)');
         return;
       }
     } catch (e) {
@@ -668,8 +834,15 @@
     if (showAllBtn) showAllBtn.addEventListener('click', function(){ showAllPanels(); });
   });
 
-  // Expose reported reviews loader and renderer for pages that want to call it directly
-  try { window.loadReportedReviews = loadReportedReviews; } catch(e) { /* ignore */ }
+  // Expose admin functions globally
+  try { 
+    window.loadReportedReviews = loadReportedReviews;
+    window.renderStats = renderStats;
+    window.renderReports = renderReports;
+    window.renderUsers = renderUsers;
+    window.renderRestaurants = renderRestaurants;
+    window.fetchJSON = fetchJSON;
+  } catch(e) { /* ignore */ }
 
   // Render function for reported reviews
   function renderReportedReviews(list){
@@ -696,13 +869,13 @@
       el.innerHTML = `
         <div class="flex justify-between items-start">
           <div>
-            <div class="font-bold text-primary">Reseña #${r.id || r.review_id || ''} — ${restaurant}</div>
-            <div class="text-sm text-gray-600">Por: ${reviewer} — ${created}</div>
+            <div class="font-bold text-primary">Reseña #${escapeHtml(r.id || r.review_id || '')} — ${escapeHtml(restaurant)}</div>
+            <div class="text-sm text-gray-600">Por: ${escapeHtml(reviewer)} — ${escapeHtml(created)}</div>
           </div>
-          <div class="text-sm text-gray-500">Reportes: ${r._reportCount || 0}</div>
+          <div class="text-sm text-gray-500">Reportes: ${escapeHtml(r._reportCount || 0)}</div>
         </div>
-        <div class="mt-3 text-gray-700">${comment || '<em>(sin comentario)</em>'}</div>
-        <div class="mt-3 text-sm text-gray-600">Estado(s) de reportes: ${statusSummary}</div>
+        <div class="mt-3 text-gray-700">${escapeHtml(comment) || '<em>(sin comentario)</em>'}</div>
+        <div class="mt-3 text-sm text-gray-600">Estado(s) de reportes: ${escapeHtml(statusSummary)}</div>
       `;
 
       container.appendChild(el);

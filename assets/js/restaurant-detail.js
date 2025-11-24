@@ -62,10 +62,20 @@ const RestaurantDetail = {
         // Título de la página
         document.title = `${restaurant.name} - Buho Eats`;
 
+        // Función auxiliar para URLs de imágenes
+        const getImageUrl = (imageUrl) => {
+            if (!imageUrl) return '../assets/img/restaurant-placeholder.jpg';
+            if (imageUrl.match(/^https?:\/\//)) return imageUrl;
+            if (imageUrl.startsWith('/uploads/')) {
+                return CONFIG.API_URL.replace(/\/api.*/, '') + imageUrl;
+            }
+            return imageUrl;
+        };
+
         // Imagen del restaurante
         const restaurantImage = document.getElementById('restaurantImage');
         if (restaurantImage) {
-            restaurantImage.src = restaurant.image_url || '../assets/img/restaurant-placeholder.jpg';
+            restaurantImage.src = getImageUrl(restaurant.image_url);
             restaurantImage.alt = restaurant.name;
         }
 
@@ -218,7 +228,7 @@ const RestaurantDetail = {
                         <div class="flex-1">
                             <div class="flex justify-between items-start mb-2">
                                 <div>
-                                    <h4 class="font-semibold text-gray-800">${this.escapeHtml(review.first_name)} ${this.escapeHtml(review.last_name)}</h4>
+                                    <h4 class="font-semibold text-gray-800">${this.unescapeHtml(review.first_name)} ${this.unescapeHtml(review.last_name)}</h4>
                                     <div class="flex items-center mt-1">
                                         ${'<span class="text-yellow-400 text-sm">★</span>'.repeat(review.rating)}
                                         ${'<span class="text-gray-300 text-sm">★</span>'.repeat(5 - review.rating)}
@@ -226,7 +236,7 @@ const RestaurantDetail = {
                                 </div>
                                 <span class="text-gray-400 text-xs">${this.formatDate(review.created_at)}</span>
                             </div>
-                            <p class="text-gray-600 text-sm">${this.escapeHtml(review.comment)}</p>
+                            <p class="text-gray-600 text-sm">${this.unescapeHtml(review.comment)}</p>
                         </div>
                     </div>
                 </div>
@@ -266,6 +276,16 @@ const RestaurantDetail = {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    },
+
+    /**
+     * Des-escapar HTML (convertir entidades HTML a caracteres normales)
+     */
+    unescapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.innerHTML = text;
+        return div.textContent;
     },
 
     /**
@@ -414,6 +434,16 @@ const RestaurantDetail = {
         const menuGrid = document.getElementById('menuGrid');
         if (!menuGrid) return;
 
+        // Función auxiliar para URLs de imágenes
+        const getImageUrl = (imageUrl) => {
+            if (!imageUrl) return null;
+            if (imageUrl.match(/^https?:\/\//)) return imageUrl;
+            if (imageUrl.startsWith('/uploads/')) {
+                return CONFIG.API_URL.replace(/\/api.*/, '') + imageUrl;
+            }
+            return imageUrl;
+        };
+
         // Agrupar por categoría
         const categories = {
             'Entrada': [],
@@ -445,10 +475,11 @@ const RestaurantDetail = {
                 `;
 
                 items.forEach(item => {
+                    const imageUrl = getImageUrl(item.image_url);
                     menuHTML += `
                         <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                            ${item.image_url ? `
-                                <img src="${item.image_url}" 
+                            ${imageUrl ? `
+                                <img src="${imageUrl}" 
                                      alt="${item.name}" 
                                      class="w-full h-48 object-cover"
                                      onerror="this.src='https://via.placeholder.com/400x300?text=Sin+Imagen'">

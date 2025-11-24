@@ -40,7 +40,13 @@ async function loadUserInfo() {
             return;
         }
         
+        // Obtener firstName del token (siempre actualizado)
         const firstName = user.firstName || user.first_name;
+        
+        // Actualizar localStorage con el nombre actual
+        if (firstName) {
+            localStorage.setItem('firstName', firstName);
+        }
         
         // Actualizar el nombre del usuario
         const userName = document.getElementById('userName');
@@ -154,6 +160,8 @@ if (document.readyState === 'loading') {
         // Cargar info del usuario si está autenticado
         if (typeof Auth !== 'undefined' && Auth.isAuthenticated()) {
             loadUserInfo();
+            configureOwnerMenu();
+            configureAdminMenu();
         }
     });
 } else {
@@ -161,6 +169,8 @@ if (document.readyState === 'loading') {
     // Cargar info del usuario si está autenticado
     if (typeof Auth !== 'undefined' && Auth.isAuthenticated()) {
         loadUserInfo();
+        configureOwnerMenu();
+        configureAdminMenu();
     }
 }
 
@@ -168,7 +178,7 @@ if (document.readyState === 'loading') {
 // FUNCIONALIDADES ESPECÍFICAS PARA OWNER
 // ===========================================================
 
-document.addEventListener('DOMContentLoaded', async () => {
+function configureOwnerMenu() {
     if (!Auth.isAuthenticated()) return;
 
     const user = Auth.getUser();
@@ -177,42 +187,101 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Si el usuario NO es owner, no hacemos nada
     if (user.role !== "owner") return;
 
-    console.log("OWNER detectado en header.js");
+    console.log("OWNER detectado en header.js - Configurando menú...");
 
     // -------- OCULTAR opciones que un owner NO usa --------
 
+    // Ocultar "Inicio"
+    const homeOption = document.getElementById('menuHomeOption');
+    if (homeOption) {
+        homeOption.classList.add("hidden");
+        console.log("Inicio ocultado");
+    }
+
     // Ocultar "Favoritos"
     const favOption = document.getElementById('menuFavoritesOption');
-    if (favOption) favOption.classList.add("hidden");
+    if (favOption) {
+        favOption.classList.add("hidden");
+        console.log("Favoritos ocultado");
+    }
 
-    // Ocultar "Explorar Restaurantes"
+    // Ocultar "Explorar Restaurantes" (si existe)
     const exploreOption = document.getElementById('menuExploreOption');
-    if (exploreOption) exploreOption.classList.add("hidden");
-
-    // -------- MOSTRAR opción Estadísticas --------
-    const statsOption = document.getElementById('menuStatsOption');
-    if (statsOption) {
-        statsOption.classList.remove("hidden");
-        statsOption.classList.add("block");
-
-        statsOption.addEventListener("click", () => {
-            window.location.href = "/pages/statistics.html";
-        });
+    if (exploreOption) {
+        exploreOption.classList.add("hidden");
+        console.log("Explorar ocultado");
     }
 
-    // -------- MOSTRAR opción "Mi Restaurante" --------
-    const restaurantOption = document.getElementById('menuMyRestaurantOption');
-    if (restaurantOption) {
-        restaurantOption.classList.remove("hidden");
-        restaurantOption.classList.add("block");
+    // -------- MOSTRAR opciones de owner --------
+    const ownerOptions = document.querySelectorAll('.owner-only');
+    console.log("Owner options encontradas:", ownerOptions.length);
+    
+    ownerOptions.forEach(option => {
+        option.classList.remove("hidden");
+        option.classList.add("block");
+        console.log("Mostrando:", option.id || option.textContent.trim());
+    });
+}
 
-        restaurantOption.addEventListener("click", () => {
-            const restaurantId = localStorage.getItem("restaurantId");
-            if (restaurantId) {
-                window.location.href = `/pages/restaurant-detail.html?id=${restaurantId}&mode=owner`;
-            } else {
-                alert("Tu restaurante aún no está configurado.");
-            }
-        });
+// Exportar función
+window.configureOwnerMenu = configureOwnerMenu;
+
+// ===========================================================
+// FUNCIONALIDADES ESPECÍFICAS PARA ADMIN
+// ===========================================================
+
+function configureAdminMenu() {
+    if (!Auth.isAuthenticated()) return;
+
+    const user = Auth.getUser();
+    if (!user) return;
+
+    // Si el usuario NO es admin, no hacemos nada
+    if (user.role !== "admin") return;
+
+    console.log("ADMIN detectado en header.js - Configurando menú...");
+
+    // -------- MODIFICAR "Inicio" a "Administrar" --------
+    const homeOption = document.getElementById('menuHomeOption');
+    if (homeOption) {
+        // Cambiar texto a "Administrar"
+        const span = homeOption.querySelector('span');
+        if (span) {
+            span.textContent = 'Administrar';
+        }
+        
+        // Cambiar URL al dashboard-admin
+        homeOption.href = 'dashboard-admin.html';
+        
+        // Asegurar que sea visible
+        homeOption.classList.remove("hidden");
+        homeOption.classList.add("block");
+        
+        console.log("Opción 'Inicio' cambiada a 'Administrar'");
     }
-});
+
+    // Ocultar "Favoritos"
+    const favOption = document.getElementById('menuFavoritesOption');
+    if (favOption) {
+        favOption.classList.add("hidden");
+    }
+
+    // Ocultar todas las opciones de owner
+    const ownerOptions = document.querySelectorAll('.owner-only');
+    ownerOptions.forEach(option => {
+        option.classList.add("hidden");
+        option.classList.remove("block");
+    });
+
+    // Ocultar todas las opciones de admin (las páginas separadas ya no se usan)
+    const adminOptions = document.querySelectorAll('.admin-only');
+    adminOptions.forEach(option => {
+        option.classList.add("hidden");
+        option.classList.remove("block");
+    });
+
+    console.log("Menú de admin configurado - Administrar, Perfil y Cerrar Sesión visibles");
+}
+
+// Exportar función
+window.configureAdminMenu = configureAdminMenu;

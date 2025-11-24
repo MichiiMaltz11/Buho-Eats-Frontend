@@ -56,9 +56,190 @@
             padding-top: 120px !important;
             min-height: calc(100vh - 120px);
         }
+
+        /* Modal styles */
+        #customDialog {
+            display: none;
+        }
+
+        #customDialog:not(.hidden) {
+            display: flex !important;
+        }
+
+        #customDialog.flex {
+            display: flex !important;
+        }
+
+        /* Estilos para las cards de admin */
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Estilos para botones */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-success {
+            background-color: #06BB0C;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #059a0a;
+        }
+
+        .btn-danger {
+            background-color: #C11D0C;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #a01609;
+        }
+
+        .btn-muted {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-muted:hover {
+            background-color: #5a6268;
+        }
+
+        .btn.small {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        /* Tabla de usuarios */
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .users-table thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .users-table th {
+            background-color: #3D405B;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .users-table th:nth-child(1) { width: 20%; } /* Nombre */
+        .users-table th:nth-child(2) { width: 25%; } /* Email */
+        .users-table th:nth-child(3) { width: 10%; } /* Rol */
+        .users-table th:nth-child(4) { width: 10%; } /* Strikes */
+        .users-table th:nth-child(5) { width: 10%; } /* Activo */
+        .users-table th:nth-child(6) { width: 25%; } /* Acciones */
+
+        .users-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            background-color: white;
+        }
+
+        .users-table tbody tr:hover td {
+            background-color: #f9fafb;
+        }
+
+        .users-table tbody tr {
+            transition: background-color 0.2s;
+        }
+
+        /* Contenedor de users-list con scroll solo en tbody */
+        #users-list {
+            width: 100%;
+            max-height: 400px;
+            overflow-y: auto;
+            display: block;
+        }
+
+        #users-list table {
+            display: table;
+            width: 100%;
+        }
+
+        /* Reportes */
+        .report {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: white;
+        }
+
+        .reports-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* Cards de stats */
+        #stats > div {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        #stats .text-sm {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        #stats .text-2xl {
+            color: #3D405B;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        /* Texto muted */
+        .text-muted {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        /* Restaurant cards */
+        .restaurant-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .restaurant-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
     </style>
 </head>
-<body class="bg-gray-50" data-page="dashboard">
+<body class="bg-gray-50" data-page="dashboard-admin">
     <!-- MODAL DE CONFIRMACIÓN -->
     <div id="customDialog" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden items-center justify-center">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
@@ -102,58 +283,58 @@
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="container mx-auto px-4 py-8">
-        <!-- Título de bienvenida con buscador -->
-        <div class="mb-8 flex justify-between items-center gap-4">
-            <h2 class="text-3xl font-bold text-primary mb-2">¡Bienvenido!</h2>
-            
-            <!-- Buscador de restaurantes -->
-            <div class="relative flex-1 max-w-md">
-                <div class="relative">
-                    <input 
-                        type="text" 
-                        id="searchInput"
-                        placeholder="Buscar restaurante..." 
-                        class="w-full px-4 py-3 pl-12 rounded-lg border-2 border-gray-300 focus:border-secondary focus:outline-none transition shadow-md"
-                        onfocus="showSearchResults()"
-                        oninput="searchRestaurants()"
-                    >
-                    <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </div>
-                
-                <!-- Dropdown de resultados -->
-                <div 
-                    id="searchDropdown"
-                    class="hidden absolute left-0 right-0 mt-2 bg-white rounded-lg shadow-2xl z-50 overflow-hidden"
-                >
-                    <div class="p-4">
-                        <!-- Resultados de búsqueda en tiempo real -->
-                        <div id="searchResults" class="max-h-96 overflow-y-auto">
-                        </div>
-                    </div>
-                </div>
+        <!-- Título -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-primary">Panel de Administración</h1>
+        </div>
+
+        <!-- ESTADÍSTICAS GENERALES -->
+        <div class="mb-6">
+            <h2 class="text-2xl font-bold text-primary mb-4">Estadísticas Generales</h2>
+            <div id="stats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="text-center py-4">Cargando...</div>
             </div>
         </div>
 
-        <!-- CARRUSEL DE RESTAURANTES DESTACADOS -->
-        <div id="carousel-container"></div>
+        <!-- SECCIONES EN GRID -->
+        <section id="admin-panels" class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            
+            <!-- REPORTES DE RESEÑAS -->
+            <div id="reports-panel" class="col-span-1 lg:col-span-3 p-6 bg-white rounded-lg shadow-md">
+                <div class="mb-4">
+                    <h3 class="text-2xl font-bold text-primary">Reportes Pendientes</h3>
+                </div>
+                <div id="reports-list" class="max-h-80 overflow-y-auto">
+                    <div class="text-gray-500">Cargando reportes...</div>
+                </div>
+            </div>
 
-        <!-- ADMIN PANELS: Stats, Reports, Users -->
-       
+            <!-- GESTIÓN DE USUARIOS -->
+            <div id="users-panel" class="col-span-1 lg:col-span-3 p-6 bg-white rounded-lg shadow-md">
+                <div class="mb-4">
+                    <h3 class="text-2xl font-bold text-primary">Gestión de Usuarios</h3>
+                </div>
+                <div id="users-list">
+                    <div class="text-gray-500">Cargando usuarios...</div>
+                </div>
+            </div>
 
-        <!-- Gestión de restaurantes ahora en su propia vista -->
-        <div class="mb-12">
-            <div class="card p-6 bg-white rounded-lg shadow-md">
-                <div class="flex items-center justify-between">
+
+        </section>
+
+        <!-- GESTIÓN DE RESTAURANTES -->
+        <div class="mb-6">
+            <div class="p-6 bg-white rounded-lg shadow-md">
+                <div class="flex justify-between items-center mb-4">
                     <div>
-                        <h3 class="text-2xl font-bold text-primary">Gestión de Restaurantes</h3>
-                        <p class="text-gray-600 mt-1">Todas las operaciones de editar, eliminar y administrar restaurantes se encuentran en la vista dedicada.</p>
+                        <h2 class="text-2xl font-bold text-primary">Gestión de Restaurantes</h2>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <a href="dashboard-admin-restaurants.html" class="px-4 py-2 bg-secondary text-white rounded-lg shadow hover:bg-secondary/90">Ir a Gestión de Restaurantes</a>
-                        <button onclick="loadRestaurants()" class="px-4 py-2 border rounded-lg">Refrescar</button>
-                    </div>
+                    <button onclick="loadRestaurants()" class="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary/90">
+                        Refrescar
+                    </button>
+                </div>
+                <div id="restaurants-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[500px] overflow-y-auto">
+                    <div class="col-span-full text-center py-8 text-gray-500">Cargando restaurantes...</div>
                 </div>
             </div>
         </div>
@@ -245,7 +426,6 @@
                 confirmText: 'Aceptar',
                 cancelText: 'Cancelar',
                 onConfirm: function() {
-                    // Llamar a Auth.logout() que ahora invalida el token en el servidor
                     Auth.logout().catch(err => console.error('Error en logout:', err));
                 }
             });
@@ -256,19 +436,26 @@
         window.isLoadingRestaurants = false;
 
         /**
-         * Cargar restaurantes desde la API
+         * Cargar restaurantes desde la API (usando ruta admin para obtener owner)
          */
         async function loadRestaurants(filters = {}) {
             try {
                 window.isLoadingRestaurants = true;
                 showLoadingState();
 
-                console.log('Cargando restaurantes desde API...');
-                const response = await RestaurantAPI.getAll(filters);
+                console.log('Cargando restaurantes desde API admin...');
+                // Usar la ruta admin que incluye información del owner
+                const token = await Auth.getToken();
+                const response = await fetch(`${CONFIG.API_URL}/admin/restaurants`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 
-                console.log('Respuesta recibida:', response);
+                const result = await response.json();
+                console.log('Respuesta recibida:', result);
                 
-                if (response.success) {
+                if (result.success) {
                     // Cargar favoritos del usuario
                     let userFavorites = [];
                     
@@ -295,52 +482,98 @@
                         }
                     }
                     
-                    // Verificar si tiene la estructura correcta
-                    if (response.data && response.data.restaurants) {
-                        console.log('Estructura correcta, mapeando datos...');
+                    // Verificar si tiene la estructura correcta (admin devuelve data.data)
+                    if (result.data && result.data.data) {
+                        console.log('Estructura admin correcta, mapeando datos...');
                         
                         // Mapear los datos de la API al formato que usa el frontend
-                        window.restaurants = response.data.restaurants.map(restaurant => ({
-                            id: restaurant.id,
-                            name: restaurant.name,
-                            category: restaurant.cuisine_type || 'Sin categoría',
-                            rating: restaurant.rating || restaurant.average_rating || 0,
-                            image: restaurant.image_url || 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=' + encodeURIComponent(restaurant.name),
-                            reviews: restaurant.total_reviews || 0,
-                            isFavorite: userFavorites.includes(restaurant.id),
-                            // Datos adicionales
-                            description: restaurant.description,
-                            address: restaurant.address,
-                            phone: restaurant.phone,
-                            price_range: restaurant.price_range,
-                            opening_hours: restaurant.opening_hours
-                        }));
+                        window.restaurants = result.data.data.map(restaurant => {
+                            let imageUrl = '../assets/img/restaurants/default/burger-1.jpg';
+                            if (restaurant.image_url) {
+                                if (restaurant.image_url.startsWith('http')) {
+                                    imageUrl = restaurant.image_url;
+                                } else {
+                                    // Construir URL completa: http://localhost:3000/uploads/...
+                                    const baseUrl = CONFIG.API_URL.replace('/api', '');
+                                    imageUrl = baseUrl + restaurant.image_url;
+                                }
+                            }
+                            
+                            return {
+                                id: restaurant.id,
+                                name: restaurant.name,
+                                category: restaurant.cuisine_type || 'Sin categoría',
+                                rating: restaurant.rating || restaurant.average_rating || 0,
+                                image: imageUrl,
+                                image_url: imageUrl,
+                                reviews: restaurant.total_reviews || 0,
+                                isFavorite: userFavorites.includes(restaurant.id),
+                                is_active: restaurant.is_active,
+                                // Datos del owner
+                                owner_first: restaurant.owner_first,
+                                owner_last: restaurant.owner_last,
+                                owner_email: restaurant.owner_email,
+                                owner_name: `${restaurant.owner_first || ''} ${restaurant.owner_last || ''}`.trim(),
+                                // Datos adicionales
+                                description: restaurant.description,
+                                address: restaurant.address,
+                                phone: restaurant.phone,
+                                price_range: restaurant.price_range,
+                                opening_hours: restaurant.opening_hours
+                            };
+                        });
 
                         console.log(`${window.restaurants.length} restaurantes cargados`);
                         console.log('Primer restaurante:', window.restaurants[0]);
+                        console.log('Imagen del primer restaurante:', window.restaurants[0]?.image);
 
-                        totalPages = Math.ceil(window.restaurants.length / itemsPerPage);
-                        currentPage = 1;
-                        renderRestaurants();
+                        // Limpiar contenedor antes de renderizar
+                        const container = document.getElementById('restaurants-list');
+                        if (container) {
+                            container.innerHTML = '';
+                        }
+
+                        // Renderizar usando la función de admin.js con el array correcto
+                        if (window.renderRestaurants) {
+                            console.log('Llamando a renderRestaurants con', window.restaurants.length, 'restaurantes');
+                            window.renderRestaurants(window.restaurants, true);
+                        } else {
+                            console.error('window.renderRestaurants no está disponible');
+                        }
                         hideLoadingState();
                     } else {
                         // Si la respuesta no tiene data.restaurants, intentar con la estructura alternativa
                         console.warn('Estructura alternativa detectada');
                         if (response.restaurants) {
-                            window.restaurants = response.restaurants.map(restaurant => ({
-                                id: restaurant.id,
-                                name: restaurant.name,
-                                category: restaurant.cuisine_type || 'Sin categoría',
-                                rating: restaurant.rating || restaurant.average_rating || 0,
-                                image: restaurant.image_url || 'https://via.placeholder.com/400x300/3D405B/FFFFFF?text=' + encodeURIComponent(restaurant.name),
-                                reviews: restaurant.total_reviews || 0,
-                                isFavorite: userFavorites.includes(restaurant.id)
-                            }));
+                            window.restaurants = response.restaurants.map(restaurant => {
+                                let imageUrl = '../assets/img/restaurants/default/burger-1.jpg';
+                                if (restaurant.image_url) {
+                                    if (restaurant.image_url.startsWith('http')) {
+                                        imageUrl = restaurant.image_url;
+                                    } else {
+                                        const baseUrl = CONFIG.API_URL.replace('/api', '');
+                                        imageUrl = baseUrl + restaurant.image_url;
+                                    }
+                                }
+                                
+                                return {
+                                    id: restaurant.id,
+                                    name: restaurant.name,
+                                    category: restaurant.cuisine_type || 'Sin categoría',
+                                    rating: restaurant.rating || restaurant.average_rating || 0,
+                                    image: imageUrl,
+                                    image_url: imageUrl,
+                                    reviews: restaurant.total_reviews || 0,
+                                    isFavorite: userFavorites.includes(restaurant.id)
+                                };
+                            });
                             
                             console.log(`${window.restaurants.length} restaurantes cargados (estructura alternativa)`);
-                            totalPages = Math.ceil(window.restaurants.length / itemsPerPage);
-                            currentPage = 1;
-                            renderRestaurants();
+                            
+                            // Renderizar usando la función de admin.js
+                            if (window.renderRestaurants) {
+                                window.renderRestaurants(window.restaurants, true);
+                            }
                             hideLoadingState();
                         } else {
                             throw new Error('Estructura de respuesta no reconocida');
@@ -362,7 +595,7 @@
          * Mostrar estado de carga
          */
         function showLoadingState() {
-            const grid = document.getElementById('restaurantsGrid');
+            const grid = document.getElementById('restaurants-list');
             if (grid) {
                 grid.innerHTML = `
                     <div class="col-span-full flex flex-col items-center justify-center py-12">
@@ -384,7 +617,7 @@
          * Mostrar mensaje de error
          */
         function showError(message) {
-            const grid = document.getElementById('restaurantsGrid');
+            const grid = document.getElementById('restaurants-list');
             if (grid) {
                 grid.innerHTML = `
                     <div class="col-span-full bg-red-50 border-2 border-red-200 rounded-lg p-6 text-center">
@@ -515,17 +748,7 @@
             window.location.href = `restaurant-detail.html?id=${id}`;
         }
 
-        function renderRestaurants() {
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const restaurantsToShow = window.restaurants.slice(startIndex, endIndex);
-            
-            // Usar el componente de cards
-            renderRestaurantCards(restaurantsToShow, 'restaurantsGrid');
-            
-            updatePaginationInfo();
-            updatePaginationButtons();
-        }
+
 
         function updatePaginationInfo() {
             const startIndex = (currentPage - 1) * itemsPerPage + 1;
@@ -619,6 +842,155 @@
             }
         });
 
+        // Toggle de paneles
+        function togglePanel(panelId) {
+            const panel = document.getElementById(panelId);
+            const isHidden = panel.style.display === 'none';
+            panel.style.display = isHidden ? 'block' : 'none';
+            
+            // Cambiar ícono de flecha
+            const button = panel.querySelector('button[onclick*="togglePanel"]');
+            const svg = button?.querySelector('svg path');
+            if (svg) {
+                if (isHidden) {
+                    svg.setAttribute('d', 'M5 15l7-7 7 7'); // Flecha hacia arriba
+                } else {
+                    svg.setAttribute('d', 'M19 9l-7 7-7-7'); // Flecha hacia abajo
+                }
+            }
+            
+            // Actualizar visibilidad del botón "Mostrar Todo"
+            updateShowAllButton();
+        }
+
+        // Actualizar visibilidad del botón "Mostrar Todo"
+        function updateShowAllButton() {
+            const usersPanel = document.getElementById('users-panel');
+            const statsPanel = document.getElementById('stats-panel');
+            const showAllBtn = document.getElementById('showAllBtn');
+            
+            // Mostrar botón si algún panel está oculto
+            const hasHiddenPanels = usersPanel.style.display === 'none' || statsPanel.style.display === 'none';
+            
+            if (hasHiddenPanels) {
+                showAllBtn.style.display = 'block';
+            } else {
+                showAllBtn.style.display = 'none';
+            }
+        }
+
+        // Mostrar todos los paneles
+        function showAllPanels() {
+            const panels = ['reports-panel', 'users-panel', 'stats-panel'];
+            panels.forEach(panelId => {
+                const panel = document.getElementById(panelId);
+                if (panel) {
+                    panel.style.display = 'block';
+                    // Actualizar flecha a "arriba"
+                    const svg = panel.querySelector('button[onclick*="togglePanel"] svg path');
+                    if (svg) svg.setAttribute('d', 'M5 15l7-7 7 7');
+                }
+            });
+            
+            // Ocultar el botón
+            updateShowAllButton();
+        }
+
+        // Cargar datos del dashboard
+        async function loadStats() {
+            try {
+                const res = await (window.fetchJSON ? await window.fetchJSON('/api/admin/stats') : fetch(CONFIG.API_URL + '/admin/stats', {
+                    headers: { 'Authorization': 'Bearer ' + await Auth.getToken() }
+                }).then(r => r.json()));
+                
+                console.log('Respuesta de stats:', res);
+                
+                if (res && res.data) {
+                    window.renderStats ? window.renderStats(res.data) : console.log('Stats:', res.data);
+                }
+            } catch (error) {
+                console.error('Error cargando stats:', error);
+            }
+        }
+
+        async function loadReports() {
+            try {
+                const res = await (window.fetchJSON ? await window.fetchJSON('/api/admin/reports?status=pendiente') : fetch(CONFIG.API_URL + '/admin/reports?status=pendiente', {
+                    headers: { 'Authorization': 'Bearer ' + await Auth.getToken() }
+                }).then(r => r.json()));
+                
+                console.log('Respuesta de reportes:', res);
+                
+                if (res && res.data) {
+                    const reportsList = res.data.data || res.data || [];
+                    window.renderReports ? window.renderReports(reportsList) : console.log('Reports:', reportsList);
+                }
+            } catch (error) {
+                console.error('Error cargando reportes:', error);
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                const res = await (window.fetchJSON ? await window.fetchJSON('/api/admin/users') : fetch(CONFIG.API_URL + '/admin/users', {
+                    headers: { 'Authorization': 'Bearer ' + await Auth.getToken() }
+                }).then(r => r.json()));
+                
+                console.log('Respuesta de usuarios:', res);
+                
+                if (res && res.success) {
+                    // La respuesta puede tener estructura: {success: true, data: {data: [...], count: N}}
+                    const usersList = res.data?.data || res.data || [];
+                    console.log('Lista de usuarios:', usersList);
+                    
+                    if (window.renderUsers) {
+                        window.renderUsers(usersList);
+                    } else {
+                        console.log('Users:', usersList);
+                        // Fallback: mostrar tabla básica
+                        const container = document.getElementById('users-list');
+                        if (container && usersList.length > 0) {
+                            container.innerHTML = `
+                                <table class="users-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Email</th>
+                                            <th>Rol</th>
+                                            <th>Strikes</th>
+                                            <th>Activo</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${usersList.map(u => `
+                                            <tr>
+                                                <td>${u.first_name} ${u.last_name}</td>
+                                                <td>${u.email}</td>
+                                                <td>${u.role}</td>
+                                                <td>${u.strikes || 0}</td>
+                                                <td>${u.is_active ? 'Sí' : 'No'}</td>
+                                                <td>
+                                                    <button class="btn btn-danger small">Ban</button>
+                                                    <button class="btn btn-success small">Desban</button>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            `;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error cargando usuarios:', error);
+                const container = document.getElementById('users-list');
+                if (container) {
+                    container.innerHTML = `<div class="text-red-500">Error al cargar usuarios: ${error.message}</div>`;
+                }
+            }
+        }
+
         // Inicializar el dashboard
         document.addEventListener('DOMContentLoaded', async function() {
             // Verificar autenticación primero
@@ -627,8 +999,54 @@
                 return;
             }
             
-            // Cargar restaurantes desde la API
-            await loadRestaurants();
+            // Esperar a que el header se cargue completamente
+            setTimeout(() => {
+                // Configurar menú de admin (modificar opciones)
+                console.log('Configurando menú de admin...');
+                console.log('configureAdminMenu disponible?', typeof configureAdminMenu);
+                
+                if (typeof configureAdminMenu === 'function') {
+                    configureAdminMenu();
+                } else {
+                    // Si no está disponible aún, configurar manualmente
+                    console.log('Configurando opciones manualmente...');
+                    const homeOption = document.getElementById('menuHomeOption');
+                    const favOption = document.getElementById('menuFavoritesOption');
+                    const adminOptions = document.querySelectorAll('.admin-only');
+                    const ownerOptions = document.querySelectorAll('.owner-only');
+                    
+                    if (homeOption) {
+                        // Cambiar a "Administrar"
+                        const span = homeOption.querySelector('span');
+                        if (span) span.textContent = 'Administrar';
+                        homeOption.href = 'dashboard-admin.html';
+                        homeOption.classList.remove('hidden');
+                        homeOption.classList.add('block');
+                        console.log('Inicio cambiado a Administrar');
+                    }
+                    if (favOption) {
+                        favOption.classList.add('hidden');
+                        console.log('Favoritos ocultado');
+                    }
+                    adminOptions.forEach(opt => {
+                        opt.classList.add('hidden');
+                        opt.classList.remove('block');
+                    });
+                    ownerOptions.forEach(opt => {
+                        opt.classList.add('hidden');
+                        opt.classList.remove('block');
+                    });
+                    console.log('Opciones admin/owner ocultadas');
+                }
+            }, 100);
+            
+            // Cargar todas las secciones
+            await Promise.all([
+                loadStats(),
+                loadReports(),
+                loadUsers(),
+                loadRestaurants()
+            ]);
         });
     </script>
  </body>

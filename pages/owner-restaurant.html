@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Restaurante - Buho Eats Owner</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="../libs/tailwind.js"></script>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3D405B',
+                        secondary: '#588B8B',
+                        success: '#06BB0C',
+                        danger: '#C11D0C',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../assets/css/main.css">
+    
+    <style>
+        body {
+            background-image: url('../assets/img/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.2);
+            z-index: -1;
+        }
+        
+        main {
+            padding-top: 120px !important;
+        }
+
+        .edit-icon {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .edit-icon:hover {
+            transform: scale(1.1);
+            color: #588B8B;
+        }
+
+        .modal {
+            display: none;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+    </style>
+</head>
+<body class="bg-gray-50" data-page="owner-restaurant">
+    
+    <!-- MODAL DE CONFIRMACIÓN -->
+    <div id="customDialog" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
+            <div class="p-6">
+                <h3 id="dialogTitle" class="text-2xl font-bold text-primary"></h3>
+            </div>
+            <div class="p-6">
+                <p id="dialogMessage" class="text-gray-600"></p>
+            </div>
+            <div class="p-6 flex gap-3">
+                <button 
+                    id="dialogCancelBtn" 
+                    class="flex-1 px-6 py-3 bg-danger text-white rounded-lg font-semibold hover:bg-danger/90 transition-all transform hover:scale-105"
+                    onclick="closeDialog(false)"
+                >
+                    Cancelar
+                </button>
+                <button 
+                    id="dialogConfirmBtn" 
+                    class="flex-1 px-6 py-3 bg-success text-white rounded-lg font-semibold hover:bg-success/90 transition-all transform hover:scale-105"
+                    onclick="closeDialog(true)"
+                >
+                    Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- HEADER -->
+    <div id="header-container"></div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="container mx-auto px-4 py-8">
+        
+        <!-- BANNER DEL RESTAURANTE CON EDICIÓN -->
+        <div class="relative bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+            <!-- Imagen del banner -->
+            <div class="relative h-80 bg-gray-200">
+                <img id="restaurantBanner" src="../assets/img/restaurants/default/italian-1.jpg" alt="Restaurante" class="w-full h-full object-cover">
+                
+                <!-- Botón de editar foto -->
+                <button onclick="openPhotoModal()" class="absolute top-4 right-4 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg transition">
+                    <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Información básica -->
+            <div class="p-8">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                            <h1 id="restaurantName" class="text-4xl font-bold text-primary">Cargando...</h1>
+                            <button onclick="openEditInfoModal()" class="edit-icon text-gray-400 hover:text-secondary">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4 text-gray-600 mb-4">
+                            <div class="flex items-center">
+                                <span class="text-yellow-400 mr-1">⭐</span>
+                                <span class="font-semibold text-gray-800" id="restaurantRating">0.0</span>
+                                <span class="ml-1">(<span id="totalReviews">0</span> reseñas)</span>
+                            </div>
+                            <span>•</span>
+                            <span id="restaurantCategory">Sin categoría</span>
+                        </div>
+                        
+                        <p id="restaurantDescription" class="text-gray-700 mb-4">
+                            Sin descripción
+                        </p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-5 h-5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span id="restaurantAddress">Sin dirección</span>
+                            </div>
+                            
+                            <div class="flex items-center gap-2">
+                                <svg class="w-5 h-5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                </svg>
+                                <span id="restaurantPhone">Sin teléfono</span>
+                            </div>
+                            
+                            <div class="flex items-center gap-2">
+                                <svg class="w-5 h-5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                <span id="restaurantEmail">Sin email</span>
+                            </div>
+                            
+                            <div class="flex items-center gap-2">
+                                <svg class="w-5 h-5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span id="restaurantHours">Sin horarios</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MENÚ DEL RESTAURANTE -->
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-primary">Menú</h2>
+                <button onclick="openAddMenuItemModal()" class="bg-secondary text-white px-6 py-3 rounded-lg hover:bg-secondary/90 transition flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Agregar Platillo
+                </button>
+            </div>
+
+            <!-- Categorías del menú -->
+            <div id="menuContainer">
+                <p class="text-gray-500 text-center py-8">Cargando menú...</p>
+            </div>
+        </div>
+
+        <!-- RESEÑAS -->
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <h2 class="text-3xl font-bold text-primary mb-6">Reseñas de Clientes</h2>
+            
+            <div id="reviewsContainer">
+                <p class="text-gray-500 text-center py-8">Cargando reseñas...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL: EDITAR INFORMACIÓN -->
+    <div id="editInfoModal" class="modal fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b">
+                <h3 class="text-2xl font-bold text-primary">Editar Información del Restaurante</h3>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+                    <input type="text" id="editName" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-secondary">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+                    <textarea id="editDescription" rows="4" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-secondary"></textarea>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Cocina</label>
+                    <input type="text" id="editCuisineType" placeholder="Ej: Italiana" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-secondary">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Dirección</label>
+                    <input type="text" id="editAddress" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-secondary">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+                        <input type="tel" id="editPhone" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-secondary">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" id="editEmail" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-secondary">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Horarios</label>
+                    <input type="text" id="editHours" placeholder="Ej: Lun-Vie: 9am-10pm, Sáb-Dom: 10am-11pm" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-secondary">
+                </div>
+            </div>
+            
+            <div class="p-6 border-t flex gap-3">
+                <button onclick="closeEditInfoModal()" class="flex-1 px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition">
+                    Cancelar
+                </button>
+                <button onclick="saveRestaurantInfo()" class="flex-1 px-6 py-3 bg-success text-white rounded-lg hover:bg-success/90 transition">
+                    Guardar Cambios
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CAMBIAR FOTO -->
+    <div id="photoModal" class="modal fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4">
+            <div class="p-6 border-b">
+                <h3 class="text-2xl font-bold text-primary">Cambiar Foto del Restaurante</h3>
+            </div>
+            
+            <div class="p-6">
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                    <input type="file" id="photoInput" accept="image/*" class="hidden" onchange="previewPhoto(event)">
+                    <label for="photoInput" class="cursor-pointer">
+                        <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <p class="text-gray-600">Haz clic para seleccionar una imagen</p>
+                        <p class="text-sm text-gray-400 mt-2">JPG, PNG, WEBP (Max 5MB)</p>
+                    </label>
+                </div>
+                
+                <div id="photoPreview" class="mt-4 hidden">
+                    <img id="photoPreviewImg" src="" alt="Preview" class="w-full h-48 object-cover rounded-lg">
+                </div>
+            </div>
+            
+            <div class="p-6 border-t flex gap-3">
+                <button onclick="closePhotoModal()" class="flex-1 px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition">
+                    Cancelar
+                </button>
+                <button onclick="uploadPhoto()" class="flex-1 px-6 py-3 bg-success text-white rounded-lg hover:bg-success/90 transition">
+                    Subir Foto
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: AGREGAR/EDITAR PLATILLO -->
+    <div id="menuItemModal" class="modal fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4">
+            <div class="p-6 border-b">
+                <h3 id="menuItemModalTitle" class="text-2xl font-bold text-primary">Agregar Platillo</h3>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <input type="hidden" id="menuItemId">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nombre del Platillo</label>
+                    <input type="text" id="menuItemName" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-secondary">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+                    <textarea id="menuItemDescription" rows="3" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-secondary"></textarea>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Precio ($)</label>
+                        <input type="number" id="menuItemPrice" step="0.01" min="0" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-secondary">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
+                        <select id="menuItemCategory" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-secondary">
+                            <option value="Entrada">Entrada</option>
+                            <option value="Plato Principal">Plato Principal</option>
+                            <option value="Postre">Postre</option>
+                            <option value="Bebida">Bebida</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Imagen del Platillo</label>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                        <input type="file" id="menuItemImage" accept="image/*" class="hidden" onchange="previewMenuItemPhoto(event)">
+                        <label for="menuItemImage" class="cursor-pointer block text-center">
+                            <svg class="w-12 h-12 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <p class="text-sm text-gray-600">Haz clic para seleccionar imagen</p>
+                        </label>
+                    </div>
+                    <div id="menuItemImagePreview" class="mt-2 hidden">
+                        <img id="menuItemImagePreviewImg" src="" alt="Preview" class="w-full h-32 object-cover rounded-lg">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-6 border-t flex gap-3">
+                <button onclick="closeMenuItemModal()" class="flex-1 px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition">
+                    Cancelar
+                </button>
+                <button onclick="saveMenuItem()" class="flex-1 px-6 py-3 bg-success text-white rounded-lg hover:bg-success/90 transition">
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CONFIRMACIÓN GENÉRICA -->
+    <div id="confirmModal" class="modal fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4">
+            <div class="p-6 border-b">
+                <h3 id="confirmTitle" class="text-2xl font-bold text-primary">Confirmar</h3>
+            </div>
+            
+            <div class="p-6">
+                <p id="confirmMessage" class="text-gray-700"></p>
+            </div>
+            
+            <div class="p-6 border-t flex gap-3">
+                <button onclick="closeConfirmModal(false)" class="flex-1 px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition">
+                    Cancelar
+                </button>
+                <button onclick="closeConfirmModal(true)" class="flex-1 px-6 py-3 bg-danger text-white rounded-lg hover:bg-danger/90 transition">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: REPORTAR RESEÑA -->
+    <div id="reportModal" class="modal fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4">
+            <div class="p-6 border-b">
+                <h3 class="text-2xl font-bold text-primary">Reportar Reseña</h3>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <p class="text-gray-700 mb-4">¿Por qué reportas esta reseña?</p>
+                
+                <div class="space-y-2">
+                    <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                        <input type="radio" name="reportReason" value="spam" class="w-5 h-5 text-danger">
+                        <span>Spam o publicidad</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                        <input type="radio" name="reportReason" value="ofensivo" class="w-5 h-5 text-danger">
+                        <span>Contenido ofensivo</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                        <input type="radio" name="reportReason" value="falso" class="w-5 h-5 text-danger">
+                        <span>Información falsa</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                        <input type="radio" name="reportReason" value="otro" class="w-5 h-5 text-danger" checked>
+                        <span>Otro motivo</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="p-6 border-t flex gap-3">
+                <button onclick="closeReportModal(false)" class="flex-1 px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition">
+                    Cancelar
+                </button>
+                <button onclick="closeReportModal(true)" class="flex-1 px-6 py-3 bg-danger text-white rounded-lg hover:bg-danger/90 transition">
+                    Reportar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/utils.js"></script>
+    <script src="../assets/js/dialog.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/header.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/owner-restaurant.js"></script>
+</body>
+</html>
