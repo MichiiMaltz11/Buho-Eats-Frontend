@@ -251,7 +251,7 @@ function configureAdminMenu() {
         }
         
         // Cambiar URL al dashboard-admin
-        homeOption.href = 'dashboard-admin.html';
+        homeOption.href = 'dashboard-admin';
         
         // Asegurar que sea visible
         homeOption.classList.remove("hidden");

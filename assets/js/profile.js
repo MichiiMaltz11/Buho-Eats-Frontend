@@ -363,7 +363,7 @@ async function uploadProfilePhoto(base64Image) {
         }
 
         // 2. Actualizar URL de la foto en el perfil del usuario
-        const fullPhotoUrl = `${CONFIG.SERVER_URL}${uploadResult.data.url}`;
+        // Usar solo la URL relativa (el backend la convertirá a absoluta cuando la devuelva)
         const profileResponse = await fetch(`${apiUrl}/users/photo`, {
             method: 'PUT',
             headers: {
@@ -371,7 +371,7 @@ async function uploadProfilePhoto(base64Image) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ 
-                profilePhoto: fullPhotoUrl
+                profilePhoto: uploadResult.data.url
             })
         });
 
@@ -387,7 +387,7 @@ async function uploadProfilePhoto(base64Image) {
         // Actualizar la foto en el header si existe
         const headerPhoto = document.querySelector('.user-avatar, [alt="User avatar"]');
         if (headerPhoto) {
-            headerPhoto.src = fullPhotoUrl;
+            headerPhoto.src = uploadResult.data.url;
         }
 
     } catch (error) {

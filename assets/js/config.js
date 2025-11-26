@@ -4,10 +4,10 @@
 const CONFIG = {
 
     /** URL del backend */
-    API_URL: "http://localhost:3000/api",
+    API_URL: "/api",
 
     /** URL base del servidor (para imágenes y archivos) */
-    SERVER_URL: "http://localhost:3000",
+    SERVER_URL: "",
 
     /** Endpoints principales */
     ENDPOINTS: {

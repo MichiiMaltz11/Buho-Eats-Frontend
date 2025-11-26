@@ -286,13 +286,13 @@ const Auth = {
         const role = this.getUserRole();
         switch (role) {
             case 'admin':
-                window.location.href = '../pages/dashboard-admin.html';
+                window.location.href = '../pages/dashboard-admin';
                 break;
             case 'owner':
-                window.location.href = '../pages/owner-restaurant.html';
+                window.location.href = '../pages/owner-restaurant';
                 break;
             default:
-                window.location.href = '../pages/dashboard-user.html';
+                window.location.href = '../pages/dashboard-user';
         }
     },
 };
